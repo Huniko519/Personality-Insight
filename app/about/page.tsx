@@ -15,7 +15,7 @@ export default function AboutPage() {
           <div className="relative rounded-2xl overflow-hidden mb-16">
             <div className="absolute inset-0 bg-rose-900 opacity-70"></div>
             <img
-              src="/placeholder.svg?height=600&width=1200"
+              src="/thinking-feeling-classrooms.png"
               alt="Team collaboration"
               className="w-full h-64 md:h-96 object-cover"
             />
@@ -51,7 +51,7 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="rounded-xl overflow-hidden shadow-lg">
-                <img src="/placeholder.svg?height=500&width=600" alt="Our team" className="w-full h-auto" />
+                <img src="/thinking-feeling-classrooms.png" alt="Our team" className="w-full h-auto" />
               </div>
             </div>
           </div>
@@ -176,31 +176,31 @@ export default function AboutPage() {
                 {
                   name: "Dr. Sarah Johnson",
                   role: "Founder & Chief Psychologist",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image: "/thinking-feeling-classrooms.png",
                   type: "INFJ",
                 },
                 {
                   name: "Michael Chen",
                   role: "Lead Data Scientist",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image: "/thinking-feeling-classrooms.png",
                   type: "INTP",
                 },
                 {
                   name: "Emma Rodriguez",
                   role: "UX/UI Designer",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image: "/thinking-feeling-classrooms.png",
                   type: "ENFP",
                 },
                 {
                   name: "James Wilson",
                   role: "Content Director",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image: "/thinking-feeling-classrooms.png",
                   type: "ENTJ",
                 },
               ].map((member) => (
                 <div key={member.name} className="bg-white rounded-xl shadow-md overflow-hidden">
                   <img
-                    src={member.image || "/placeholder.svg"}
+                    src={member.image || "/thinking-feeling-classrooms.png"}
                     alt={member.name}
                     className="w-full h-64 object-cover"
                   />

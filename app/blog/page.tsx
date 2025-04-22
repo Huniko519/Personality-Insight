@@ -55,7 +55,7 @@ export default async function BlogPage() {
               <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="bg-rose-200 h-64 md:h-auto">
                   <img
-                    src={featuredPost.image || "/placeholder.svg?height=600&width=800"}
+                    src={featuredPost.image || "/thinking-feeling-classrooms.png"}
                     alt={featuredPost.title}
                     className="w-full h-full object-cover"
                   />
@@ -90,7 +90,7 @@ export default async function BlogPage() {
             {regularPosts.map((post) => (
               <Card key={post.id} className="border-rose-200 shadow-md hover:shadow-lg transition-shadow">
                 <div className="h-48 overflow-hidden">
-                  <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover" />
+                  <img src={post.image || "/thinking-feeling-classrooms.png"} alt={post.title} className="w-full h-full object-cover" />
                 </div>
                 <CardHeader className="pb-2">
                   <div className="flex items-center text-sm text-rose-600 mb-1">

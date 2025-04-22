@@ -8,7 +8,7 @@
       "author": "Dr. Sarah Johnson",
       "readTime": "8 min read",
       "category": "Psychology",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     },
     {
       "id": "introverts-extraverts",
@@ -18,7 +18,7 @@
       "author": "Michael Chen",
       "readTime": "6 min read",
       "category": "Personality Insights",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     },
     {
       "id": "four-dimensions",
@@ -28,7 +28,7 @@
       "author": "Dr. Robert Miller",
       "readTime": "15 min read",
       "category": "Psychology",
-      "image": "/placeholder.svg?height=600&width=1200",
+      "image": "/vibrant-brainstorm.png",
       "featured": true
     },
     {
@@ -39,7 +39,7 @@
       "author": "Emma Rodriguez",
       "readTime": "10 min read",
       "category": "Career Development",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     },
     {
       "id": "relationships-compatibility",
@@ -49,7 +49,7 @@
       "author": "Dr. James Wilson",
       "readTime": "9 min read",
       "category": "Relationships",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     },
     {
       "id": "cognitive-functions",
@@ -59,7 +59,7 @@
       "author": "Dr. Sarah Johnson",
       "readTime": "12 min read",
       "category": "Psychology",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     },
     {
       "id": "personal-growth",
@@ -69,7 +69,7 @@
       "author": "Alex Thompson",
       "readTime": "7 min read",
       "category": "Self-Improvement",
-      "image": "/placeholder.svg?height=400&width=600"
+      "image": "/personal-growth-journey.jpg"
     }
   ]
 }

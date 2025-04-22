@@ -104,7 +104,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
           {/* Featured Image */}
           <div className="mb-8 rounded-xl overflow-hidden shadow-md">
-            <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-auto" />
+            <img src={post.image || "/thinking-feeling-classrooms.png"} alt={post.title} className="w-full h-auto" />
           </div>
 
           {/* Article Content */}
@@ -150,7 +150,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             <div className="flex flex-col sm:flex-row items-center sm:items-start">
               <div className="w-20 h-20 rounded-full overflow-hidden mb-4 sm:mb-0 sm:mr-6 flex-shrink-0">
                 <img
-                  src={post.authorImage || "/placeholder.svg"}
+                  src={post.authorImage || "/thinking-feeling-classrooms.png"}
                   alt={post.author}
                   className="w-full h-full object-cover"
                 />
@@ -171,7 +171,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   <Card key={relatedPost.id} className="border-rose-200 shadow-md hover:shadow-lg transition-shadow">
                     <div className="h-40 overflow-hidden">
                       <img
-                        src={relatedPost.image || "/placeholder.svg"}
+                        src={relatedPost.image || "/thinking-feeling-classrooms.png"}
                         alt={relatedPost.title}
                         className="w-full h-full object-cover"
                       />

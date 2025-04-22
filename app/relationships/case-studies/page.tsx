@@ -13,9 +13,8 @@ export default function CaseStudiesPage() {
       <Header />
       <main className="min-h-screen bg-gradient-to-b from-rose-50 to-white">
         <div className="relative h-64 md:h-80 lg:h-96 w-full mb-12 overflow-hidden">
-          {/* Use a placeholder if case-study-header.jpg doesn't exist */}
           <Image
-            src="/relationship-roundtable.png"
+            src="/case-study-header.jpg"
             alt="Personality relationships case studies"
             fill
             className="object-cover"
@@ -56,7 +55,7 @@ export default function CaseStudiesPage() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={study.image || "/placeholder.svg?height=400&width=600&query=personality relationship"}
+                    src={study.image || "/vibrant-student-hub.png"}
                     alt={study.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
