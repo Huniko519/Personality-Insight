@@ -1,3 +1,7 @@
+import LoadingBar from "@/components/loading"
+
 export default function Loading() {
-  return null
+  return (
+    <LoadingBar />
+  )
 }

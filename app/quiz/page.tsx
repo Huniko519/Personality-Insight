@@ -121,7 +121,7 @@ export default function QuizPage() {
                   <CardTitle className="text-xl text-rose-800">{question.text}</CardTitle>
                   <div className="flex items-center mt-2">
                     <TooltipProvider>
-                      <Tooltip>
+                      <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <div className="flex cursor-help">{renderWeightIndicator(question.weight)}</div>
                         </TooltipTrigger>
@@ -139,7 +139,7 @@ export default function QuizPage() {
 
                     {question.subtype && (
                       <TooltipProvider>
-                        <Tooltip>
+                        <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
                             <div className="ml-2 cursor-help">
                               <HelpCircle className="h-4 w-4 text-rose-400" />
@@ -162,6 +162,7 @@ export default function QuizPage() {
               <RadioGroup
                 value={selectedOption !== null ? selectedOption.toString() : undefined}
                 onValueChange={(value) => setSelectedOption(Number.parseInt(value))}
+                defaultValue={null}
               >
                 {question.options.map((option: string, index: number) => (
                   <div key={index} className="flex items-center space-x-2 mb-4 p-3 rounded-md hover:bg-rose-50">
