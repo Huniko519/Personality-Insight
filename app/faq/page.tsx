@@ -5,7 +5,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Search, HelpCircle, BookOpen, Briefcase, Users, Brain, Mail } from "lucide-react"
@@ -274,45 +273,47 @@ export default function FAQPage() {
             </div>
           ) : (
             // Tabbed FAQ Categories
-            <div>
-              <Tabs defaultValue={activeCategory} onValueChange={setActiveCategory} className="mb-12">
-                <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                  <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                    {faqCategories.map((category) => (
-                      <TabsTrigger
-                        key={category.id}
-                        value={category.id}
-                        className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-800 flex items-center justify-center"
-                      >
-                        <category.icon className="h-4 w-4 mr-2" />
-                        <span>{category.name}</span>
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
+            <div className="mb-12">
+              <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                  {faqCategories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => setActiveCategory(category.id)}
+                      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                        activeCategory === category.id
+                          ? "bg-rose-100 text-rose-800 shadow-sm"
+                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                      }`}
+                    >
+                      <category.icon className="h-4 w-4 mr-2" />
+                      <span>{category.name}</span>
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                {faqCategories.map((category) => (
-                  <TabsContent key={category.id} value={category.id}>
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                      <div className="flex items-center mb-6">
-                        <category.icon className="h-8 w-8 text-rose-600 mr-3" />
-                        <h2 className="text-2xl font-semibold text-rose-800">{category.name}</h2>
-                      </div>
-
-                      <Accordion type="single" collapsible className="border-rose-200">
-                        {category.questions.map((faq, index) => (
-                          <AccordionItem key={index} value={`item-${index}`} className="border-b border-rose-100">
-                            <AccordionTrigger className="text-rose-800 hover:text-rose-600 py-4">
-                              <div className="text-left">{faq.question}</div>
-                            </AccordionTrigger>
-                            <AccordionContent className="text-rose-700 py-4 px-2">{faq.answer}</AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
+              {faqCategories.map((category) => (
+                <div key={category.id} className={activeCategory === category.id ? "block" : "hidden"}>
+                  <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="flex items-center mb-6">
+                      <category.icon className="h-8 w-8 text-rose-600 mr-3" />
+                      <h2 className="text-2xl font-semibold text-rose-800">{category.name}</h2>
                     </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
+
+                    <Accordion type="single" collapsible className="border-rose-200">
+                      {category.questions.map((faq, index) => (
+                        <AccordionItem key={index} value={`item-${index}`} className="border-b border-rose-100">
+                          <AccordionTrigger className="text-rose-800 hover:text-rose-600 py-4">
+                            <div className="text-left">{faq.question}</div>
+                          </AccordionTrigger>
+                          <AccordionContent className="text-rose-700 py-4 px-2">{faq.answer}</AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

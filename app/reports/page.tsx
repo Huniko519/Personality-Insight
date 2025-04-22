@@ -19,12 +19,15 @@ import html2canvas from "html2canvas"
 export default function ReportsPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<string>("")
+  // Update the sections state to include portrait section
   const [sections, setSections] = useState({
     overview: true,
+    portrait: true,
     strengths: true,
     weaknesses: true,
     careers: true,
     relationships: true,
+    growth: true,
     development: true,
     cognitive: true,
   })
@@ -154,6 +157,7 @@ export default function ReportsPage() {
 
                 <div>
                   <h3 className="text-rose-800 font-medium mb-3">Report Sections</h3>
+                  {/* Update the sections checkboxes to include portrait section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -163,6 +167,16 @@ export default function ReportsPage() {
                       />
                       <Label htmlFor="overview" className="text-rose-700">
                         Type Overview
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="portrait"
+                        checked={sections.portrait}
+                        onCheckedChange={() => handleSectionToggle("portrait")}
+                      />
+                      <Label htmlFor="portrait" className="text-rose-700">
+                        Personality Portrait
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -207,12 +221,22 @@ export default function ReportsPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
+                        id="growth"
+                        checked={sections.growth}
+                        onCheckedChange={() => handleSectionToggle("growth")}
+                      />
+                      <Label htmlFor="growth" className="text-rose-700">
+                        Personal Growth
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
                         id="development"
                         checked={sections.development}
                         onCheckedChange={() => handleSectionToggle("development")}
                       />
                       <Label htmlFor="development" className="text-rose-700">
-                        Personal Development
+                        Development Tips
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -327,6 +351,50 @@ export default function ReportsPage() {
                   </section>
                 )}
 
+                {/* Add portrait section to the generated report */}
+                {sections.portrait && personalityTypes[selectedType]?.portraitDescription && (
+                  <section className="mb-8">
+                    <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
+                      Personality Portrait
+                    </h3>
+
+                    <div className="mb-6">
+                      <p className="text-rose-700 mb-4">{personalityTypes[selectedType]?.portraitDescription}</p>
+                    </div>
+
+                    {personalityTypes[selectedType]?.poeticDescription && (
+                      <div className="bg-rose-50 p-5 rounded-lg mb-6 italic text-rose-700 border-l-4 border-rose-300">
+                        <p className="whitespace-pre-line">{personalityTypes[selectedType]?.poeticDescription}</p>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.detailedDescription && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-2">Detailed Description</h4>
+                        <p className="text-rose-700 mb-4 whitespace-pre-line">
+                          {personalityTypes[selectedType]?.detailedDescription}
+                        </p>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.stressResponse && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-2">Response to Stress</h4>
+                        <p className="text-rose-700 mb-4">{personalityTypes[selectedType]?.stressResponse}</p>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.naturalAbilities && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-2">Natural Abilities</h4>
+                        <p className="text-rose-700 mb-4 whitespace-pre-line">
+                          {personalityTypes[selectedType]?.naturalAbilities}
+                        </p>
+                      </div>
+                    )}
+                  </section>
+                )}
+
                 {sections.strengths && (
                   <section className="mb-8">
                     <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
@@ -359,16 +427,120 @@ export default function ReportsPage() {
                   </section>
                 )}
 
+                {/* Update careers section with more detailed information */}
                 {sections.careers && (
                   <section className="mb-8">
                     <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
                       Career Recommendations
                     </h3>
+
+                    {personalityTypes[selectedType]?.careerTraits && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-3">Career-Related Traits</h4>
+                        <ul className="space-y-2">
+                          {personalityTypes[selectedType]?.careerTraits.map((trait, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-check"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-rose-700">{trait}</p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.careerEnvironment && (
+                      <div className="mb-6 bg-rose-50 p-5 rounded-lg">
+                        <h4 className="font-semibold text-rose-800 mb-2">Ideal Work Environment</h4>
+                        <p className="text-rose-700">{personalityTypes[selectedType]?.careerEnvironment}</p>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.careerStrengths && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-3">Career Strengths</h4>
+                        <ul className="space-y-2">
+                          {personalityTypes[selectedType]?.careerStrengths.map((strength, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-check"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-rose-700">{strength}</p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.careerChallenges && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-rose-800 mb-3">Career Challenges</h4>
+                        <ul className="space-y-2">
+                          {personalityTypes[selectedType]?.careerChallenges.map((challenge, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-alert-triangle"
+                                >
+                                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                  <line x1="12" y1="9" x2="12" y2="13" />
+                                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-rose-700">{challenge}</p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     <p className="text-rose-700 mb-4">
                       Based on your personality type, these career paths may align well with your natural strengths and
                       preferences:
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {personalityTypes[selectedType]?.careers.map((career, index) => (
                         <div key={index} className="bg-rose-50 p-3 rounded-md">
                           <p className="text-rose-700">{career}</p>
@@ -387,6 +559,7 @@ export default function ReportsPage() {
                   </section>
                 )}
 
+                {/* Update relationships section with more detailed information */}
                 {sections.relationships && (
                   <section className="mb-8">
                     <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
@@ -394,8 +567,13 @@ export default function ReportsPage() {
                     </h3>
 
                     <div className="mb-4">
-                      <h4 className="font-semibold text-rose-800 mb-2">Communication Style</h4>
-                      <p className="text-rose-700">{personalityTypes[selectedType]?.relationships.communication}</p>
+                      <h4 className="font-semibold text-rose-800 mb-2">As Lovers and Partners</h4>
+                      {personalityTypes[selectedType]?.relationships.loveQuote && (
+                        <div className="bg-rose-50 p-4 rounded-lg mb-4 italic text-rose-700 border-l-4 border-rose-300">
+                          <p>{personalityTypes[selectedType]?.relationships.loveQuote}</p>
+                        </div>
+                      )}
+                      <p className="text-rose-700">{personalityTypes[selectedType]?.relationships.asPartners}</p>
                     </div>
 
                     <div className="mb-4">
@@ -404,9 +582,81 @@ export default function ReportsPage() {
                     </div>
 
                     <div className="mb-4">
-                      <h4 className="font-semibold text-rose-800 mb-2">As Partners</h4>
-                      <p className="text-rose-700">{personalityTypes[selectedType]?.relationships.asPartners}</p>
+                      <h4 className="font-semibold text-rose-800 mb-2">Communication Style</h4>
+                      <p className="text-rose-700">{personalityTypes[selectedType]?.relationships.communication}</p>
                     </div>
+
+                    {personalityTypes[selectedType]?.asParents && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-rose-800 mb-2">As Parents</h4>
+                        {personalityTypes[selectedType]?.relationships.parentQuote && (
+                          <div className="bg-rose-50 p-4 rounded-lg mb-4 italic text-rose-700 border-l-4 border-rose-300">
+                            <p>{personalityTypes[selectedType]?.relationships.parentQuote}</p>
+                          </div>
+                        )}
+                        <p className="text-rose-700 whitespace-pre-line">{personalityTypes[selectedType]?.asParents}</p>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.relationshipStrengths && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-rose-800 mb-2">Relationship Strengths</h4>
+                        <ul className="space-y-2">
+                          {personalityTypes[selectedType]?.relationshipStrengths.map((strength, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-check"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              </div>
+                              <p className="text-rose-700">{strength}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {personalityTypes[selectedType]?.relationshipWeaknesses && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-rose-800 mb-2">Relationship Challenges</h4>
+                        <ul className="space-y-2">
+                          {personalityTypes[selectedType]?.relationshipWeaknesses.map((weakness, index) => (
+                            <li key={index} className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-alert-triangle"
+                                >
+                                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                  <line x1="12" y1="9" x2="12" y2="13" />
+                                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                              </div>
+                              <p className="text-rose-700">{weakness}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <div className="bg-rose-50 p-4 rounded-md">
@@ -436,10 +686,247 @@ export default function ReportsPage() {
                   </section>
                 )}
 
+                {/* Add growth section */}
+                {sections.growth && (
+                  <section className="mb-8">
+                    <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
+                      Personal Growth
+                    </h3>
+
+                    {personalityTypes[selectedType]?.personalGrowth ? (
+                      <div className="space-y-6">
+                        {personalityTypes[selectedType]?.personalGrowth.meaningOfSuccess && (
+                          <div className="mb-6">
+                            <h4 className="font-semibold text-rose-800 mb-2">What Success Means to {selectedType}</h4>
+                            <p className="text-rose-700 mb-4 whitespace-pre-line">
+                              {personalityTypes[selectedType]?.personalGrowth.meaningOfSuccess}
+                            </p>
+                          </div>
+                        )}
+
+                        {personalityTypes[selectedType]?.personalGrowth.strengths &&
+                          personalityTypes[selectedType]?.personalGrowth.strengths.length > 0 && (
+                            <div className="mb-6">
+                              <h4 className="font-semibold text-rose-800 mb-3">Growth Strengths</h4>
+                              <ul className="space-y-2">
+                                {personalityTypes[selectedType]?.personalGrowth.strengths.map((strength, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <div className="mr-3 mt-1 text-rose-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="lucide lucide-check"
+                                      >
+                                        <polyline points="20 6 9 17 4 12" />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <p className="text-rose-700">{strength}</p>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                        {personalityTypes[selectedType]?.personalGrowth.problemAreas &&
+                          personalityTypes[selectedType]?.personalGrowth.problemAreas.length > 0 && (
+                            <div className="mb-6">
+                              <h4 className="font-semibold text-rose-800 mb-3">Potential Problem Areas</h4>
+                              <ul className="space-y-2">
+                                {personalityTypes[selectedType]?.personalGrowth.problemAreas.map((problem, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <div className="mr-3 mt-1 text-rose-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="lucide lucide-alert-triangle"
+                                      >
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                        <line x1="12" y1="9" x2="12" y2="13" />
+                                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <p className="text-rose-700">{problem}</p>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                        {personalityTypes[selectedType]?.personalGrowth.solutions &&
+                          personalityTypes[selectedType]?.personalGrowth.solutions.length > 0 && (
+                            <div className="mb-6">
+                              <h4 className="font-semibold text-rose-800 mb-3">Growth Opportunities</h4>
+                              <ul className="space-y-2">
+                                {personalityTypes[selectedType]?.personalGrowth.solutions.map((solution, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <div className="mr-3 mt-1 text-rose-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="lucide lucide-lightbulb"
+                                      >
+                                        <line x1="9" y1="18" x2="15" y2="18" />
+                                        <line x1="10" y1="22" x2="14" y2="22" />
+                                        <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8A6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <p className="text-rose-700">{solution}</p>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                        {personalityTypes[selectedType]?.personalGrowth.rulesForSuccess &&
+                          personalityTypes[selectedType]?.personalGrowth.rulesForSuccess.length > 0 && (
+                            <div className="mb-6">
+                              <h4 className="font-semibold text-rose-800 mb-3">Rules for Success</h4>
+                              <ul className="space-y-2">
+                                {personalityTypes[selectedType]?.personalGrowth.rulesForSuccess.map((rule, index) => (
+                                  <li key={index} className="flex items-start">
+                                    <div className="mr-3 mt-1 text-rose-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="lucide lucide-star"
+                                      >
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <p className="text-rose-700">{rule}</p>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                      </div>
+                    ) : (
+                      <div className="bg-rose-50 p-5 rounded-lg mb-6">
+                        <p className="text-rose-700">
+                          Growth information for {selectedType}s is currently being developed. Check back soon for
+                          personalized growth strategies and development paths tailored to the {selectedType}{" "}
+                          personality type.
+                        </p>
+                        <div className="mt-4">
+                          <h4 className="font-semibold text-rose-800 mb-2">General Growth Tips for {selectedType}s:</h4>
+                          <ul className="space-y-2 mt-3">
+                            <li className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-lightbulb"
+                                >
+                                  <line x1="9" y1="18" x2="15" y2="18" />
+                                  <line x1="10" y1="22" x2="14" y2="22" />
+                                  <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8A6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                                </svg>
+                              </div>
+                              <p className="text-rose-700">
+                                Recognize and leverage your natural strengths while being mindful of potential blind
+                                spots.
+                              </p>
+                            </li>
+                            <li className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-lightbulb"
+                                >
+                                  <line x1="9" y1="18" x2="15" y2="18" />
+                                  <line x1="10" y1="22" x2="14" y2="22" />
+                                  <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8A6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                                </svg>
+                              </div>
+                              <p className="text-rose-700">
+                                Seek balance by developing your less dominant cognitive functions.
+                              </p>
+                            </li>
+                            <li className="flex items-start">
+                              <div className="mr-3 mt-1 text-rose-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-lightbulb"
+                                >
+                                  <line x1="9" y1="18" x2="15" y2="18" />
+                                  <line x1="10" y1="22" x2="14" y2="22" />
+                                  <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8A6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                                </svg>
+                              </div>
+                              <p className="text-rose-700">
+                                Practice self-awareness and reflection to better understand your patterns and triggers.
+                              </p>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                )}
+
                 {sections.development && (
                   <section className="mb-8">
                     <h3 className="text-xl font-semibold text-rose-800 mb-4 border-b border-rose-100 pb-2">
-                      Personal Development
+                      Development Tips
                     </h3>
 
                     <p className="text-rose-700 mb-4">

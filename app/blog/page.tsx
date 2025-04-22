@@ -1,81 +1,42 @@
 import Link from "next/link"
+import { promises as fs } from "fs"
+import path from "path"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { CalendarDays, User, Clock, ArrowRight } from "lucide-react"
 
-// Sample blog posts data
-const blogPosts = [
-  {
-    id: "understanding-mbti",
-    title: "Understanding MBTI: The Science Behind Personality Types",
-    excerpt:
-      "Explore the history and scientific foundations of the Myers-Briggs Type Indicator and how it helps us understand human personality.",
-    date: "April 15, 2023",
-    author: "Dr. Sarah Johnson",
-    readTime: "8 min read",
-    category: "Psychology",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: "introverts-extraverts",
-    title: "Introverts vs. Extraverts: Understanding the Energy Dimension",
-    excerpt:
-      "Dive deep into the first dimension of personality type and discover how it shapes our social interactions and energy needs.",
-    date: "May 2, 2023",
-    author: "Michael Chen",
-    readTime: "6 min read",
-    category: "Personality Insights",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: "career-choices",
-    title: "How Your Personality Type Influences Career Choices",
-    excerpt:
-      "Learn how understanding your personality type can help you find a career path that aligns with your natural strengths and preferences.",
-    date: "June 10, 2023",
-    author: "Emma Rodriguez",
-    readTime: "10 min read",
-    category: "Career Development",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: "relationships-compatibility",
-    title: "Personality Types in Relationships: Finding Compatibility",
-    excerpt:
-      "Discover how different personality types interact in relationships and strategies for better communication and understanding.",
-    date: "July 8, 2023",
-    author: "Dr. James Wilson",
-    readTime: "9 min read",
-    category: "Relationships",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: "cognitive-functions",
-    title: "Cognitive Functions Explained: The Building Blocks of Personality",
-    excerpt:
-      "A comprehensive guide to understanding the eight cognitive functions that form the foundation of the MBTI system.",
-    date: "August 22, 2023",
-    author: "Dr. Sarah Johnson",
-    readTime: "12 min read",
-    category: "Psychology",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: "personal-growth",
-    title: "Using Personality Insights for Personal Growth and Development",
-    excerpt:
-      "Practical strategies for leveraging your personality type awareness to overcome challenges and develop new skills.",
-    date: "September 15, 2023",
-    author: "Alex Thompson",
-    readTime: "7 min read",
-    category: "Self-Improvement",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-]
+// Type definitions
+interface BlogPost {
+  id: string
+  title: string
+  excerpt: string
+  date: string
+  author: string
+  readTime: string
+  category: string
+  image: string
+  featured?: boolean
+}
 
-export default function BlogPage() {
+// Function to get blog posts data
+async function getBlogPosts() {
+  const filePath = path.join(process.cwd(), "data/blog/index.json")
+  const fileContents = await fs.readFile(filePath, "utf8")
+  const data = JSON.parse(fileContents)
+  return data.posts as BlogPost[]
+}
+
+export default async function BlogPage() {
+  const blogPosts = await getBlogPosts()
+
+  // Find the featured post
+  const featuredPost = blogPosts.find((post) => post.featured) || blogPosts[0]
+
+  // Get the regular posts (excluding the featured one)
+  const regularPosts = blogPosts.filter((post) => post.id !== featuredPost.id)
+
   return (
     <>
       <Header />
@@ -94,8 +55,8 @@ export default function BlogPage() {
               <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="bg-rose-200 h-64 md:h-auto">
                   <img
-                    src="/placeholder.svg?height=600&width=800"
-                    alt="Featured post"
+                    src={featuredPost.image || "/placeholder.svg?height=600&width=800"}
+                    alt={featuredPost.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -103,22 +64,17 @@ export default function BlogPage() {
                   <div className="flex items-center text-sm text-rose-600 mb-2">
                     <span className="bg-rose-100 px-3 py-1 rounded-full">Featured</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-rose-800 mb-3">
-                    The Four Dimensions of Personality: A Comprehensive Guide
-                  </h2>
-                  <p className="text-rose-700 mb-4">
-                    Explore the four key dimensions that define our personality types and how they interact to create
-                    our unique psychological preferences.
-                  </p>
+                  <h2 className="text-2xl font-bold text-rose-800 mb-3">{featuredPost.title}</h2>
+                  <p className="text-rose-700 mb-4">{featuredPost.excerpt}</p>
                   <div className="flex items-center text-sm text-rose-600 mb-4">
                     <CalendarDays className="h-4 w-4 mr-1" />
-                    <span className="mr-4">March 28, 2023</span>
+                    <span className="mr-4">{featuredPost.date}</span>
                     <User className="h-4 w-4 mr-1" />
-                    <span className="mr-4">Dr. Robert Miller</span>
+                    <span className="mr-4">{featuredPost.author}</span>
                     <Clock className="h-4 w-4 mr-1" />
-                    <span>15 min read</span>
+                    <span>{featuredPost.readTime}</span>
                   </div>
-                  <Link href="/blog/four-dimensions">
+                  <Link href={`/blog/${featuredPost.id}`}>
                     <Button className="bg-rose-600 hover:bg-rose-700">
                       Read Article
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -131,7 +87,7 @@ export default function BlogPage() {
 
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {blogPosts.map((post) => (
+            {regularPosts.map((post) => (
               <Card key={post.id} className="border-rose-200 shadow-md hover:shadow-lg transition-shadow">
                 <div className="h-48 overflow-hidden">
                   <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover" />
