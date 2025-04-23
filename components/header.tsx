@@ -55,7 +55,7 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold bg-gradient-to-r from-rose-700 to-rose-900 bg-clip-text text-transparent">
-                Personality Insight
+                PersonaIQ
               </span>
               <span className="text-xs text-rose-600 hidden sm:block">Discover Your True Self</span>
             </div>

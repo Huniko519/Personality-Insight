@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="md:col-span-4 space-y-6">
             <div>
               <h3 className="text-2xl font-bold mb-2 inline-flex items-center">
-                Personality Insight
+                PersonaIQ
                 <span className="ml-2 bg-rose-700 rounded-full p-1">
                   <Heart size={14} className="text-white" />
                 </span>

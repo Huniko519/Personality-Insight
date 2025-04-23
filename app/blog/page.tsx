@@ -43,7 +43,7 @@ export default async function BlogPage() {
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-rose-800 mb-4">Personality Insight Blog</h1>
+            <h1 className="text-4xl font-bold text-rose-800 mb-4">PersonaIQ Blog</h1>
             <p className="text-xl text-rose-700 max-w-3xl mx-auto">
               Explore articles about personality psychology, self-discovery, and practical applications of type theory
             </p>

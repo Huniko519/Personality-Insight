@@ -7,9 +7,9 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Personality Insight - Discover Your True Self",
+  title: "PersonaIQ - Discover Your True Self",
   description: "Take our scientifically designed personality test and gain valuable insights about yourself.",
-    generator: 'v0.dev'
+  generator: 'Mr. Huniko'
 }
 
 export default function RootLayout({

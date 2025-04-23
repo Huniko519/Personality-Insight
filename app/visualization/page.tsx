@@ -1080,7 +1080,7 @@ export default function VisualizationPage() {
                     <div className="mt-4 p-3 bg-white dark:bg-rose-900 rounded-md border border-rose-200 dark:border-rose-800 animate-fade-in">
                       <SocialShare
                         title="Personality Type Visualization"
-                        text={`Check out this ${selectedVisualization} visualization for ${selectedType === "none" ? "personality types" : selectedType} on Personality Insight!`}
+                        text={`Check out this ${selectedVisualization} visualization for ${selectedType === "none" ? "personality types" : selectedType} on PersonaIQ!`}
                       />
                     </div>
                   )}

@@ -20,7 +20,7 @@ export default function AboutPage() {
               className="w-full h-64 md:h-96 object-cover"
             />
             <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-6">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">About Personality Insight</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">About PersonaIQ</h1>
               <p className="text-xl text-white max-w-3xl">
                 Helping people understand themselves and others through the science of personality
               </p>
@@ -37,7 +37,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
                 <p className="text-rose-700 mb-4">
-                  Personality Insight was founded in 2020 by a team of psychologists, data scientists, and designers
+                PersonaIQ was founded in 2020 by a team of psychologists, data scientists, and designers
                   passionate about making personality psychology accessible and practical for everyone.
                 </p>
                 <p className="text-rose-700 mb-4">
@@ -117,7 +117,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold text-rose-800 mb-2">Our Values</h2>
               <div className="w-24 h-1 bg-rose-500 mx-auto mb-4"></div>
               <p className="text-rose-700 max-w-3xl mx-auto">
-                These core principles guide everything we do at Personality Insight
+                These core principles guide everything we do at PersonaIQ
               </p>
             </div>
 
@@ -168,7 +168,7 @@ export default function AboutPage() {
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-rose-800 mb-2">Our Team</h2>
               <div className="w-24 h-1 bg-rose-500 mx-auto mb-4"></div>
-              <p className="text-rose-700 max-w-3xl mx-auto">Meet the passionate experts behind Personality Insight</p>
+              <p className="text-rose-700 max-w-3xl mx-auto">Meet the passionate experts behind PersonaIQ</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -221,7 +221,7 @@ export default function AboutPage() {
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
               <p className="text-xl max-w-3xl mx-auto mb-8">
-                "At Personality Insight, our mission is to help people understand themselves and others better through
+                "At PersonaIQ, our mission is to help people understand themselves and others better through
                 the lens of personality type. We believe that self-awareness is the foundation of personal growth,
                 effective communication, and meaningful relationships."
               </p>
