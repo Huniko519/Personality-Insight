@@ -5,7 +5,8 @@ import type React from "react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X, ChevronDown, Search, Heart } from "lucide-react"
+import { Menu, X, ChevronDown, Search } from "lucide-react"
+import Image from "next/image"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -48,17 +49,13 @@ export default function Header() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
-            <div className="relative w-10 h-10 rounded-full flex items-center justify-center overflow-hidden mr-2 transition-transform group-hover:scale-110 duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-500 to-rose-700 opacity-90"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div>
-              <Heart className="w-5 h-5 text-white relative z-10 transition-transform group-hover:scale-110 duration-300" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-rose-700 to-rose-900 bg-clip-text text-transparent">
-                PersonaIQ
-              </span>
-              <span className="text-xs text-rose-600 hidden sm:block">Discover Your True Self</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="PersonalQ Logo"
+              width={150}
+              height={40}
+              className="transition-transform group-hover:scale-105 duration-300"
+            />
           </Link>
 
           {/* Desktop Navigation */}
