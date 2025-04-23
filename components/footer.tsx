@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { Mail, Twitter, Instagram, Linkedin, Heart } from "lucide-react"
+import { Mail, Twitter, Instagram, Linkedin } from "lucide-react"
+import Image from "next/image"
 
 export default function Footer() {
   return (
@@ -9,12 +10,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           <div className="md:col-span-4 space-y-6">
             <div>
-              <h3 className="text-2xl font-bold mb-2 inline-flex items-center">
-                PersonaIQ
-                <span className="ml-2 bg-rose-700 rounded-full p-1">
-                  <Heart size={14} className="text-white" />
-                </span>
-              </h3>
+              <div className="mb-2">
+                <Image src="/logo.png" alt="PersonaIQ Logo" width={150} height={40} className="brightness-0 invert" />
+              </div>
               <div className="h-1 w-20 bg-rose-600 rounded-full mb-4"></div>
               <p className="text-rose-100 leading-relaxed">
                 Discover your personality type and gain valuable insights into your strengths, challenges, and
