@@ -6,11 +6,11 @@
   "date": "March 28, 2023",
   "author": "Dr. Robert Miller",
   "authorBio": "Dr. Robert Miller is a professor of psychology specializing in personality theory. He has authored three books on the applications of type theory in organizational settings and conducts workshops on personality-based approaches to leadership development.",
-  "authorImage": "/placeholder.svg?height=100&width=100",
+  "authorImage": "/dynamic-duo-presentation.png",
   "readTime": "15 min read",
   "category": "Psychology",
   "tags": ["MBTI", "Personality Dimensions", "Psychological Preferences", "Self-awareness"],
-  "image": "/placeholder.svg?height=600&width=1200",
+  "image": "/dynamic-duo-presentation.png",
   "featured": true,
   "relatedPosts": ["understanding-mbti", "introverts-extraverts", "cognitive-functions"]
 }

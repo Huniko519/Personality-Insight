@@ -200,7 +200,7 @@ export default function FAQPage() {
         {/* Hero Section */}
         <div className="relative rounded-xl overflow-hidden mb-12 max-w-6xl mx-auto">
           <div className="absolute inset-0 bg-rose-800 opacity-80"></div>
-          <img src="/placeholder.svg?height=400&width=1200" alt="FAQ Banner" className="w-full h-64 object-cover" />
+          <img src="/workplace-collaboration.jpg" alt="FAQ Banner" className="w-full h-64 object-cover" />
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-6">
             <h1 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h1>
             <p className="text-xl text-white max-w-3xl">
