@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "PersonaIQ - Discover Your True Self",
   description: "Take our scientifically designed personality test and gain valuable insights about yourself.",
-  generator: 'Mr. Huniko'
+  generator: "Mr. Huniko",
 }
 
 export default function RootLayout({
@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png" />
+      </head>
       <body className={inter.className}>
         <ScrollToTop />
         {children}
