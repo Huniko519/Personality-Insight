@@ -11,7 +11,7 @@ interface SocialShareProps {
 }
 
 export function SocialShare({
-  title = "Personality Insight",
+  title = "PersonaIQ",
   text = "Check out this personality visualization!",
   url,
 }: SocialShareProps) {
