@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="md:col-span-4 space-y-6">
             <div>
               <div className="mb-2">
-                <Image src="/logo.png" alt="PersonalQ Logo" width={150} height={40} className="brightness-0 invert" />
+                <Image src="/logo.png" alt="PersonaIQ Logo" width={150} height={40} className="brightness-0 invert" />
               </div>
               <div className="h-1 w-20 bg-rose-600 rounded-full mb-4"></div>
               <p className="text-rose-100 leading-relaxed">

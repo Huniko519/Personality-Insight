@@ -51,7 +51,7 @@ export default function Header() {
           <Link href="/" className="flex items-center group">
             <Image
               src="/logo.png"
-              alt="PersonalQ Logo"
+              alt="PersonaIQ Logo"
               width={150}
               height={40}
               className="transition-transform group-hover:scale-105 duration-300"
