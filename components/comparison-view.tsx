@@ -12,104 +12,129 @@ import { Check, X, AlertTriangle, MessageCircle, Heart, Users, Lightbulb } from 
 const calculateCompatibility = (type1: string, type2: string): number => {
   if (!type1 || !type2) return 50
 
-  // Count matching letters
-  let matchCount = 0
-  for (let i = 0; i < 4; i++) {
-    if (type1[i] === type2[i]) matchCount++
+  // Import the compatibility data from the shared library
+  const { getCompatibility } = require("@/lib/compatibility-data")
+
+  try {
+    // Get compatibility data using the shared function
+    const compatibilityData = getCompatibility(type1, type2)
+
+    // Convert the 1-10 scale to percentage (0-100)
+    return compatibilityData.score * 10
+  } catch (error) {
+    console.error("Error calculating compatibility:", error)
+
+    // Fallback calculation if the shared function fails
+    // Count matching letters
+    let matchCount = 0
+    for (let i = 0; i < 4; i++) {
+      if (type1[i] === type2[i]) matchCount++
+    }
+
+    // Base compatibility on number of matching letters
+    // 0 matches: 30%, 1 match: 50%, 2 matches: 70%, 3 matches: 85%, 4 matches: 95%
+    const baseScores = [30, 50, 70, 85, 95]
+    return baseScores[matchCount]
   }
-
-  // Base compatibility on number of matching letters
-  // 0 matches: 30%, 1 match: 50%, 2 matches: 70%, 3 matches: 85%, 4 matches: 95%
-  const baseScores = [30, 50, 70, 85, 95]
-
-  // Special cases for known good/challenging combinations
-  const isIdeal =
-    (type1[0] !== type2[0] && type1[1] === type2[1] && type1[2] !== type2[2]) || // Opposite E/I and T/F, same N/S
-    (type1 === "INFJ" && type2 === "ENFP") ||
-    (type1 === "ENFP" && type2 === "INFJ") ||
-    (type1 === "INTJ" && type2 === "ENTP") ||
-    (type1 === "ENTP" && type2 === "INTJ")
-
-  const isChallenging =
-    (type1[0] === type2[0] && type1[1] !== type2[1] && type1[2] === type2[2]) || // Same E/I and T/F, different N/S
-    (type1 === "ESTJ" && type2 === "INFP") ||
-    (type1 === "INFP" && type2 === "ESTJ")
-
-  let score = baseScores[matchCount]
-  if (isIdeal) score = Math.min(score + 15, 98)
-  if (isChallenging) score = Math.max(score - 15, 25)
-
-  return score
 }
 
 // Get relationship dynamic description
 const getRelationshipDynamic = (type1: string, type2: string): string => {
   if (!type1 || !type2) return "Select two personality types to see their relationship dynamic."
 
-  // Count matching letters
-  let matchCount = 0
-  for (let i = 0; i < 4; i++) {
-    if (type1[i] === type2[i]) matchCount++
+  try {
+    // Import the compatibility data from the shared library
+    const { getCompatibility } = require("@/lib/compatibility-data")
+
+    // Get compatibility data using the shared function
+    const compatibilityData = getCompatibility(type1, type2)
+
+    // Return the summary from the compatibility data
+    return compatibilityData.summary
+  } catch (error) {
+    console.error("Error getting relationship dynamic:", error)
+
+    // Fallback logic if the shared function fails
+    // Count matching letters
+    let matchCount = 0
+    for (let i = 0; i < 4; i++) {
+      if (type1[i] === type2[i]) matchCount++
+    }
+
+    // Determine relationship dynamic based on letter combinations
+    if (matchCount === 4)
+      return "Mirror - You share the same perspective on the world, which creates strong understanding but may lack growth from differences."
+
+    if (matchCount === 3)
+      return "Similar - You have a lot in common, making communication easy, but may need to appreciate your one key difference."
+
+    if (matchCount === 0)
+      return "Opposite - You see the world very differently, which can create both fascination and frustration."
+
+    if (type1[0] !== type2[0] && type1[1] === type2[1] && type1[2] !== type2[2])
+      return "Complementary - Your differences in extraversion/introversion and thinking/feeling create a balanced dynamic."
+
+    if (type1[0] === type2[0] && type1[1] !== type2[1] && type1[2] === type2[2])
+      return "Challenging - You share some core traits but differ in how you perceive the world, which can lead to misunderstandings."
+
+    return "Mixed - Your relationship has both areas of natural understanding and potential challenges."
   }
-
-  // Determine relationship dynamic based on letter combinations
-  if (matchCount === 4)
-    return "Mirror - You share the same perspective on the world, which creates strong understanding but may lack growth from differences."
-
-  if (matchCount === 3)
-    return "Similar - You have a lot in common, making communication easy, but may need to appreciate your one key difference."
-
-  if (matchCount === 0)
-    return "Opposite - You see the world very differently, which can create both fascination and frustration."
-
-  if (type1[0] !== type2[0] && type1[1] === type2[1] && type1[2] !== type2[2])
-    return "Complementary - Your differences in extraversion/introversion and thinking/feeling create a balanced dynamic."
-
-  if (type1[0] === type2[0] && type1[1] !== type2[1] && type1[2] === type2[2])
-    return "Challenging - You share some core traits but differ in how you perceive the world, which can lead to misunderstandings."
-
-  return "Mixed - Your relationship has both areas of natural understanding and potential challenges."
 }
 
 // Get communication tips based on types
 const getCommunicationTips = (type1: string, type2: string): string[] => {
   if (!type1 || !type2) return []
 
-  const tips: string[] = []
+  try {
+    // Import the compatibility data from the shared library
+    const { getCompatibility } = require("@/lib/compatibility-data")
 
-  // E/I difference
-  if (type1[0] !== type2[0]) {
-    tips.push(
-      `The ${type1[0] === "E" ? type1 : type2} type should give the ${type1[0] === "I" ? type1 : type2} type space for reflection.`,
-    )
-    tips.push(
-      `The ${type1[0] === "I" ? type1 : type2} type should make an effort to engage in social activities with the ${type1[0] === "E" ? type1 : type2} type.`,
-    )
+    // Get compatibility data using the shared function
+    const compatibilityData = getCompatibility(type1, type2)
+
+    // Return the advice from the compatibility data, split into bullet points
+    const advicePoints = compatibilityData.advice.split(". ").filter((point) => point.trim().length > 0)
+    return advicePoints.length > 0 ? advicePoints : [compatibilityData.advice]
+  } catch (error) {
+    console.error("Error getting communication tips:", error)
+
+    // Fallback tips if the shared function fails
+    const tips: string[] = []
+
+    // E/I difference
+    if (type1[0] !== type2[0]) {
+      tips.push(
+        `The ${type1[0] === "E" ? type1 : type2} type should give the ${type1[0] === "I" ? type1 : type2} type space for reflection.`,
+      )
+      tips.push(
+        `The ${type1[0] === "I" ? type1 : type2} type should make an effort to engage in social activities with the ${type1[0] === "E" ? type1 : type2} type.`,
+      )
+    }
+
+    // S/N difference
+    if (type1[1] !== type2[1]) {
+      tips.push(
+        `The ${type1[1] === "S" ? type1 : type2} type should be patient with the ${type1[1] === "N" ? type1 : type2} type's abstract ideas.`,
+      )
+      tips.push(
+        `The ${type1[1] === "N" ? type1 : type2} type should provide concrete examples to the ${type1[1] === "S" ? type1 : type2} type.`,
+      )
+    }
+
+    // T/F difference
+    if (type1[2] !== type2[2]) {
+      tips.push(`The ${type1[2] === "T" ? type1 : type2} type should acknowledge emotions, not just logic.`)
+      tips.push(`The ${type1[2] === "F" ? type1 : type2} type should present reasoning behind emotional responses.`)
+    }
+
+    // J/P difference
+    if (type1[3] !== type2[3]) {
+      tips.push(`The ${type1[3] === "J" ? type1 : type2} type should be flexible with plans sometimes.`)
+      tips.push(`The ${type1[3] === "P" ? type1 : type2} type should respect deadlines and schedules.`)
+    }
+
+    return tips
   }
-
-  // S/N difference
-  if (type1[1] !== type2[1]) {
-    tips.push(
-      `The ${type1[1] === "S" ? type1 : type2} type should be patient with the ${type1[1] === "N" ? type1 : type2} type's abstract ideas.`,
-    )
-    tips.push(
-      `The ${type1[1] === "N" ? type1 : type2} type should provide concrete examples to the ${type1[1] === "S" ? type1 : type2} type.`,
-    )
-  }
-
-  // T/F difference
-  if (type1[2] !== type2[2]) {
-    tips.push(`The ${type1[2] === "T" ? type1 : type2} type should acknowledge emotions, not just logic.`)
-    tips.push(`The ${type1[2] === "F" ? type1 : type2} type should present reasoning behind emotional responses.`)
-  }
-
-  // J/P difference
-  if (type1[3] !== type2[3]) {
-    tips.push(`The ${type1[3] === "J" ? type1 : type2} type should be flexible with plans sometimes.`)
-    tips.push(`The ${type1[3] === "P" ? type1 : type2} type should respect deadlines and schedules.`)
-  }
-
-  return tips
 }
 
 // Find common traits between two types
