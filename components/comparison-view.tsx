@@ -7,14 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { personalityTypes } from "@/lib/personality-types"
 import { Check, X, AlertTriangle, MessageCircle, Heart, Users, Lightbulb } from "lucide-react"
+import { getCompatibility } from "@/lib/compatibility-data"
 
 // Calculate compatibility score between two personality types
 const calculateCompatibility = (type1: string, type2: string): number => {
   if (!type1 || !type2) return 50
 
   // Import the compatibility data from the shared library
-  const { getCompatibility } = require("@/lib/compatibility-data")
-
   try {
     // Get compatibility data using the shared function
     const compatibilityData = getCompatibility(type1, type2)
@@ -43,9 +42,6 @@ const getRelationshipDynamic = (type1: string, type2: string): string => {
   if (!type1 || !type2) return "Select two personality types to see their relationship dynamic."
 
   try {
-    // Import the compatibility data from the shared library
-    const { getCompatibility } = require("@/lib/compatibility-data")
-
     // Get compatibility data using the shared function
     const compatibilityData = getCompatibility(type1, type2)
 
@@ -86,9 +82,6 @@ const getCommunicationTips = (type1: string, type2: string): string[] => {
   if (!type1 || !type2) return []
 
   try {
-    // Import the compatibility data from the shared library
-    const { getCompatibility } = require("@/lib/compatibility-data")
-
     // Get compatibility data using the shared function
     const compatibilityData = getCompatibility(type1, type2)
 
