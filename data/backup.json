@@ -171,6 +171,218 @@
       "title": "Understanding MBTI: The Science Behind Personality Types"
     }
   },
+  "career-communication-tips": {
+    "ENFJ": [
+      "Balance positive feedback with specific areas for improvement",
+      "Be direct about needs and concerns rather than hinting",
+      "Check that others want coaching before offering development advice",
+      "Practice brevity in communications",
+      "Clarify when you need practical help versus emotional support"
+    ],
+    "ENFP": [
+      "Focus on one topic at a time in discussions",
+      "Check that others want brainstorming before generating possibilities",
+      "Follow up verbal agreements with written confirmation",
+      "Be specific about timelines and deliverables",
+      "Practice brevity when explaining concepts"
+    ],
+    "ENTJ": [
+      "Soften directness with appreciation and relationship building",
+      "Practice patience when others process information differently",
+      "Ask questions to understand others' perspectives before directing",
+      "Include the reasoning behind directives and decisions",
+      "Check for understanding and emotional impact of communications"
+    ],
+    "ENTP": [
+      "Be mindful of how debate may be perceived as criticism",
+      "Practice focusing on one topic until resolution",
+      "Balance challenging ideas with appreciation for contributions",
+      "Check that others want solutions before problem-solving",
+      "Follow up verbal agreements with written confirmation"
+    ],
+    "ESFJ": [
+      "Express concerns directly rather than hinting",
+      "Be specific when giving constructive feedback",
+      "Distinguish between preferences and requirements in instructions",
+      "Practice setting boundaries in communications",
+      "Balance relationship focus with necessary task direction"
+    ],
+    "ESFP": [
+      "Focus on one topic at a time in discussions",
+      "Follow up verbal agreements with written confirmation",
+      "Be specific about timelines and deliverables",
+      "Balance social connection with task-focused communication",
+      "Practice active listening without immediately responding"
+    ],
+    "ESTJ": [
+      "Soften directness with appreciation and relationship building",
+      "Practice patience when others process information differently",
+      "Include reasoning alongside procedures and expectations",
+      "Check for understanding and emotional impact of communications",
+      "Balance task focus with attention to team morale"
+    ],
+    "ESTP": [
+      "Check that others want solutions before problem-solving",
+      "Practice patience with discussion before action",
+      "Follow up verbal agreements with written confirmation",
+      "Provide context for decisions and direction changes",
+      "Balance directness with diplomacy in communications"
+    ],
+    "INFJ": [
+      "Express needs and boundaries directly rather than hinting",
+      "Share your thought process rather than just conclusions",
+      "Be specific when giving feedback rather than generalizing",
+      "Practice brevity when explaining concepts",
+      "Clarify when you're brainstorming versus making decisions"
+    ],
+    "INFP": [
+      "Express concerns directly rather than withdrawing",
+      "Be specific when giving feedback rather than generalizing",
+      "Clarify when you need time to process before responding",
+      "Practice brevity when explaining concepts",
+      "Share your reasoning process alongside your values-based decisions"
+    ],
+    "INTJ": [
+      "Include context and reasoning when giving directions",
+      "Schedule regular check-ins with team members",
+      "Practice patience when others need to think out loud",
+      "Add warmth to communications through small personal touches",
+      "Ask for others' input before presenting your solution"
+    ],
+    "INTP": [
+      "Start with the main point before diving into details",
+      "Check for understanding when explaining complex concepts",
+      "Be mindful of others' need for concrete examples",
+      "Schedule regular updates on projects you're handling",
+      "Practice active listening without immediately problem-solving"
+    ],
+    "ISFJ": [
+      "Express concerns directly rather than hinting",
+      "Be specific when giving feedback rather than generalizing",
+      "Clarify when you need practical help versus emotional support",
+      "Practice saying no to requests that exceed capacity",
+      "Share your valuable insights in group settings"
+    ],
+    "ISFP": [
+      "Express concerns directly rather than withdrawing",
+      "Share your reasoning alongside values-based decisions",
+      "Be specific when giving feedback rather than generalizing",
+      "Clarify when you need time to process before responding",
+      "Practice assertive communication of your valuable perspectives"
+    ],
+    "ISTJ": [
+      "Provide context and big picture when giving directions",
+      "Include reasoning alongside procedures and expectations",
+      "Add some warmth to factual communications",
+      "Check for understanding and questions after giving information",
+      "Clarify when flexibility is possible versus when standards are firm"
+    ],
+    "ISTP": [
+      "Provide context for your decisions and actions",
+      "Keep others informed of your progress on projects",
+      "Check that others understand your reasoning",
+      "Explain your thought process, not just conclusions",
+      "Acknowledge others' contributions and ideas verbally"
+    ]
+  },
+  "career-data": {
+    "ENFJ": {
+      "growthAreas": "ENFJs can enhance their effectiveness by developing boundaries and practicing self-care. Learning to separate personal worth from others' approval, becoming comfortable with necessary conflict, and balancing others' needs with their own can prevent burnout and improve leadership sustainability. Additionally, developing analytical skills, attending to practical details, and making decisions based on logic as well as values can lead to more balanced professional outcomes.",
+      "leadershipStyle": "ENFJs lead with charisma, empathy, and organizational vision. They excel at inspiring teams, developing individual potential, and creating purposeful, harmonious cultures. Their leadership style is people-centered and values-driven, focusing on growth and positive impact. They motivate others through personal connection, recognition of potential, and alignment with meaningful purpose.",
+      "teamDynamics": "In team settings, ENFJs contribute harmony, structure, and inspirational energy. They work best with collaborative, growth-oriented colleagues who value interpersonal connection and shared purpose. They may need to consciously develop comfort with necessary conflict and protection against taking on others' emotional burdens. ENFJs thrive when building team cohesion but benefit from collaborators who can provide objective analysis and attention to practical details.",
+      "workEnvironment": "ENFJs thrive in collaborative environments focused on human development and positive impact. They prefer workplaces that value interpersonal connection, clear communication, and meaningful contribution. Ideal settings offer opportunities for mentoring, team leadership, and creating harmonious, purpose-driven cultures."
+    },
+    "ENFP": {
+      "growthAreas": "ENFPs can advance their careers by developing follow-through and practical implementation skills. Creating systems for organization, practicing time management techniques, and setting concrete priorities can help translate their abundant ideas into completed projects. Additionally, developing focus, learning to say no to interesting but distracting opportunities, and building comfort with detailed analysis can enhance their professional effectiveness and credibility.",
+      "leadershipStyle": "ENFPs lead with enthusiasm, inspiration, and authentic connection. They excel at generating innovative possibilities, championing creative solutions, and bringing energy to teams and projects. Their leadership style is collaborative and empowering, focusing on potential and meaningful engagement. They motivate others through genuine appreciation, creative freedom, and connecting work to larger purpose.",
+      "teamDynamics": "In team settings, ENFPs contribute creativity, positive energy, and people-centered perspective. They work best with open-minded, supportive colleagues who value brainstorming and authentic connection. They may need to consciously develop follow-through on details and realistic assessment of timelines. ENFPs thrive when exploring possibilities but benefit from collaborators who can help with organization, implementation, and analytical decision-making.",
+      "workEnvironment": "ENFPs flourish in dynamic, creative environments that welcome innovation and authentic self-expression. They prefer workplaces with minimal hierarchy that encourage collaboration, idea generation, and personal growth. Ideal settings offer variety, flexibility, and opportunities to connect work with meaningful purpose and human impact."
+    },
+    "ENTJ": {
+      "growthAreas": "ENTJs can enhance their effectiveness by developing emotional intelligence and a more collaborative leadership approach. Learning to listen actively, show appreciation for different perspectives, and communicate with empathy can improve team dynamics and loyalty. Additionally, practicing patience with processes and people, along with occasional reflection before action, can lead to more sustainable success and prevent burnout in themselves and their teams.",
+      "leadershipStyle": "ENTJs lead with decisive authority and strategic direction. They excel at organizing resources, implementing systems, and driving toward goals. Their leadership is direct and efficient, focusing on logic, competence, and results. They motivate others through clear expectations, rational arguments, and creating structures for achievement.",
+      "teamDynamics": "In team settings, ENTJs contribute leadership, structure, and strategic direction. They work best with competent, goal-oriented colleagues who value efficiency and clear communication. They may need to consciously develop patience with different working styles and appreciation for the emotional aspects of collaboration. ENTJs thrive when leading initiatives but benefit from team members who can provide attention to interpersonal dynamics and detailed implementation.",
+      "workEnvironment": "ENTJs excel in dynamic, results-oriented environments that reward leadership and strategic thinking. They thrive in structured organizations with clear hierarchies where they can implement systems and drive toward goals. Ideal settings offer challenges, advancement opportunities, and the authority to make decisions and lead initiatives."
+    },
+    "ENTP": {
+      "growthAreas": "ENTPs can enhance their career success by developing follow-through and implementation skills. Creating systems to track projects, practicing time management techniques, and setting concrete milestones can help translate their innovative ideas into tangible results. Additionally, developing diplomatic communication, active listening skills, and sensitivity to others' emotional responses can improve leadership effectiveness and team collaboration.",
+      "leadershipStyle": "ENTPs lead through innovation, enthusiasm, and intellectual stimulation. They excel at generating creative solutions, challenging conventional thinking, and adapting to changing circumstances. Their leadership style is energetic and flexible, focusing on possibilities and strategic opportunities. They motivate others through intellectual engagement, creative freedom, and the excitement of new ideas.",
+      "teamDynamics": "In team settings, ENTPs contribute creative thinking, strategic vision, and adaptability. They work best with intellectually stimulating colleagues who enjoy brainstorming and can handle direct debate. They may need to consciously develop patience with implementation details and sensitivity to team members who prefer structure. ENTPs thrive when exploring new possibilities but benefit from collaborators who can help organize and implement their innovative ideas.",
+      "workEnvironment": "ENTPs thrive in dynamic, innovative environments that welcome new ideas and creative problem-solving. They prefer workplaces with minimal bureaucracy that encourage intellectual debate and exploration of possibilities. Ideal settings offer variety, intellectual challenge, and the freedom to question established methods."
+    },
+    "ESFJ": {
+      "growthAreas": "ESFJs can advance their careers by developing comfort with conflict and independent decision-making. Learning to address issues directly, trusting their own judgment, and setting appropriate boundaries can enhance leadership effectiveness and prevent burnout. Additionally, developing flexibility with established procedures, considering long-term implications beyond immediate needs, and becoming comfortable with necessary change can improve adaptability in evolving organizations.",
+      "leadershipStyle": "ESFJs lead with practical support, interpersonal awareness, and organizational skill. They excel at creating harmonious environments, coordinating people and resources, and attending to team needs. Their leadership style is collaborative and service-oriented, focusing on practical help and maintaining positive relationships. They motivate others through personal connection, recognition of contributions, and creating supportive, structured environments.",
+      "teamDynamics": "In team settings, ESFJs contribute harmony, practical organization, and attention to group needs. They work best with appreciative, cooperative colleagues who value clear communication and interpersonal respect. They may need to consciously develop comfort with necessary conflict and confidence in decisions that may temporarily disrupt harmony. ESFJs thrive when building team cohesion but benefit from collaborators who can help with objective analysis and implementing necessary changes.",
+      "workEnvironment": "ESFJs thrive in harmonious, collaborative environments with clear structures and opportunities for meaningful interaction. They prefer workplaces that value cooperation, practical contribution, and interpersonal connection. Ideal settings offer stability, appreciation for their efforts, and the ability to support others while working toward concrete goals."
+    },
+    "ESFP": {
+      "growthAreas": "ESFPs can advance their careers by developing structure and long-term planning. Creating systems for organization, practicing prioritization techniques, and setting concrete goals can enhance professional effectiveness. Additionally, developing comfort with data analysis, considering long-term consequences of decisions, and building patience with necessary processes can lead to more strategic career advancement and leadership opportunities.",
+      "leadershipStyle": "ESFPs lead with enthusiasm, practical support, and interpersonal connection. They excel at creating positive atmospheres, responding to immediate needs, and bringing energy to teams and projects. Their leadership style is collaborative and action-oriented, focusing on practical help and positive engagement. They motivate others through encouragement, hands-on assistance, and making work enjoyable.",
+      "teamDynamics": "In team settings, ESFPs contribute positive energy, practical assistance, and people-centered perspective. They work best with friendly, appreciative colleagues who value collaboration and immediate action. They may need to consciously develop comfort with planning processes and documentation requirements. ESFPs thrive when engaging with people and practical tasks but benefit from collaborators who can help with structure, analysis, and long-term strategic thinking.",
+      "workEnvironment": "ESFPs flourish in lively, people-oriented environments that offer practical engagement and variety. They prefer workplaces with friendly atmospheres that encourage collaboration and spontaneity. Ideal settings provide opportunities for social interaction, hands-on problem-solving, and immediate, tangible results rather than long theoretical discussions."
+    },
+    "ESTJ": {
+      "growthAreas": "ESTJs can enhance their effectiveness by developing flexibility and emotional intelligence. Learning to consider alternative approaches, practicing patience with different working styles, and becoming comfortable with necessary ambiguity can improve adaptability in changing environments. Additionally, developing active listening skills, showing appreciation for others' contributions, and considering the emotional impact of decisions can enhance leadership effectiveness and team dynamics.",
+      "leadershipStyle": "ESTJs lead with structure, decisiveness, and practical focus. They excel at organizing resources, implementing systems, and maintaining standards. Their leadership style is direct and efficient, emphasizing responsibility and results. They motivate others through clear expectations, logical reasoning, and creating structured frameworks for achievement.",
+      "teamDynamics": "In team settings, ESTJs contribute organization, direction, and practical implementation. They work best with competent, responsible colleagues who value efficiency and clear communication. They may need to consciously develop patience with brainstorming processes and appreciation for unconventional approaches. ESTJs thrive when implementing established systems but benefit from collaborators who can help with innovation and interpersonal nuance.",
+      "workEnvironment": "ESTJs excel in structured environments with clear hierarchies and established procedures. They prefer workplaces that value efficiency, practical results, and traditional approaches. Ideal settings offer opportunities for leadership, implementation of systems, and recognition for reliability and organizational skill."
+    },
+    "ESTP": {
+      "growthAreas": "ESTPs can enhance their effectiveness by developing long-term planning and follow-through. Creating systems to track ongoing projects, considering future implications of current decisions, and developing patience with necessary processes can lead to more sustainable success. Additionally, practicing active listening, considering emotional impacts of actions, and developing appreciation for different working styles can improve leadership effectiveness and team collaboration.",
+      "leadershipStyle": "ESTPs lead with action, pragmatism, and energetic problem-solving. They excel at mobilizing resources, responding to immediate challenges, and finding practical solutions. Their leadership style is direct and results-focused, emphasizing action over planning. They motivate others through energy, competitive spirit, and hands-on involvement in getting things done.",
+      "teamDynamics": "In team settings, ESTPs contribute energy, practical solutions, and adaptability. They work best with competent, action-oriented colleagues who focus on tangible results rather than abstract theories. They may need to consciously develop patience with planning processes and attention to long-term consequences. ESTPs thrive when addressing immediate challenges but benefit from collaborators who can help with follow-through, documentation, and consideration of systemic implications.",
+      "workEnvironment": "ESTPs thrive in dynamic, results-oriented environments with tangible challenges and opportunities for action. They prefer workplaces that reward practical problem-solving and quick thinking with minimal bureaucracy. Ideal settings offer variety, competitive incentives, and the freedom to address situations as they arise rather than following rigid procedures."
+    },
+    "INFJ": {
+      "growthAreas": "INFJs can enhance their career development by setting clearer boundaries and practicing assertive communication. Learning to express needs directly, developing comfort with constructive conflict, and avoiding perfectionism can improve workplace effectiveness and reduce burnout. Additionally, building practical skills to complement their visionary thinking and creating structured systems for implementation can help translate their ideals into concrete results.",
+      "leadershipStyle": "INFJs lead with vision, empathy, and quiet determination. They excel at inspiring others toward meaningful goals, understanding individual motivations, and creating harmonious team cultures. Their leadership style is values-driven and supportive, focusing on purpose and personal development. They motivate others through authentic connection, shared ideals, and individual recognition.",
+      "teamDynamics": "In team settings, INFJs contribute insight, harmony, and purposeful direction. They work best with authentic, growth-oriented colleagues who share their values and appreciate depth of thought. They may need to consciously develop comfort with direct feedback and protection against absorbing others' emotional states. INFJs thrive when connecting work to meaningful purpose but benefit from collaborators who can help with practical implementation and direct communication.",
+      "workEnvironment": "INFJs thrive in harmonious environments that align with their values and allow them to make meaningful contributions. They prefer workplaces that respect individuality, minimize conflict, and provide opportunities for personal growth. Ideal settings offer a clear mission, supportive relationships, and the ability to work both independently and collaboratively toward purposeful goals."
+    },
+    "INFP": {
+      "growthAreas": "INFPs can advance their careers by developing practical implementation skills and structured work habits. Creating systems for organization, setting concrete deadlines, and practicing direct communication can help translate their idealistic vision into tangible outcomes. Additionally, building resilience to criticism, developing comfort with data-driven decision making, and learning to separate personal identity from work products can enhance professional effectiveness.",
+      "leadershipStyle": "INFPs lead with authenticity, compassion, and values-based vision. They excel at understanding individual needs, fostering personal growth, and aligning work with meaningful purpose. Their leadership style is supportive and democratic, focusing on creating harmony and honoring each person's unique contribution. They motivate others through personal connection, shared values, and creating space for authentic expression.",
+      "teamDynamics": "In team settings, INFPs contribute creativity, empathy, and values alignment. They work best with authentic, supportive colleagues who respect individual differences and share commitment to meaningful goals. They may need to consciously develop comfort with conflict and structure for implementing ideas. INFPs thrive when connecting to purpose but benefit from collaborators who can help with organization, time management, and direct communication.",
+      "workEnvironment": "INFPs flourish in environments that honor individuality, creativity, and personal values. They prefer workplaces with flexible structures that allow for authentic self-expression and meaningful contribution. Ideal settings offer autonomy, opportunities for creative problem-solving, and alignment with their core values and sense of purpose."
+    },
+    "INTJ": {
+      "growthAreas": "INTJs can enhance their career development by focusing on emotional intelligence and interpersonal skills. Learning to communicate complex ideas in accessible ways, developing patience with different working styles, and practicing active listening can significantly improve team dynamics and leadership effectiveness. Additionally, cultivating flexibility when plans change and becoming more comfortable with ambiguity can help INTJs adapt to today's rapidly changing workplace.",
+      "leadershipStyle": "INTJs lead with strategic vision and intellectual authority. They excel at developing innovative systems, setting high standards, and implementing long-term plans. Their leadership focuses on efficiency, competence, and continuous improvement. They motivate others through logical reasoning and clear direction rather than emotional appeals.",
+      "teamDynamics": "In team settings, INTJs contribute strategic vision and analytical problem-solving. They work best with competent colleagues who value efficiency and intellectual discussion. They may need to consciously develop patience with brainstorming processes and appreciation for different working styles. INTJs thrive when given independence to implement their ideas but benefit from collaborators who can help translate their complex concepts for broader audiences.",
+      "workEnvironment": "INTJs thrive in environments that value innovation, intellectual challenge, and independence. They prefer workplaces that are organized, efficient, and free from unnecessary bureaucracy. Ideal settings allow them to implement their strategic vision with minimal micromanagement, providing access to resources for continuous learning and improvement."
+    },
+    "INTP": {
+      "growthAreas": "INTPs can advance their careers by developing implementation skills to complement their theoretical strengths. Focusing on project management techniques, setting concrete deadlines, and practicing clear communication of complex ideas will help translate their innovative thinking into practical results. Additionally, developing emotional intelligence, active listening skills, and an appreciation for different working styles can improve collaboration and leadership potential.",
+      "leadershipStyle": "INTPs lead through intellectual insight and conceptual innovation. They excel at analyzing complex problems, generating creative solutions, and questioning established systems. Their leadership style is non-hierarchical, focusing on exploring possibilities and sharing knowledge. They give team members autonomy while providing conceptual frameworks for decision-making.",
+      "teamDynamics": "In team settings, INTPs contribute innovative thinking and logical analysis. They work best with intellectually curious colleagues who respect independence and value conceptual discussion. They may need to consciously develop follow-through on group projects and attentiveness to practical details. INTPs thrive when given freedom to explore ideas but benefit from collaborators who can help implement their theoretical insights.",
+      "workEnvironment": "INTPs flourish in environments that encourage theoretical exploration and problem-solving. They need workplaces that offer intellectual freedom, minimal structure, and opportunities to work independently on complex challenges. Ideal settings respect their need for autonomy while providing access to information and resources for continuous learning."
+    },
+    "ISFJ": {
+      "growthAreas": "ISFJs can advance their careers by developing assertiveness and comfort with change. Learning to express needs directly, setting appropriate boundaries, and voicing their valuable insights can increase their influence and prevent burnout. Additionally, practicing flexibility when routines change, developing comfort with ambiguity, and considering innovative approaches can enhance adaptability in evolving work environments.",
+      "leadershipStyle": "ISFJs lead with dependability, practical support, and attention to individual needs. They excel at creating harmonious environments, maintaining important traditions, and ensuring team members have the resources they need. Their leadership style is service-oriented and detail-focused, emphasizing reliability and personal care. They motivate others through practical assistance, recognition of contributions, and creating stable, supportive atmospheres.",
+      "teamDynamics": "In team settings, ISFJs contribute reliability, detailed follow-through, and interpersonal harmony. They work best with respectful, appreciative colleagues who value cooperation and clear communication. They may need to consciously develop comfort with conflict and confidence in sharing their perspectives. ISFJs thrive when supporting established systems but benefit from collaborators who can help with assertiveness and adapting to significant changes.",
+      "workEnvironment": "ISFJs thrive in harmonious environments with clear structures and opportunities to support others. They prefer workplaces that value reliability, cooperation, and attention to detail. Ideal settings offer stability, appreciation for their contributions, and the ability to develop expertise while making a positive difference in people's lives."
+    },
+    "ISFP": {
+      "growthAreas": "ISFPs can advance their careers by developing long-term planning and assertive communication. Creating structured approaches to goals, practicing direct expression of needs, and building comfort with self-promotion can enhance professional advancement. Additionally, developing objective analysis skills, separating constructive feedback from personal criticism, and considering systemic implications beyond personal values can lead to more balanced decision-making.",
+      "leadershipStyle": "ISFPs lead with authenticity, practical creativity, and quiet support. They excel at modeling values through action, finding artistic solutions, and understanding individual needs. Their leadership style is gentle and action-oriented, focusing on personal example rather than directive authority. They motivate others through genuine appreciation, creative freedom, and alignment with meaningful values.",
+      "teamDynamics": "In team settings, ISFPs contribute practical creativity, adaptability, and values alignment. They work best with respectful, authentic colleagues who appreciate individual differences and minimize conflict. They may need to consciously develop comfort with planning processes and confidence in expressing their valuable perspectives. ISFPs thrive when applying skills to meaningful projects but benefit from collaborators who can help with structure, long-term planning, and direct communication.",
+      "workEnvironment": "ISFPs flourish in flexible environments that honor individuality and allow for creative expression. They prefer workplaces with supportive atmospheres that respect personal values and provide hands-on opportunities. Ideal settings offer autonomy, appreciation for aesthetic contributions, and alignment with their authentic sense of purpose."
+    },
+    "ISTJ": {
+      "growthAreas": "ISTJs can enhance their career development by cultivating adaptability and openness to innovation. Practicing flexibility when procedures change, developing comfort with ambiguity, and considering alternative approaches can improve effectiveness in today's rapidly evolving workplace. Additionally, building emotional intelligence, practicing active listening, and developing appreciation for different working styles can enhance leadership potential and team collaboration.",
+      "leadershipStyle": "ISTJs lead with reliability, structure, and practical expertise. They excel at creating efficient systems, maintaining standards, and ensuring consistent results. Their leadership style is methodical and principled, focusing on responsibility and proper procedure. They motivate others through clear expectations, logical reasoning, and personal example of dependability.",
+      "teamDynamics": "In team settings, ISTJs contribute reliability, organization, and practical problem-solving. They work best with competent, responsible colleagues who value efficiency and clear communication. They may need to consciously develop patience with brainstorming processes and appreciation for unconventional approaches. ISTJs thrive when implementing established systems but benefit from collaborators who can help with innovation and adapting to unexpected changes.",
+      "workEnvironment": "ISTJs thrive in structured environments with clear expectations and established procedures. They prefer workplaces that value reliability, precision, and logical organization. Ideal settings offer stability, opportunities to develop expertise, and recognition for dependability and attention to detail."
+    },
+    "ISTP": {
+      "growthAreas": "ISTPs can enhance their career development by building communication skills and long-term planning. Practicing active listening, providing context for their decisions, and keeping others informed of their progress can improve team collaboration and leadership potential. Additionally, considering long-term implications of choices, connecting daily tasks to broader goals, and developing comfort with planning ahead can lead to more strategic career advancement.",
+      "leadershipStyle": "ISTPs lead through technical expertise, calm problem-solving, and practical action. They excel at troubleshooting complex situations, responding effectively to crises, and finding efficient solutions. Their leadership style is hands-on and results-oriented, focusing on competence rather than hierarchy. They motivate others through respect for autonomy, logical reasoning, and demonstrating practical skills.",
+      "teamDynamics": "In team settings, ISTPs contribute practical problem-solving, adaptability, and technical skill. They work best with competent, straightforward colleagues who respect independence and focus on results. They may need to consciously develop patience with planning processes and appreciation for the need to communicate their thinking. ISTPs thrive when addressing immediate challenges but benefit from collaborators who can help with long-term planning and interpersonal communication.",
+      "workEnvironment": "ISTPs thrive in hands-on environments that offer practical challenges and autonomy. They prefer workplaces with minimal bureaucracy that allow for independent problem-solving and tangible results. Ideal settings provide variety, opportunities to develop technical expertise, and freedom from unnecessary meetings or paperwork."
+    }
+  },
   "career-database": [
     {
       "category": "Technology",
@@ -764,6 +976,120 @@
       "workEnvironment": "Architecture firms, construction companies, government agencies"
     }
   ],
+  "career-development-strategies": {
+    "ENFJ": [
+      "Practice saying no to requests that exceed capacity",
+      "Schedule regular self-care activities as non-negotiable commitments",
+      "Develop comfort with necessary conflict and setting boundaries",
+      "Practice making decisions based on logic as well as values",
+      "Create systems to prevent taking on others' emotional burdens"
+    ],
+    "ENFP": [
+      "Use project management tools to track ideas and implementation",
+      "Practice prioritization techniques for competing opportunities",
+      "Set specific completion criteria before starting new projects",
+      "Develop realistic time estimates for tasks and commitments",
+      "Create accountability systems for follow-through on details"
+    ],
+    "ENTJ": [
+      "Practice active listening without immediately problem-solving",
+      "Ask for feedback about your leadership style's impact on others",
+      "Schedule regular reflection time to consider long-term implications",
+      "Develop appreciation for different working styles and approaches",
+      "Practice showing recognition for others' contributions"
+    ],
+    "ENTP": [
+      "Create systems to track projects from ideation to completion",
+      "Practice focusing on one project until completion before starting new ones",
+      "Set specific deadlines and accountability measures for yourself",
+      "Develop diplomatic approaches to presenting challenging ideas",
+      "Practice active listening without immediate debate"
+    ],
+    "ESFJ": [
+      "Practice addressing conflicts directly rather than avoiding them",
+      "Develop comfort with decisions that may temporarily disrupt harmony",
+      "Create boundaries to prevent overextending yourself for others",
+      "Practice trusting your judgment even when others disagree",
+      "Join innovation teams to develop comfort with necessary change"
+    ],
+    "ESFP": [
+      "Use organizational tools to track projects and deadlines",
+      "Practice prioritization techniques for competing activities",
+      "Create structured approaches to long-term career goals",
+      "Join analytical teams to develop data-based decision making",
+      "Practice following through on commitments even when more interesting options arise"
+    ],
+    "ESTJ": [
+      "Practice active listening without immediately problem-solving",
+      "Ask for feedback about your leadership style's impact on others",
+      "Join creative teams to develop appreciation for innovation",
+      "Practice flexibility when procedures need to change",
+      "Develop patience with different working styles and approaches"
+    ],
+    "ESTP": [
+      "Create systems to track ongoing projects and follow-through",
+      "Practice considering long-term implications before taking action",
+      "Develop patience with necessary planning and documentation",
+      "Ask for feedback about your communication style's impact",
+      "Join strategic planning teams to build long-term thinking skills"
+    ],
+    "INFJ": [
+      "Practice setting and communicating clear boundaries",
+      "Develop comfort with constructive conflict and direct feedback",
+      "Create structured systems for implementing visionary ideas",
+      "Build resilience through distinguishing between helpful and unhelpful perfectionism",
+      "Schedule regular breaks to prevent absorbing others' emotional states"
+    ],
+    "INFP": [
+      "Create structured systems for organizing tasks and tracking progress",
+      "Practice separating constructive feedback from personal criticism",
+      "Set concrete deadlines and accountability measures",
+      "Develop comfort with data-driven decision making",
+      "Join teams that require regular deliverables to build implementation skills"
+    ],
+    "INTJ": [
+      "Practice active listening without immediately formulating responses",
+      "Join collaborative projects that require interpersonal skills",
+      "Ask for feedback on how your communication is received by others",
+      "Develop methods to explain complex ideas in accessible language",
+      "Schedule time for relationship building alongside task completion"
+    ],
+    "INTP": [
+      "Use project management tools to track progress and deadlines",
+      "Practice explaining complex concepts in simple, concrete terms",
+      "Set specific milestones for theoretical projects",
+      "Join collaborative teams to develop interpersonal skills",
+      "Volunteer for presentations to practice communication"
+    ],
+    "ISFJ": [
+      "Practice assertive communication of needs and boundaries",
+      "Develop comfort with necessary change and ambiguity",
+      "Join decision-making committees to build confidence in sharing perspectives",
+      "Create systems to prevent overcommitment and burnout",
+      "Practice flexibility when routines need to change"
+    ],
+    "ISFP": [
+      "Create structured approaches to long-term goals",
+      "Practice direct communication of needs and ideas",
+      "Develop comfort with self-promotion and highlighting accomplishments",
+      "Join planning committees to build strategic thinking skills",
+      "Practice separating constructive feedback from personal criticism"
+    ],
+    "ISTJ": [
+      "Practice flexibility when procedures need to change",
+      "Join innovation teams to develop comfort with new approaches",
+      "Ask for feedback on how to improve interpersonal communication",
+      "Develop appreciation for different working styles and perspectives",
+      "Practice adapting to unexpected changes with resilience"
+    ],
+    "ISTP": [
+      "Practice communicating your reasoning process to others",
+      "Create systems for documenting progress and decisions",
+      "Develop long-term career planning with concrete milestones",
+      "Join collaborative teams to build communication skills",
+      "Practice connecting daily tasks to broader organizational goals"
+    ]
+  },
   "case-studies": [
     {
       "image": "/personality-development.jpg",
