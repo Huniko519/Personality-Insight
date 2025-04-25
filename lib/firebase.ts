@@ -23,7 +23,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
@@ -186,7 +186,6 @@ export const getFAQCategories = async () => {
     console.error("Error fetching FAQ categories:", error)
     return []
   }
-
 }
 // Function to get case studies from Firebase
 export async function getCaseStudiesFromFirebase() {
@@ -237,6 +236,52 @@ export const initializeDatabase = async () => {
   } catch (error) {
     console.error("Error initializing database:", error)
     throw error
+  }
+}
+
+// Function to get career-specific data for a personality type
+export async function getCareerDataForType(typeCode: string) {
+  try {
+    const snapshot = await get(ref(database, `/career-data/${typeCode}`))
+    if (snapshot.exists()) {
+      return snapshot.val()
+    } else {
+      console.warn(`No career data found for ${typeCode}, returning null`)
+      return null
+    }
+  } catch (error) {
+    console.error(`Error fetching career data for ${typeCode}:`, error)
+    return null
+  }
+}
+
+// Function to get development strategies for a personality type
+export async function getDevStrategiesForType(typeCode: string) {
+  try {
+    const snapshot = await get(ref(database, `/career-development-strategies/${typeCode}`))
+    if (snapshot.exists()) {
+      return snapshot.val()
+    } else {
+      return []
+    }
+  } catch (error) {
+    console.error(`Error fetching development strategies for ${typeCode}:`, error)
+    return []
+  }
+}
+
+// Function to get communication tips for a personality type
+export async function getCommunicationTipsForType(typeCode: string) {
+  try {
+    const snapshot = await get(ref(database, `/career-communication-tips/${typeCode}`))
+    if (snapshot.exists()) {
+      return snapshot.val()
+    } else {
+      return []
+    }
+  } catch (error) {
+    console.error(`Error fetching communication tips for ${typeCode}:`, error)
+    return []
   }
 }
 
