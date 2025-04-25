@@ -1,19 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Check, X, AlertTriangle, MessageCircle, Heart, Users, Lightbulb } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { personalityTypes } from "@/lib/personality-types"
-import { Check, X, AlertTriangle, MessageCircle, Heart, Users, Lightbulb } from "lucide-react"
 import { getCompatibility } from "@/lib/compatibility-data"
+import { getPersonalityTypes } from "@/lib/firebase"
 
 // Calculate compatibility score between two personality types
 const calculateCompatibility = (type1: string, type2: string): number => {
   if (!type1 || !type2) return 50
 
-  // Import the compatibility data from the shared library
   try {
     // Get compatibility data using the shared function
     const compatibilityData = getCompatibility(type1, type2)
@@ -130,38 +129,94 @@ const getCommunicationTips = (type1: string, type2: string): string[] => {
   }
 }
 
-// Find common traits between two types
-const findCommonTraits = (type1: string, type2: string): string[] => {
-  if (!type1 || !type2 || !personalityTypes[type1] || !personalityTypes[type2]) return []
-
-  const traits1 = personalityTypes[type1].traits
-  const traits2 = personalityTypes[type2].traits
-
-  return traits1.filter((trait) => traits2.includes(trait))
-}
-
-// Find unique traits for each type
-const findUniqueTraits = (type1: string, type2: string): { type1: string[]; type2: string[] } => {
-  if (!type1 || !type2 || !personalityTypes[type1] || !personalityTypes[type2]) return { type1: [], type2: [] }
-
-  const traits1 = personalityTypes[type1].traits
-  const traits2 = personalityTypes[type2].traits
-
-  return {
-    type1: traits1.filter((trait) => !traits2.includes(trait)),
-    type2: traits2.filter((trait) => !traits1.includes(trait)),
-  }
-}
-
 export default function ComparisonView() {
+  const [types, setTypes] = useState<any[]>([])
   const [type1, setType1] = useState<string>("")
   const [type2, setType2] = useState<string>("")
+  const [compatibility, setCompatibility] = useState<number>(50)
+  const [relationshipDynamic, setRelationshipDynamic] = useState<string>("")
+  const [communicationTips, setCommunicationTips] = useState<string[]>([])
+  const [commonTraits, setCommonTraits] = useState<string[]>([])
+  const [uniqueTraits, setUniqueTraits] = useState<{ type1: string[]; type2: string[] }>({ type1: [], type2: [] })
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isInitializing, setIsInitializing] = useState<boolean>(true)
+  const [personalityTypesData, setPersonalityTypesData] = useState<any>({})
 
-  const compatibility = calculateCompatibility(type1, type2)
-  const relationshipDynamic = getRelationshipDynamic(type1, type2)
-  const communicationTips = getCommunicationTips(type1, type2)
-  const commonTraits = findCommonTraits(type1, type2)
-  const uniqueTraits = findUniqueTraits(type1, type2)
+  // Load all personality types
+  useEffect(() => {
+    async function loadTypes() {
+      try {
+        const allTypes = await getPersonalityTypes()
+        setPersonalityTypesData(allTypes)
+        setTypes(Object.values(allTypes))
+      } catch (error) {
+        console.error("Error loading personality types:", error)
+      } finally {
+        setIsInitializing(false)
+      }
+    }
+
+    loadTypes()
+  }, [])
+
+  // Find common traits between two types
+  const findCommonTraits = (type1: string, type2: string): string[] => {
+    if (!type1 || !type2 || !personalityTypesData[type1] || !personalityTypesData[type2]) return []
+
+    const traits1 = personalityTypesData[type1].traits
+    const traits2 = personalityTypesData[type2].traits
+
+    return traits1.filter((trait: string) => traits2.includes(trait))
+  }
+
+  // Find unique traits for each type
+  const findUniqueTraits = (type1: string, type2: string): { type1: string[]; type2: string[] } => {
+    if (!type1 || !type2 || !personalityTypesData[type1] || !personalityTypesData[type2])
+      return { type1: [], type2: [] }
+
+    const traits1 = personalityTypesData[type1].traits
+    const traits2 = personalityTypesData[type2].traits
+
+    return {
+      type1: traits1.filter((trait: string) => !traits2.includes(trait)),
+      type2: traits2.filter((trait: string) => !traits1.includes(trait)),
+    }
+  }
+
+  // Load compatibility data when types change
+  useEffect(() => {
+    async function loadCompatibilityData() {
+      if (!type1 || !type2) {
+        setCompatibility(50)
+        setRelationshipDynamic("")
+        setCommunicationTips([])
+        setCommonTraits([])
+        setUniqueTraits({ type1: [], type2: [] })
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        const compScore = calculateCompatibility(type1, type2)
+        const dynamic = getRelationshipDynamic(type1, type2)
+        const tips = getCommunicationTips(type1, type2)
+        const common = findCommonTraits(type1, type2)
+        const unique = findUniqueTraits(type1, type2)
+
+        setCompatibility(compScore)
+        setRelationshipDynamic(dynamic)
+        setCommunicationTips(tips)
+        setCommonTraits(common)
+        setUniqueTraits(unique)
+      } catch (error) {
+        console.error("Error loading compatibility data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCompatibilityData()
+  }, [type1, type2, personalityTypesData])
 
   // Get compatibility color based on score
   const getCompatibilityColor = (score: number) => {
@@ -181,22 +236,22 @@ export default function ComparisonView() {
               <SelectValue placeholder="Select first type" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(personalityTypes).map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type} - {personalityTypes[type].nickname}
+              {types.map((type) => (
+                <SelectItem key={type.code} value={type.code}>
+                  {type.code} - {type.nickname}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          {type1 && (
+          {type1 && personalityTypesData[type1] && (
             <Card className="mt-4 border-rose-200">
               <CardContent className="p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-bold text-rose-800">{type1}</h3>
-                  <Badge className="bg-rose-100 text-rose-800">{personalityTypes[type1].nickname}</Badge>
+                  <Badge className="bg-rose-100 text-rose-800">{personalityTypesData[type1].nickname}</Badge>
                 </div>
-                <p className="text-sm text-rose-700 mb-3">{personalityTypes[type1].shortDescription}</p>
+                <p className="text-sm text-rose-700 mb-3">{personalityTypesData[type1].shortDescription}</p>
               </CardContent>
             </Card>
           )}
@@ -209,29 +264,37 @@ export default function ComparisonView() {
               <SelectValue placeholder="Select second type" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(personalityTypes).map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type} - {personalityTypes[type].nickname}
+              {types.map((type) => (
+                <SelectItem key={type.code} value={type.code}>
+                  {type.code} - {type.nickname}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          {type2 && (
+          {type2 && personalityTypesData[type2] && (
             <Card className="mt-4 border-rose-200">
               <CardContent className="p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-bold text-rose-800">{type2}</h3>
-                  <Badge className="bg-rose-100 text-rose-800">{personalityTypes[type2].nickname}</Badge>
+                  <Badge className="bg-rose-100 text-rose-800">{personalityTypesData[type2].nickname}</Badge>
                 </div>
-                <p className="text-sm text-rose-700 mb-3">{personalityTypes[type2].shortDescription}</p>
+                <p className="text-sm text-rose-700 mb-3">{personalityTypesData[type2].shortDescription}</p>
               </CardContent>
             </Card>
           )}
         </div>
       </div>
 
-      {type1 && type2 ? (
+      {isInitializing ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700"></div>
+        </div>
+      ) : isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700"></div>
+        </div>
+      ) : type1 && type2 ? (
         <div className="space-y-6">
           <Card className="border-rose-200">
             <CardContent className="p-6">

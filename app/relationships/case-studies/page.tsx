@@ -1,13 +1,30 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import Image from "next/image"
 import { BookOpen, ArrowRight, Heart, Lightbulb, MessageSquare, Users, BookMarked } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import Link from "next/link"
-import Image from "next/image"
-import { caseStudies } from "@/lib/case-studies-data"
+import { getCaseStudiesFromFirebase } from "@/lib/firebase"
 
 export default function CaseStudiesPage() {
+  const [caseStudies, setCaseStudies] = useState([])
+
+  useEffect(() => {
+    const fetchCaseStudies = async () => {
+      try {
+        const studies = await getCaseStudiesFromFirebase()
+        setCaseStudies(studies || [])
+      } catch (error) {
+        console.error("Error fetching case studies:", error)
+        setCaseStudies([])
+      }
+    }
+
+    fetchCaseStudies()
+  }, [])
+
   return (
     <>
       <Header />

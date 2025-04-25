@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { getPersonalityTypeByCode } from "@/lib/firebase"
 
 interface PersonalityType {
   code: string
@@ -77,21 +78,16 @@ export async function generateStaticParams() {
 
 async function getPersonalityType(type: string): Promise<PersonalityType | null> {
   try {
-    // Import directly from the personality-types library
-    const { personalityTypes } = await import("@/lib/personality-types")
+    // Get all personality types from the database
     const typeCode = type.toUpperCase()
+    const personalityType = await getPersonalityTypeByCode(typeCode)
 
-    // Check if the type exists in our data
-    if (!personalityTypes[typeCode]) {
+    if (!personalityType) {
       console.error(`Personality type ${typeCode} not found`)
       return null
     }
 
-    // Return the personality type with its code
-    return {
-      code: typeCode,
-      ...personalityTypes[typeCode],
-    }
+    return personalityType
   } catch (error) {
     console.error(`Error fetching personality type ${type}:`, error)
     return null

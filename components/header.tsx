@@ -1,12 +1,11 @@
 "use client"
 
 import type React from "react"
-
-import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { Menu, X, ChevronDown, Search } from "lucide-react"
 import Image from "next/image"
+import { Button } from "@/components/ui/button"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -51,7 +50,7 @@ export default function Header() {
           <Link href="/" className="flex items-center group">
             <Image
               src="/logo.png"
-              alt="PersonaIQ Logo"
+              alt="PersonalQ Logo"
               width={150}
               height={40}
               className="transition-transform group-hover:scale-105 duration-300"
