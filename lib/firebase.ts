@@ -14,6 +14,7 @@ export interface PersonalityExplanations {
   relationshipExplanation: string
 }
 
+// Firebase Config
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -185,7 +186,7 @@ export const getFAQCategories = async () => {
     console.error("Error fetching FAQ categories:", error)
     return []
   }
-  
+
 }
 // Function to get case studies from Firebase
 export async function getCaseStudiesFromFirebase() {
