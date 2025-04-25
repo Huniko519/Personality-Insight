@@ -1,9 +1,9 @@
 import Link from "next/link"
+import { Brain, Users, Briefcase, BookOpen, Award, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { Brain, Users, Briefcase, BookOpen, Award, Globe } from "lucide-react"
 
 export default function AboutPage() {
   return (

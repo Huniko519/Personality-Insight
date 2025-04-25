@@ -1,7 +1,7 @@
-import Header from "@/components/header"
-import Footer from "@/components/footer"
 import Link from "next/link"
 import { Heart, ArrowRight, Search, Lightbulb, MessageCircle, Zap } from "lucide-react"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 

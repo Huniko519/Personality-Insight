@@ -1,8 +1,8 @@
+import Link from "next/link"
+import { Heart, Users, ArrowRight } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CompatibilityChart from "@/components/compatibility-chart"
-import { Heart, Users, ArrowRight } from "lucide-react"
-import Link from "next/link"
 
 export default function CompatibilityPage() {
   return (

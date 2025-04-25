@@ -1,8 +1,8 @@
+import Link from "next/link"
+import Image from "next/image"
 import { Heart, Users, Briefcase, Home, BookOpen, ArrowRight, MessageSquare } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import Link from "next/link"
-import Image from "next/image"
 
 export default function RelationshipsPage() {
   return (

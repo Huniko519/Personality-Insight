@@ -2,23 +2,25 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { FileText, Download, Printer, Mail, CheckCircle } from "lucide-react"
+import { jsPDF } from "jspdf"
+import html2canvas from "html2canvas"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { personalityTypes } from "@/lib/personality-types"
-import { dimensionExplanations } from "@/lib/personality-explanations"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { FileText, Download, Printer, Mail, CheckCircle } from "lucide-react"
-import { jsPDF } from "jspdf"
-import html2canvas from "html2canvas"
+import { getAllPersonalityTypes, getPersonalityExplanations } from "@/lib/firebase"
 
 export default function ReportsPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<string>("")
+  const [personalityTypes, setPersonalityTypes] = useState<any>({})
+  const [personalityExplanations, setPersonalityExplanations] = useState<any>({})
+  const [isLoading, setIsLoading] = useState(true)
   // Update the sections state to include portrait section
   const [sections, setSections] = useState({
     overview: true,
@@ -36,6 +38,23 @@ export default function ReportsPage() {
   const [emailAddress, setEmailAddress] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+
+  // Fetch personality types and explanations
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [types, explanations] = await Promise.all([getAllPersonalityTypes(), getPersonalityExplanations()])
+        setPersonalityTypes(types)
+        setPersonalityExplanations(explanations)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   // Get personality type from localStorage if available
   useEffect(() => {
@@ -132,7 +151,14 @@ export default function ReportsPage() {
             </p>
           </div>
 
-          {!reportGenerated ? (
+          {isLoading ? (
+            <Card className="border-rose-200 shadow-md mb-8 p-8 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="h-8 w-8 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin"></div>
+              </div>
+              <p className="text-rose-700">Loading personality types...</p>
+            </Card>
+          ) : !reportGenerated ? (
             <Card className="border-rose-200 shadow-md mb-8">
               <CardHeader>
                 <CardTitle className="text-rose-800">Create Your Report</CardTitle>
@@ -942,8 +968,8 @@ export default function ReportsPage() {
                           <div>
                             <p>
                               {selectedType.includes("E")
-                                ? dimensionExplanations.EI.development.E
-                                : dimensionExplanations.EI.development.I}
+                                ? personalityExplanations.EI?.development.E
+                                : personalityExplanations.EI?.development.I}
                             </p>
                           </div>
                         </li>
@@ -952,8 +978,8 @@ export default function ReportsPage() {
                           <div>
                             <p>
                               {selectedType.includes("S")
-                                ? dimensionExplanations.SN.development.S
-                                : dimensionExplanations.SN.development.N}
+                                ? personalityExplanations.SN?.development.S
+                                : personalityExplanations.SN?.development.N}
                             </p>
                           </div>
                         </li>
@@ -962,8 +988,8 @@ export default function ReportsPage() {
                           <div>
                             <p>
                               {selectedType.includes("T")
-                                ? dimensionExplanations.TF.development.T
-                                : dimensionExplanations.TF.development.F}
+                                ? personalityExplanations.TF?.development.T
+                                : personalityExplanations.TF?.development.F}
                             </p>
                           </div>
                         </li>
@@ -972,8 +998,8 @@ export default function ReportsPage() {
                           <div>
                             <p>
                               {selectedType.includes("J")
-                                ? dimensionExplanations.JP.development.J
-                                : dimensionExplanations.JP.development.P}
+                                ? personalityExplanations.JP?.development.J
+                                : personalityExplanations.JP?.development.P}
                             </p>
                           </div>
                         </li>
@@ -1031,9 +1057,7 @@ export default function ReportsPage() {
 
                 <div className="text-center border-t border-rose-200 pt-6 mt-8">
                   <p className="text-rose-600 text-sm mb-2">This report was generated by PersonaIQ</p>
-                  <p className="text-rose-500 text-xs">
-                    © {new Date().getFullYear()} PersonaIQ. All rights reserved.
-                  </p>
+                  <p className="text-rose-500 text-xs">© {new Date().getFullYear()} PersonaIQ. All rights reserved.</p>
                 </div>
               </div>
 

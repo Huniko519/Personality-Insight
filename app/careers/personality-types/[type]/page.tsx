@@ -1,22 +1,59 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { useParams, notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { personalityTypes } from "@/lib/personality-types"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { getPersonalityTypeByCode } from "@/lib/firebase"
 
-export function generateStaticParams() {
-  return Object.keys(personalityTypes).map((type) => ({
-    type: type.toLowerCase(),
-  }))
-}
+export default function TypeCareerPage() {
+  const params = useParams()
+  const typeCode = (params.type as string).toUpperCase()
 
-export default function TypeCareerPage({ params }: { params: { type: string } }) {
-  const typeCode = params.type.toUpperCase()
-  const personalityType = personalityTypes[typeCode]
+  const [personalityType, setPersonalityType] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  if (!personalityType) {
+  useEffect(() => {
+    async function fetchPersonalityType() {
+      try {
+        const type = await getPersonalityTypeByCode(typeCode)
+        if (!type) {
+          console.error(`Personality type ${typeCode} not found`)
+          setError(true)
+        } else {
+          setPersonalityType(type)
+        }
+      } catch (error) {
+        console.error(`Error fetching personality type ${typeCode}:`, error)
+        setError(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPersonalityType()
+  }, [typeCode])
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-12 px-4 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+            <p className="mt-4 text-slate-600">Loading personality type data...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  if (error || !personalityType) {
     notFound()
   }
 
@@ -33,11 +70,11 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <Link href="/careers/personality-types">
-              <Button variant="ghost" className="mb-4 text-rose-700 hover:text-rose-800 hover:bg-rose-100">
+              <Button variant="ghost" className="mb-4 text-slate-700 hover:text-slate-800 hover:bg-slate-100">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -56,9 +93,9 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
                 Back to All Types
               </Button>
             </Link>
-            <h1 className="text-4xl font-bold text-rose-800 mb-2">{typeCode} Careers</h1>
-            <h2 className="text-2xl font-semibold text-rose-700">{personalityType.name}</h2>
-            <p className="text-rose-600 mt-2">{personalityType.nickname}</p>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">{typeCode} Careers</h1>
+            <h2 className="text-2xl font-semibold text-slate-700">{personalityType.name}</h2>
+            <p className="text-slate-600 mt-2">{personalityType.nickname}</p>
           </div>
 
           <Tabs defaultValue="overview" className="mb-12">
@@ -69,28 +106,28 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
             </TabsList>
 
             <TabsContent value="overview" className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-rose-800 mb-4">Career Profile: {typeCode}</h3>
-              <p className="mb-6 text-rose-700">{personalityType.description}</p>
+              <h3 className="text-xl font-semibold text-slate-800 mb-4">Career Profile: {typeCode}</h3>
+              <p className="mb-6 text-slate-700">{personalityType.description}</p>
 
-              <h4 className="font-semibold text-rose-800 mb-3">Ideal Work Environment</h4>
-              <p className="mb-6 text-rose-700">{careerContent.workEnvironment}</p>
+              <h4 className="font-semibold text-slate-800 mb-3">Ideal Work Environment</h4>
+              <p className="mb-6 text-slate-700">{careerContent.workEnvironment}</p>
 
-              <h4 className="font-semibold text-rose-800 mb-3">Recommended Career Paths</h4>
+              <h4 className="font-semibold text-slate-800 mb-3">Recommended Career Paths</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {personalityType.careers.map((career, index) => (
-                  <div key={index} className="bg-rose-50 p-3 rounded-md">
-                    <p className="text-rose-700">{career}</p>
+                  <div key={index} className="bg-slate-50 p-3 rounded-md">
+                    <p className="text-slate-700">{career}</p>
                   </div>
                 ))}
               </div>
 
-              <h4 className="font-semibold text-rose-800 mb-3">Famous {typeCode}s in Their Careers</h4>
-              <p className="text-rose-700 mb-2">
+              <h4 className="font-semibold text-slate-800 mb-3">Famous {typeCode}s in Their Careers</h4>
+              <p className="text-slate-700 mb-2">
                 These well-known individuals share your personality type and have excelled in their fields:
               </p>
               <div className="flex flex-wrap gap-2">
                 {personalityType.famousPeople.map((person, index) => (
-                  <span key={index} className="bg-rose-100 px-3 py-1 rounded-full text-rose-700">
+                  <span key={index} className="bg-slate-100 px-3 py-1 rounded-full text-slate-700">
                     {person}
                   </span>
                 ))}
@@ -100,11 +137,11 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
             <TabsContent value="strengths" className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-xl font-semibold text-rose-800 mb-4">Professional Strengths</h3>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-4">Professional Strengths</h3>
                   <ul className="space-y-3">
                     {personalityType.strengths.map((strength, index) => (
                       <li key={index} className="flex items-start">
-                        <div className="mr-3 mt-1 text-rose-500">
+                        <div className="mr-3 mt-1 text-slate-500">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="18"
@@ -122,22 +159,22 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
                           </svg>
                         </div>
                         <div>
-                          <p className="text-rose-700">{strength}</p>
+                          <p className="text-slate-700">{strength}</p>
                         </div>
                       </li>
                     ))}
                   </ul>
 
-                  <h3 className="text-xl font-semibold text-rose-800 mt-8 mb-4">Leadership Style</h3>
-                  <p className="text-rose-700 mb-4">{careerContent.leadershipStyle}</p>
+                  <h3 className="text-xl font-semibold text-slate-800 mt-8 mb-4">Leadership Style</h3>
+                  <p className="text-slate-700 mb-4">{careerContent.leadershipStyle}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-rose-800 mb-4">Workplace Challenges</h3>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-4">Workplace Challenges</h3>
                   <ul className="space-y-3">
                     {personalityType.weaknesses.map((weakness, index) => (
                       <li key={index} className="flex items-start">
-                        <div className="mr-3 mt-1 text-rose-500">
+                        <div className="mr-3 mt-1 text-slate-500">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="18"
@@ -156,28 +193,28 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
                           </svg>
                         </div>
                         <div>
-                          <p className="text-rose-700">{weakness}</p>
+                          <p className="text-slate-700">{weakness}</p>
                         </div>
                       </li>
                     ))}
                   </ul>
 
-                  <h3 className="text-xl font-semibold text-rose-800 mt-8 mb-4">Team Dynamics</h3>
-                  <p className="text-rose-700 mb-4">{careerContent.teamDynamics}</p>
+                  <h3 className="text-xl font-semibold text-slate-800 mt-8 mb-4">Team Dynamics</h3>
+                  <p className="text-slate-700 mb-4">{careerContent.teamDynamics}</p>
                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="development" className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-rose-800 mb-4">Career Development for {typeCode}s</h3>
+              <h3 className="text-xl font-semibold text-slate-800 mb-4">Career Development for {typeCode}s</h3>
 
               <div className="mb-8">
-                <h4 className="font-semibold text-rose-800 mb-3">Growth Opportunities</h4>
-                <p className="text-rose-700 mb-4">{careerContent.growthAreas}</p>
+                <h4 className="font-semibold text-slate-800 mb-3">Growth Opportunities</h4>
+                <p className="text-slate-700 mb-4">{careerContent.growthAreas}</p>
 
-                <div className="bg-rose-50 p-4 rounded-md">
-                  <h5 className="font-semibold text-rose-800 mb-2">Development Strategies</h5>
-                  <ul className="list-disc list-inside text-rose-700 space-y-2">
+                <div className="bg-slate-50 p-4 rounded-md">
+                  <h5 className="font-semibold text-slate-800 mb-2">Development Strategies</h5>
+                  <ul className="list-disc list-inside text-slate-700 space-y-2">
                     {getDevStrategies(typeCode).map((strategy, index) => (
                       <li key={index}>{strategy}</li>
                     ))}
@@ -186,12 +223,12 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
               </div>
 
               <div className="mb-8">
-                <h4 className="font-semibold text-rose-800 mb-3">Communication in the Workplace</h4>
-                <p className="text-rose-700 mb-4">{personalityType.relationships.communication}</p>
+                <h4 className="font-semibold text-slate-800 mb-3">Communication in the Workplace</h4>
+                <p className="text-slate-700 mb-4">{personalityType.relationships.communication}</p>
 
-                <div className="bg-rose-50 p-4 rounded-md">
-                  <h5 className="font-semibold text-rose-800 mb-2">Communication Tips</h5>
-                  <ul className="list-disc list-inside text-rose-700 space-y-2">
+                <div className="bg-slate-50 p-4 rounded-md">
+                  <h5 className="font-semibold text-slate-800 mb-2">Communication Tips</h5>
+                  <ul className="list-disc list-inside text-slate-700 space-y-2">
                     {getCommunicationTips(typeCode).map((tip, index) => (
                       <li key={index}>{tip}</li>
                     ))}
@@ -200,20 +237,20 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
               </div>
 
               <div>
-                <h4 className="font-semibold text-rose-800 mb-3">Long-term Career Satisfaction</h4>
-                <p className="text-rose-700 mb-4">
+                <h4 className="font-semibold text-slate-800 mb-3">Long-term Career Satisfaction</h4>
+                <p className="text-slate-700 mb-4">
                   For long-term career satisfaction, {typeCode}s should seek roles that align with their core values:
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-6">
                   {personalityType.values.map((value, index) => (
-                    <span key={index} className="bg-rose-100 px-3 py-1 rounded-full text-rose-700">
+                    <span key={index} className="bg-slate-100 px-3 py-1 rounded-full text-slate-700">
                       {value}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-rose-700">
+                <p className="text-slate-700">
                   Remember that while your personality type provides valuable insights, your individual experiences,
                   skills, and interests also play crucial roles in finding fulfilling work. Use this information as a
                   starting point for exploration rather than a limitation.
@@ -224,10 +261,10 @@ export default function TypeCareerPage({ params }: { params: { type: string } })
 
           <div className="text-center mb-8">
             <Link href="/quiz">
-              <Button className="bg-rose-600 hover:bg-rose-700 mr-4">Take the Personality Test</Button>
+              <Button className="bg-slate-600 hover:bg-slate-700 mr-4">Take the Personality Test</Button>
             </Link>
             <Link href="/careers">
-              <Button variant="outline" className="border-rose-600 text-rose-600 hover:bg-rose-50">
+              <Button variant="outline" className="border-slate-600 text-slate-600 hover:bg-slate-50">
                 Explore Career Matches
               </Button>
             </Link>

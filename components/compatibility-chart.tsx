@@ -1,32 +1,121 @@
 "use client"
 
 import React from "react"
-
 import { useState, useEffect } from "react"
-import { personalityTypes } from "@/lib/personality-types"
-import { getCompatibility } from "@/lib/compatibility-data"
+import { Info, Heart } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Info } from "lucide-react"
-import { Heart } from "lucide-react"
+import { getCompatibility } from "@/lib/compatibility-data"
+import { getPersonalityTypes } from "@/lib/firebase"
 
 export default function CompatibilityChart() {
   const [selectedType1, setSelectedType1] = useState<string>("INFJ")
   const [selectedType2, setSelectedType2] = useState<string>("ENFP")
-  const [compatibility, setCompatibility] = useState(getCompatibility(selectedType1, selectedType2))
+  const [compatibility, setCompatibility] = useState({
+    score: 5,
+    description: "Loading compatibility data...",
+    strengths: ["Loading..."],
+    challenges: ["Loading..."],
+    advice: "Loading advice...",
+    summary: "Loading summary...",
+  })
   const [view, setView] = useState<"chart" | "details">("chart")
+  const [isLoading, setIsLoading] = useState(true)
+  const [compatibilityMatrix, setCompatibilityMatrix] = useState<Record<string, Record<string, number>>>({})
+  const [personalityTypes, setPersonalityTypes] = useState<any>({})
+  const [allTypes, setAllTypes] = useState<string[]>([])
+
+  // Load personality types and compatibility data
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setIsLoading(true)
+
+        // Load personality types
+        const types = await getPersonalityTypes()
+        setPersonalityTypes(types)
+
+        const typeKeys = Object.keys(types)
+        setAllTypes(typeKeys)
+
+        // Now load compatibility data
+        await loadAllCompatibilityData(typeKeys)
+
+        // Set initial compatibility
+        try {
+          const initialCompat = getCompatibility(selectedType1, selectedType2)
+          setCompatibility(initialCompat)
+        } catch (error) {
+          console.error(`Error loading initial compatibility for ${selectedType1} and ${selectedType2}:`, error)
+          // Set default compatibility if there's an error
+          setCompatibility({
+            score: 5,
+            description: `Compatibility data between ${selectedType1} and ${selectedType2} is not available.`,
+            strengths: ["Unique perspectives", "Potential for growth"],
+            challenges: ["May need to work on communication", "Different approaches to situations"],
+            advice: "Focus on understanding each other's perspectives and communication styles.",
+            summary: "A match with specific strengths and challenges.",
+          })
+        }
+      } catch (error) {
+        console.error("Error loading personality types:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
+
+  // Load compatibility data for all types
+  async function loadAllCompatibilityData(types: string[]) {
+    const matrix: Record<string, Record<string, number>> = {}
+
+    // Initialize the matrix with empty objects
+    types.forEach((type) => {
+      matrix[type] = {}
+    })
+
+    // Load compatibility data for each pair of types
+    for (const type1 of types) {
+      for (const type2 of types) {
+        try {
+          const compat = getCompatibility(type1, type2)
+          matrix[type1][type2] = compat.score
+        } catch (error) {
+          console.error(`Error loading compatibility for ${type1} and ${type2}:`, error)
+          // Use a default score if there's an error
+          matrix[type1][type2] = 5
+        }
+      }
+    }
+
+    setCompatibilityMatrix(matrix)
+  }
 
   // Update compatibility when selected types change
   useEffect(() => {
-    setCompatibility(getCompatibility(selectedType1, selectedType2))
+    if (!selectedType1 || !selectedType2) return
+
+    try {
+      const compat = getCompatibility(selectedType1, selectedType2)
+      setCompatibility(compat)
+    } catch (error) {
+      console.error(`Error loading compatibility for ${selectedType1} and ${selectedType2}:`, error)
+      // Set default compatibility data if there's an error
+      setCompatibility({
+        score: 5,
+        description: `Compatibility data between ${selectedType1} and ${selectedType2} is not available.`,
+        strengths: ["Unique perspectives", "Potential for growth"],
+        challenges: ["May need to work on communication", "Different approaches to situations"],
+        advice: "Focus on understanding each other's perspectives and communication styles.",
+        summary: "A match with specific strengths and challenges.",
+      })
+    }
   }, [selectedType1, selectedType2])
 
-  const allTypes = Object.keys(personalityTypes)
-
-  // Update the chart styling with a more modern and attractive design
-
-  // Replace the getCellColor function with this more attractive version:
+  // Function to get cell color based on score
   const getCellColor = (score: number) => {
     if (score >= 8)
       return "bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border-green-300 shadow-sm"
@@ -42,12 +131,25 @@ export default function CompatibilityChart() {
     return "Challenging"
   }
 
-  // Add a summary property to the compatibility data structure
-  // Add this function to the component:
-  const getCompatibilitySummary = (type1, type2) => {
-    const compat = getCompatibility(type1, type2)
+  // Function to get compatibility summary
+  const getCompatibilitySummary = (type1: string, type2: string) => {
+    if (compatibilityMatrix[type1] && compatibilityMatrix[type1][type2] !== undefined) {
+      const score = compatibilityMatrix[type1][type2]
+      if (score >= 8) return "Excellent compatibility with complementary strengths."
+      if (score >= 6) return "Good compatibility with some areas to work on."
+      return "Challenging match that requires effort and understanding."
+    }
+    return "A match with specific strengths and challenges."
+  }
+
+  if (isLoading && Object.keys(compatibilityMatrix).length === 0) {
     return (
-      compat.summary || `A ${getScoreLabel(compat.score).toLowerCase()} match with specific strengths and challenges.`
+      <div className="flex justify-center items-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700 mx-auto mb-4"></div>
+          <p className="text-rose-700">Loading compatibility data...</p>
+        </div>
+      </div>
     )
   }
 
@@ -59,7 +161,6 @@ export default function CompatibilityChart() {
           <TabsTrigger value="details">Detailed Comparison</TabsTrigger>
         </TabsList>
 
-        {/* Replace the chart section in the TabsContent with this enhanced version: */}
         <TabsContent value="chart" className="mt-4">
           <div className="rounded-xl border border-rose-200 shadow-lg bg-white">
             <div className="min-w-max">
@@ -84,7 +185,7 @@ export default function CompatibilityChart() {
                       <span className="text-rose-800">{type1}</span>
                     </div>
                     {allTypes.map((type2, colIndex) => {
-                      const compatScore = getCompatibility(type1, type2).score
+                      const compatScore = compatibilityMatrix[type1]?.[type2] || 5
                       const isSelected = selectedType1 === type1 && selectedType2 === type2
 
                       // Enhanced cell styling
@@ -163,7 +264,7 @@ export default function CompatibilityChart() {
                                     {getScoreLabel(compatScore)}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-600">{getCompatibility(type1, type2).summary}</p>
+                                <p className="text-sm text-gray-600">{getCompatibilitySummary(type1, type2)}</p>
                                 <p className="text-xs text-rose-600 mt-2 italic">Click for details</p>
                               </TooltipContent>
                             </Tooltip>
@@ -204,7 +305,7 @@ export default function CompatibilityChart() {
               >
                 {allTypes.map((type) => (
                   <option key={type} value={type}>
-                    {type} - {personalityTypes[type].nickname}
+                    {type} - {personalityTypes[type]?.nickname || ""}
                   </option>
                 ))}
               </select>
@@ -218,7 +319,7 @@ export default function CompatibilityChart() {
               >
                 {allTypes.map((type) => (
                   <option key={type} value={type}>
-                    {type} - {personalityTypes[type].nickname}
+                    {type} - {personalityTypes[type]?.nickname || ""}
                   </option>
                 ))}
               </select>
@@ -256,10 +357,10 @@ export default function CompatibilityChart() {
                     <div className="bg-rose-100 p-1 rounded-full mr-2">
                       <Info className="h-4 w-4 text-rose-600" />
                     </div>
-                    {selectedType1} ({personalityTypes[selectedType1].nickname})
+                    {selectedType1} ({personalityTypes[selectedType1]?.nickname || ""})
                   </h3>
                   <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {personalityTypes[selectedType1].traits.slice(0, 4).map((trait, index) => (
+                    {personalityTypes[selectedType1]?.traits?.slice(0, 4).map((trait: string, index: number) => (
                       <li key={index}>{trait}</li>
                     ))}
                   </ul>
@@ -269,10 +370,10 @@ export default function CompatibilityChart() {
                     <div className="bg-rose-100 p-1 rounded-full mr-2">
                       <Info className="h-4 w-4 text-rose-600" />
                     </div>
-                    {selectedType2} ({personalityTypes[selectedType2].nickname})
+                    {selectedType2} ({personalityTypes[selectedType2]?.nickname || ""})
                   </h3>
                   <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {personalityTypes[selectedType2].traits.slice(0, 4).map((trait, index) => (
+                    {personalityTypes[selectedType2]?.traits?.slice(0, 4).map((trait: string, index: number) => (
                       <li key={index}>{trait}</li>
                     ))}
                   </ul>

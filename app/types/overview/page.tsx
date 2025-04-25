@@ -1,19 +1,64 @@
 "use client"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { getAllPersonalityTypes } from "@/lib/personality-types"
+import Loading from "@/components/loading"
+import { getAllPersonalityTypes } from "@/lib/firebase"
 
 export default function PersonalityTypesOverviewPage() {
-  const allTypes = getAllPersonalityTypes()
+  const [allTypes, setAllTypes] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchTypes() {
+      try {
+        const types = await getAllPersonalityTypes()
+        setAllTypes(types)
+      } catch (err) {
+        console.error("Error fetching personality types:", err)
+        setError("Failed to load personality types from the database. Please try again later.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTypes()
+  }, [])
+
+  if (loading) {
+    return <Loading />
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+            <h1 className="text-2xl font-bold text-rose-800 mb-4">Database Error</h1>
+            <p className="text-rose-700 mb-6">{error}</p>
+            <Button onClick={() => window.location.reload()} className="bg-rose-600 hover:bg-rose-700">
+              Try Again
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  // Ensure allTypes is an array before using filter
+  const safeAllTypes = Array.isArray(allTypes) ? allTypes : []
 
   // Group personality types by category
-  const analysts = allTypes.filter((type) => ["INTJ", "INTP", "ENTJ", "ENTP"].includes(type.code))
-  const diplomats = allTypes.filter((type) => ["INFJ", "INFP", "ENFJ", "ENFP"].includes(type.code))
-  const sentinels = allTypes.filter((type) => ["ISTJ", "ISFJ", "ESTJ", "ESFJ"].includes(type.code))
-  const explorers = allTypes.filter((type) => ["ISTP", "ISFP", "ESTP", "ESFP"].includes(type.code))
+  const analysts = safeAllTypes.filter((type) => ["INTJ", "INTP", "ENTJ", "ENTP"].includes(type.code))
+  const diplomats = safeAllTypes.filter((type) => ["INFJ", "INFP", "ENFJ", "ENFP"].includes(type.code))
+  const sentinels = safeAllTypes.filter((type) => ["ISTJ", "ISFJ", "ESTJ", "ESFJ"].includes(type.code))
+  const explorers = safeAllTypes.filter((type) => ["ISTP", "ISFP", "ESTP", "ESFP"].includes(type.code))
 
   return (
     <>

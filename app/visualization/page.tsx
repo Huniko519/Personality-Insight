@@ -1,28 +1,26 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
+import { Info, Download, Share2, ChevronRight, ChevronLeft, BarChart2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { personalityTypes } from "@/lib/personality-types"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { dimensionExplanations } from "@/lib/personality-explanations"
 import { Button } from "@/components/ui/button"
-import { Info, Download, Share2, ChevronRight, ChevronLeft, BarChart2 } from "lucide-react"
 import SocialShare from "@/components/social-share"
-import dynamic from "next/dynamic"
+import { getPersonalityExplanations, getAllPersonalityTypes } from "@/lib/firebase"
 
-// Use dynamic import with no SSR for the comparison component as well
+// Use dynamic import with no SSR for the comparison component
 const ComparisonView = dynamic(() => import("@/components/comparison-view"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[500px] bg-white rounded-lg border border-rose-200">
+    <div className="flex items-center justify-center h-[500px] bg-white rounded-lg border border-slate-200">
       <div className="text-center">
-        <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-rose-300 border-t-rose-600"></div>
-        <p className="mt-4 text-lg text-rose-800 font-medium">Loading Comparison View...</p>
+        <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600"></div>
+        <p className="mt-4 text-lg text-slate-800 font-medium">Loading Comparison View...</p>
       </div>
     </div>
   ),
@@ -32,6 +30,8 @@ export default function VisualizationPage() {
   const router = useRouter()
   const [selectedVisualization, setSelectedVisualization] = useState<string>("type-wheel")
   const [selectedType, setSelectedType] = useState<string>("none")
+  const [personalityTypes, setPersonalityTypes] = useState<Record<string, any>>({})
+  const [isLoading, setIsLoading] = useState(true)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 650 })
   const [hoveredType, setHoveredType] = useState<string | null>(null)
@@ -41,6 +41,45 @@ export default function VisualizationPage() {
   const [showShareOptions, setShowShareOptions] = useState(false)
   const [selectedDimension, setSelectedDimension] = useState<string>("EI")
   const [dimensionValue, setDimensionValue] = useState<number>(50)
+  const [error, setError] = useState<string | null>(null)
+  const [dimensionExplanations, setDimensionExplanations] = useState<any>({})
+
+  // Load personality types
+  useEffect(() => {
+    const loadTypes = async () => {
+      try {
+        setIsLoading(true)
+        const types = await getAllPersonalityTypes()
+        const typesObj: Record<string, any> = {}
+        types.forEach((type) => {
+          typesObj[type.code] = type
+        })
+        setPersonalityTypes(typesObj)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error loading personality types:", error)
+        setError("Failed to load personality types. Please try again later.")
+        setIsLoading(false)
+      }
+    }
+
+    loadTypes()
+  }, [])
+
+  // Load personality explanations
+  useEffect(() => {
+    const loadExplanations = async () => {
+      try {
+        const explanations = await getPersonalityExplanations()
+        setDimensionExplanations(explanations.dimensionExplanations || {})
+      } catch (error) {
+        console.error("Error loading personality explanations:", error)
+        setError("Failed to load personality explanations. Please try again later.")
+      }
+    }
+
+    loadExplanations()
+  }, [])
 
   // Animation loop
   useEffect(() => {
@@ -61,7 +100,9 @@ export default function VisualizationPage() {
   useEffect(() => {
     if (
       canvasRef.current &&
-      ["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization)
+      ["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization) &&
+      !isLoading &&
+      Object.keys(personalityTypes).length > 0
     ) {
       const canvas = canvasRef.current
       const ctx = canvas.getContext("2d")
@@ -94,7 +135,17 @@ export default function VisualizationPage() {
         }
       }
     }
-  }, [selectedVisualization, selectedType, hoveredType, canvasSize, animationPhase, selectedDimension, dimensionValue])
+  }, [
+    selectedVisualization,
+    selectedType,
+    hoveredType,
+    canvasSize,
+    animationPhase,
+    selectedDimension,
+    dimensionValue,
+    isLoading,
+    personalityTypes,
+  ])
 
   // Handle canvas mouse events
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -434,11 +485,11 @@ export default function VisualizationPage() {
   ) => {
     if (!type) {
       // Draw prompt to select a type
-      ctx.fillStyle = "#fff5f7" // rose-50
+      ctx.fillStyle = "#fff1f2" // slate-50
       ctx.fillRect(0, 0, width, height)
 
       // Add subtle background pattern
-      ctx.strokeStyle = "rgba(244, 63, 94, 0.05)" // rose-500 with very low opacity
+      ctx.strokeStyle = "rgba(100, 116, 139, 0.05)" // slate-500 with very low opacity
       ctx.lineWidth = 1
 
       // Grid pattern
@@ -464,13 +515,13 @@ export default function VisualizationPage() {
       ctx.translate(-width / 2, -height / 2)
 
       // Draw icon
-      ctx.fillStyle = "rgba(244, 63, 94, 0.1)" // rose-500 with low opacity
+      ctx.fillStyle = "rgba(100, 116, 139, 0.1)" // slate-500 with low opacity
       ctx.beginPath()
       ctx.arc(width / 2, height / 2 - 50, 40, 0, Math.PI * 2)
       ctx.fill()
 
       // Draw arrow
-      ctx.strokeStyle = "rgba(244, 63, 94, 0.6)" // rose-500 with medium opacity
+      ctx.strokeStyle = "rgba(100, 116, 139, 0.6)" // slate-500 with medium opacity
       ctx.lineWidth = 3
       ctx.beginPath()
       ctx.moveTo(width / 2, height / 2 - 70)
@@ -486,9 +537,8 @@ export default function VisualizationPage() {
       ctx.restore()
 
       // Draw text with shadow
-      ctx.shadowColor = "rgba(244, 63, 94, 0.3)" // rose-500 with medium opacity
-      ctx.shadowBlur = 10
-      ctx.fillStyle = "#881337" // rose-900
+      ctx.shadowColor = "rgba(100, 116, 139, 0.3)" // slate-500 with medium opacity
+      ctx.fillStyle = "#881337" // slate-900
       ctx.font = "bold 22px Arial"
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
@@ -497,7 +547,7 @@ export default function VisualizationPage() {
       // Draw subtitle with pulsing opacity
       const pulseOpacity = 0.6 + Math.sin(phase * 3) * 0.3
       ctx.shadowBlur = 0
-      ctx.fillStyle = `rgba(244, 63, 94, ${pulseOpacity})` // rose-500 with pulsing opacity
+      ctx.fillStyle = `rgba(100, 116, 139, ${pulseOpacity})` // slate-500 with pulsing opacity
       ctx.font = "18px Arial"
       ctx.fillText("to view cognitive functions", width / 2, height / 2 + 45)
 
@@ -515,24 +565,24 @@ export default function VisualizationPage() {
     const startY = 120
 
     // Colors
-    const bgColor = "#fff5f7" // rose-50
-    const textColor = "#881337" // rose-900
-    const titleColor = "#be123c" // rose-700
+    const bgColor = "#fff1f2" // slate-50
+    const textColor = "#881337" // slate-900
+    const titleColor = "#9f1239" // slate-800
     const barColors = [
-      { fill: "#e11d48", text: "#ffffff" }, // Dominant - rose-600
-      { fill: "#f43f5e", text: "#ffffff" }, // Auxiliary - rose-500
-      { fill: "#fb7185", text: "#881337" }, // Tertiary - rose-400
-      { fill: "#fda4af", text: "#881337" }, // Inferior - rose-300
+      { fill: "#be123c", text: "#ffffff" }, // Dominant - slate-700
+      { fill: "#e11d48", text: "#ffffff" }, // Auxiliary - slate-600
+      { fill: "#f43f5e", text: "#ffffff" }, // Tertiary - slate-500
+      { fill: "#fb7185", text: "#9f1239" }, // Inferior - slate-400
     ]
     const positionLabels = ["Dominant", "Auxiliary", "Tertiary", "Inferior"]
-    const positionColors = ["#be123c", "#e11d48", "#f43f5e", "#fb7185"] // rose-700 to rose-400
+    const positionColors = ["#9f1239", "#be123c", "#e11d48", "#f43f5e"] // slate-800 to slate-500
 
     // Draw background
     ctx.fillStyle = bgColor
     ctx.fillRect(0, 0, width, height)
 
     // Add subtle background pattern
-    ctx.strokeStyle = "rgba(244, 63, 94, 0.05)" // rose-500 with very low opacity
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.05)" // slate-500 with very low opacity
     ctx.lineWidth = 1
 
     // Grid pattern
@@ -551,7 +601,7 @@ export default function VisualizationPage() {
     }
 
     // Draw title with enhanced styling
-    ctx.shadowColor = "rgba(244, 63, 94, 0.3)" // rose-500 with medium opacity
+    ctx.shadowColor = "rgba(100, 116, 139, 0.3)" // slate-500 with medium opacity
     ctx.shadowBlur = 10
     ctx.shadowOffsetY = 2
     ctx.fillStyle = titleColor
@@ -574,7 +624,7 @@ export default function VisualizationPage() {
 
       // Draw bar background with rounded corners
       const cornerRadius = barHeight / 2
-      ctx.fillStyle = "rgba(254, 205, 211, 0.5)" // rose-200 with opacity
+      ctx.fillStyle = "rgba(226, 232, 240, 0.5)" // slate-200 with opacity
 
       // Draw rounded rectangle for background
       ctx.beginPath()
@@ -674,8 +724,8 @@ export default function VisualizationPage() {
     const animatedBoxY = boxY + Math.sin(phase * 2) * 3
 
     // Draw box background
-    ctx.fillStyle = "rgba(254, 205, 211, 0.4)" // rose-200 with opacity
-    ctx.shadowColor = "rgba(244, 63, 94, 0.2)"
+    ctx.fillStyle = "rgba(226, 232, 240, 0.4)" // slate-200 with opacity
+    ctx.shadowColor = "rgba(100, 116, 139, 0.2)"
     ctx.shadowBlur = 10
 
     // Draw rounded box
@@ -694,7 +744,7 @@ export default function VisualizationPage() {
     ctx.fill()
 
     // Add subtle border
-    ctx.strokeStyle = "rgba(244, 63, 94, 0.3)"
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.3)"
     ctx.lineWidth = 1
     ctx.stroke()
     ctx.shadowBlur = 0
@@ -949,261 +999,284 @@ export default function VisualizationPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-            <Card className="lg:col-span-1 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-left">
-              <CardHeader>
-                <CardTitle className="text-rose-800 dark:text-rose-200">Visualization Options</CardTitle>
-                <CardDescription className="dark:text-rose-300">Select a visualization type</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                    Visualization Type
-                  </label>
-                  <Select value={selectedVisualization} onValueChange={setSelectedVisualization}>
-                    <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                      <SelectValue placeholder="Select visualization" />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                      <SelectItem value="type-wheel">Type Wheel</SelectItem>
-                      <SelectItem value="cognitive-functions">Cognitive Functions</SelectItem>
-                      <SelectItem value="dimension-spectrum">Dimension Spectrum</SelectItem>
-                      <SelectItem value="comparison">Type Comparison</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {selectedVisualization === "dimension-spectrum" ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                        Select Dimension
-                      </label>
-                      <Select value={selectedDimension} onValueChange={handleDimensionChange}>
-                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                          <SelectValue placeholder="Select dimension" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                          <SelectItem value="EI">Extraversion vs. Introversion</SelectItem>
-                          <SelectItem value="SN">Sensing vs. Intuition</SelectItem>
-                          <SelectItem value="TF">Thinking vs. Feeling</SelectItem>
-                          <SelectItem value="JP">Judging vs. Perceiving</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="pt-2">
-                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                        Adjust Preference
-                      </label>
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
-                          {selectedDimension[0]}
-                        </div>
-                        <div className="flex-1 mx-4">
-                          <div className="relative h-4 bg-rose-100 dark:bg-rose-800/50 rounded-full overflow-hidden shadow-inner">
-                            <div
-                              className="absolute h-4 bg-gradient-to-r from-rose-300 via-rose-400 to-rose-500 dark:from-rose-400 dark:via-rose-500 dark:to-rose-600 rounded-full"
-                              style={{ width: `${dimensionValue}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
-                          {selectedDimension[1]}
-                        </div>
-                      </div>
-                      <div className="flex justify-between mt-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSliderChange("left")}
-                          className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSliderChange("right")}
-                          className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ) : selectedVisualization !== "comparison" ? (
+          {error ? (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8">
+              <p>{error}</p>
+              <Button
+                onClick={() => window.location.reload()}
+                className="mt-2 bg-red-100 text-red-700 hover:bg-red-200"
+              >
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+              <Card className="lg:col-span-1 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-left">
+                <CardHeader>
+                  <CardTitle className="text-rose-800 dark:text-rose-200">Visualization Options</CardTitle>
+                  <CardDescription className="dark:text-rose-300">Select a visualization type</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                      Personality Type
+                      Visualization Type
                     </label>
-                    <Select value={selectedType} onValueChange={setSelectedType}>
+                    <Select value={selectedVisualization} onValueChange={setSelectedVisualization}>
                       <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                        <SelectValue placeholder="Select type (optional)" />
+                        <SelectValue placeholder="Select visualization" />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                        {selectedVisualization === "cognitive-functions" ? null : (
-                          <SelectItem value="none">None</SelectItem>
-                        )}
-                        {Object.keys(personalityTypes).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type} - {personalityTypes[type].name}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="type-wheel">Type Wheel</SelectItem>
+                        <SelectItem value="cognitive-functions">Cognitive Functions</SelectItem>
+                        <SelectItem value="dimension-spectrum">Dimension Spectrum</SelectItem>
+                        <SelectItem value="comparison">Type Comparison</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                ) : null}
 
-                <div className="pt-4 border-t border-rose-100 dark:border-rose-800">
-                  <Button
-                    onClick={downloadVisualization}
-                    variant="outline"
-                    className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Image
-                  </Button>
-                </div>
+                  {selectedVisualization === "dimension-spectrum" ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
+                          Select Dimension
+                        </label>
+                        <Select value={selectedDimension} onValueChange={handleDimensionChange}>
+                          <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
+                            <SelectValue placeholder="Select dimension" />
+                          </SelectTrigger>
+                          <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
+                            <SelectItem value="EI">Extraversion vs. Introversion</SelectItem>
+                            <SelectItem value="SN">Sensing vs. Intuition</SelectItem>
+                            <SelectItem value="TF">Thinking vs. Feeling</SelectItem>
+                            <SelectItem value="JP">Judging vs. Perceiving</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                <div>
-                  <Button
-                    onClick={() => setShowShareOptions(!showShareOptions)}
-                    variant="outline"
-                    className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share Visualization
-                  </Button>
+                      <div className="pt-2">
+                        <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
+                          Adjust Preference
+                        </label>
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
+                            {selectedDimension[0]}
+                          </div>
+                          <div className="flex-1 mx-4">
+                            <div className="relative h-4 bg-rose-100 dark:bg-rose-800/50 rounded-full overflow-hidden shadow-inner">
+                              <div
+                                className="absolute h-4 bg-gradient-to-r from-rose-300 via-rose-400 to-rose-500 dark:from-rose-400 dark:via-rose-500 dark:to-rose-600 rounded-full"
+                                style={{ width: `${dimensionValue}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
+                            {selectedDimension[1]}
+                          </div>
+                        </div>
+                        <div className="flex justify-between mt-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSliderChange("left")}
+                            className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSliderChange("right")}
+                            className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : selectedVisualization !== "comparison" ? (
+                    <div>
+                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
+                        Personality Type
+                      </label>
+                      <Select value={selectedType} onValueChange={setSelectedType}>
+                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
+                          <SelectValue placeholder="Select type (optional)" />
+                        </SelectTrigger>
+                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
+                          {selectedVisualization === "cognitive-functions" ? null : (
+                            <SelectItem value="none">None</SelectItem>
+                          )}
+                          {!isLoading &&
+                            Object.keys(personalityTypes).map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type} - {personalityTypes[type].name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : null}
 
-                  {showShareOptions && (
-                    <div className="mt-4 p-3 bg-white dark:bg-rose-900 rounded-md border border-rose-200 dark:border-rose-800 animate-fade-in">
-                      <SocialShare
-                        title="Personality Type Visualization"
-                        text={`Check out this ${selectedVisualization} visualization for ${selectedType === "none" ? "personality types" : selectedType} on PersonaIQ!`}
-                      />
+                  <div className="pt-4 border-t border-rose-100 dark:border-rose-800">
+                    <Button
+                      onClick={downloadVisualization}
+                      variant="outline"
+                      className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Image
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      onClick={() => setShowShareOptions(!showShareOptions)}
+                      variant="outline"
+                      className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Share Visualization
+                    </Button>
+
+                    {showShareOptions && (
+                      <div className="mt-4 p-3 bg-white dark:bg-rose-900 rounded-md border border-rose-200 dark:border-rose-800 animate-fade-in">
+                        <SocialShare
+                          title="Personality Type Visualization"
+                          text={`Check out this ${selectedVisualization} visualization for ${selectedType === "none" ? "personality types" : selectedType} on PersonaIQ!`}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-3 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-right">
+                <CardHeader>
+                  <CardTitle className="text-rose-800 dark:text-rose-200">
+                    {selectedVisualization === "type-wheel" && "MBTI Type Wheel"}
+                    {selectedVisualization === "cognitive-functions" && "Cognitive Functions"}
+                    {selectedVisualization === "dimension-spectrum" && "Personality Dimensions"}
+                    {selectedVisualization === "comparison" && "Personality Type Comparison"}
+                  </CardTitle>
+                  <CardDescription className="dark:text-rose-300">
+                    {selectedVisualization === "type-wheel" && "Visual representation of all 16 personality types"}
+                    {selectedVisualization === "cognitive-functions" &&
+                      "How different functions stack in a personality type"}
+                    {selectedVisualization === "dimension-spectrum" &&
+                      "The four dimensions that define personality type"}
+                    {selectedVisualization === "comparison" &&
+                      "Compare traits and compatibility between personality types"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center h-[500px] bg-white rounded-lg border border-slate-200">
+                      <div className="text-center">
+                        <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600"></div>
+                        <p className="mt-4 text-lg text-slate-800 font-medium">Loading Visualization...</p>
+                      </div>
+                    </div>
+                  ) : (
+                    ["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization) && (
+                      <div
+                        className={`bg-white dark:bg-rose-900/50 rounded-lg p-4 flex justify-center ${
+                          selectedVisualization === "dimension-spectrum"
+                            ? "dimension-spectrum-container"
+                            : selectedVisualization === "type-wheel"
+                              ? "type-wheel-container"
+                              : "canvas-container"
+                        }`}
+                      >
+                        <canvas
+                          ref={canvasRef}
+                          width={canvasSize.width}
+                          height={canvasSize.height}
+                          className="max-w-full h-auto border border-rose-200 dark:border-rose-800 rounded-lg shadow-md transition-all duration-300"
+                          onMouseMove={handleCanvasMouseMove}
+                          onMouseLeave={handleCanvasMouseLeave}
+                          onClick={handleCanvasClick}
+                        />
+                      </div>
+                    )
+                  )}
+
+                  {selectedVisualization === "comparison" && <ComparisonView />}
+
+                  {selectedVisualization === "type-wheel" && (
+                    <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 flex items-start animate-fade-in">
+                      <Info className="h-5 w-5 text-rose-600 dark:text-rose-400 mr-2 mt-0.5 flex-shrink-0" />
+                      <p className="text-rose-700 dark:text-rose-300 text-sm">
+                        <strong>Tip:</strong> Click on any personality type in the wheel to view detailed information
+                        about that type. Hover over a type to highlight it.
+                      </p>
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card className="lg:col-span-3 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-right">
-              <CardHeader>
-                <CardTitle className="text-rose-800 dark:text-rose-200">
-                  {selectedVisualization === "type-wheel" && "MBTI Type Wheel"}
-                  {selectedVisualization === "cognitive-functions" && "Cognitive Functions"}
-                  {selectedVisualization === "dimension-spectrum" && "Personality Dimensions"}
-                  {selectedVisualization === "comparison" && "Personality Type Comparison"}
-                </CardTitle>
-                <CardDescription className="dark:text-rose-300">
-                  {selectedVisualization === "type-wheel" && "Visual representation of all 16 personality types"}
-                  {selectedVisualization === "cognitive-functions" &&
-                    "How different functions stack in a personality type"}
-                  {selectedVisualization === "dimension-spectrum" && "The four dimensions that define personality type"}
-                  {selectedVisualization === "comparison" &&
-                    "Compare traits and compatibility between personality types"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization) && (
-                  <div
-                    className={`bg-white dark:bg-rose-950 rounded-lg p-4 flex justify-center ${
-                      selectedVisualization === "dimension-spectrum"
-                        ? "dimension-spectrum-container"
-                        : selectedVisualization === "type-wheel"
-                          ? "type-wheel-container"
-                          : "canvas-container"
-                    }`}
-                  >
-                    <canvas
-                      ref={canvasRef}
-                      width={canvasSize.width}
-                      height={canvasSize.height}
-                      className="max-w-full h-auto border border-rose-200 dark:border-rose-800 rounded-lg shadow-md transition-all duration-300"
-                      onMouseMove={handleCanvasMouseMove}
-                      onMouseLeave={handleCanvasMouseLeave}
-                      onClick={handleCanvasClick}
-                    />
-                  </div>
-                )}
-
-                {selectedVisualization === "comparison" && <ComparisonView />}
-
-                {selectedVisualization === "type-wheel" && (
-                  <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 flex items-start animate-fade-in">
-                    <Info className="h-5 w-5 text-rose-600 dark:text-rose-400 mr-2 mt-0.5 flex-shrink-0" />
-                    <p className="text-rose-700 dark:text-rose-300 text-sm">
-                      <strong>Tip:</strong> Click on any personality type in the wheel to view detailed information
-                      about that type. Hover over a type to highlight it.
-                    </p>
-                  </div>
-                )}
-
-                {selectedVisualization === "cognitive-functions" && selectedType && selectedType !== "none" && (
-                  <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
-                    <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
-                      About {selectedType} Cognitive Functions
-                    </h3>
-                    <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
-                      Each personality type has a unique pattern of cognitive functions that influences how they
-                      perceive the world and make decisions. The dominant function is the most developed and consciously
-                      used, while the inferior function is often less developed.
-                    </p>
-                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                        <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                          Dominant & Auxiliary:
-                        </span>
-                        <span className="text-rose-600 dark:text-rose-400">
-                          These are your primary ways of interacting with the world. They're well-developed and you use
-                          them consciously.
-                        </span>
-                      </div>
-                      <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                        <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                          Tertiary & Inferior:
-                        </span>
-                        <span className="text-rose-600 dark:text-rose-400">
-                          These functions are less developed and may emerge in times of stress or as areas for personal
-                          growth.
-                        </span>
+                  {selectedVisualization === "cognitive-functions" && selectedType && selectedType !== "none" && (
+                    <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
+                      <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
+                        About {selectedType} Cognitive Functions
+                      </h3>
+                      <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
+                        Each personality type has a unique pattern of cognitive functions that influences how they
+                        perceive the world and make decisions. The dominant function is the most developed and
+                        consciously used, while the inferior function is often less developed.
+                      </p>
+                      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
+                            Dominant & Auxiliary:
+                          </span>
+                          <span className="text-rose-600 dark:text-rose-400">
+                            These are your primary ways of interacting with the world. They're well-developed and you
+                            use them consciously.
+                          </span>
+                        </div>
+                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
+                            Tertiary & Inferior:
+                          </span>
+                          <span className="text-rose-600 dark:text-rose-400">
+                            These functions are less developed and may emerge in times of stress or as areas for
+                            personal growth.
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {selectedVisualization === "dimension-spectrum" && (
-                  <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
-                    <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
-                      Understanding {selectedDimension[0]} vs {selectedDimension[1]}
-                    </h3>
-                    <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
-                      {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].description}
-                    </p>
-                    <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-                      <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                        <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                          {selectedDimension[0]}:
-                        </span>
-                        <span className="text-rose-600 dark:text-rose-400">
-                          {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].left}
-                        </span>
-                      </div>
-                      <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                        <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                          {selectedDimension[1]}:
-                        </span>
-                        <span className="text-rose-600 dark:text-rose-400">
-                          {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].right}
-                        </span>
+                  {selectedVisualization === "dimension-spectrum" && (
+                    <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
+                      <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
+                        Understanding {selectedDimension[0]} vs {selectedDimension[1]}
+                      </h3>
+                      <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
+                        {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].description}
+                      </p>
+                      <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
+                            {selectedDimension[0]}:
+                          </span>
+                          <span className="text-rose-600 dark:text-rose-400">
+                            {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].left}
+                          </span>
+                        </div>
+                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
+                            {selectedDimension[1]}:
+                          </span>
+                          <span className="text-rose-600 dark:text-rose-400">
+                            {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].right}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           <Card className="border-rose-200 dark:border-rose-800 shadow-md mb-8 animate-slide-up">
             <CardHeader>
