@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Shield, UserPlus, Trash2, Edit, Check, X } from "lucide-react"
+import { ref, get, set, remove } from "firebase/database"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { useRouter } from "next/navigation"
 import { ProtectedAdminRoute } from "@/components/auth/protected-admin-route"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -21,9 +24,6 @@ import {
 } from "@/components/ui/dialog"
 import { Loading } from "@/components/loading"
 import { database, auth } from "@/lib/firebase"
-import { ref, get, set, remove } from "firebase/database"
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 
 interface User {

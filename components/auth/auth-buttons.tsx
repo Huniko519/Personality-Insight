@@ -1,8 +1,8 @@
 "use client"
 import Link from "next/link"
-import { useAuth } from "@/lib/auth"
-import { Button } from "@/components/ui/button"
 import { LogIn, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/auth"
 
 export function AuthButtons() {
   const { user, signOut } = useAuth()

@@ -4,14 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useAuth } from "@/lib/auth"
+import { Mail, AlertCircle, CheckCircle } from "lucide-react"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Mail, AlertCircle, CheckCircle } from "lucide-react"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import { useAuth } from "@/lib/auth"
 
 export default function ForgotPasswordPage() {
   const { resetPassword, error: authError } = useAuth()
