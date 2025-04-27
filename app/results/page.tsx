@@ -1,382 +1,418 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Clock, Share2, BookOpen, Briefcase, Heart, Brain, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+import { Share2, Download, Award, ArrowRight, Clock } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
 import SocialShare from "@/components/social-share"
-import { getPersonalityTypeByCode, getPersonalityExplanations } from "@/lib/firebase"
+import { useAuth } from "@/lib/auth"
+import { saveTestResult } from "@/lib/firebase"
 
 export default function ResultsPage() {
   const searchParams = useSearchParams()
-  const typeParam = searchParams.get("type")
-  const timeParam = searchParams.get("time")
-
-  const [personalityType, setPersonalityType] = useState<any>(null)
-  const [explanations, setExplanations] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const personalityType = searchParams.get("type") || "INFJ"
+  const quizTime = searchParams.get("time") ? Number.parseInt(searchParams.get("time") as string) : undefined
   const [showShare, setShowShare] = useState(false)
+  const { user } = useAuth()
 
+  // Save result to Firebase if user is logged in
   useEffect(() => {
-    const fetchData = async () => {
-      if (typeParam) {
+    const saveResult = async () => {
+      if (user && personalityType) {
         try {
-          setLoading(true)
-          setError(null)
-
-          const typeData = await getPersonalityTypeByCode(typeParam)
-          if (!typeData) {
-            setError("Personality type not found in the database.")
-            setLoading(false)
-            return
+          // Create a result object with the necessary data
+          const result = {
+            userId: user.uid,
+            type: personalityType,
+            date: new Date().toISOString(),
+            timeToComplete: quizTime,
+            // You could add more data here like confidence scores, etc.
           }
-          setPersonalityType(typeData)
 
-          const explanationsData = await getPersonalityExplanations()
-          setExplanations(explanationsData)
+          await saveTestResult(result)
+          console.log("Test result saved to Firebase")
         } catch (error) {
-          console.error("Error fetching personality data:", error)
-          setError("Failed to load personality data. Please try again later.")
-        } finally {
-          setLoading(false)
+          console.error("Error saving test result:", error)
         }
-      } else {
-        setError("No personality type specified")
-        setLoading(false)
       }
     }
 
-    fetchData()
-  }, [typeParam])
+    saveResult()
+  }, [user, personalityType, quizTime])
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-rose-800 mb-4">Analyzing Your Results</h1>
-            <p className="text-rose-600 mb-6">Preparing your personality profile...</p>
-            <div className="w-16 h-16 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin mx-auto"></div>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
+  // Format time from seconds to minutes and seconds
+  const formatTime = (seconds?: number) => {
+    if (!seconds) return "N/A"
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}m ${secs}s`
   }
-
-  if (error || !personalityType) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="mb-6 flex justify-center">
-              <div className="bg-rose-100 p-3 rounded-full">
-                <AlertTriangle className="h-12 w-12 text-rose-600" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-rose-800 mb-4">Results Not Found</h1>
-            <p className="text-rose-600 mb-6">{error || "We couldn't find your personality type results."}</p>
-            <Link href="/quiz">
-              <Button className="bg-rose-600 hover:bg-rose-700">Take the Test Again</Button>
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
-  // Ensure type exists and has a default value
-  const typeCode = personalityType?.type || "unknown"
-
-  // Format the completion time if available
-  const formattedTime = timeParam
-    ? (() => {
-        const timeInSeconds = Number.parseInt(timeParam)
-        const minutes = Math.floor(timeInSeconds / 60)
-        const seconds = timeInSeconds % 60
-        return `${minutes}m ${seconds}s`
-      })()
-    : null
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-rose-50 via-rose-100 to-rose-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-4xl font-bold text-rose-800 mb-2">Your Personality Type</h1>
-            <p className="text-rose-600 mb-4">Based on your responses, you are a:</p>
-            <div className="inline-block bg-white px-6 py-3 rounded-lg shadow-md border border-rose-200">
-              <h2 className="text-3xl font-bold text-rose-700">{typeCode}</h2>
-              <p className="text-rose-600">{personalityType?.name || "Personality Type"}</p>
-            </div>
-
-            {formattedTime && (
-              <div className="mt-4 flex justify-center">
-                <div className="flex items-center text-rose-600 bg-white px-4 py-2 rounded-full shadow-sm border border-rose-200">
-                  <Clock className="h-4 w-4 mr-2 text-rose-500" />
-                  <span>Completed in {formattedTime}</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Card className="mb-8 border-rose-200 shadow-lg animate-fade-in">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-rose-800">{personalityType?.name || "Personality Type"}</CardTitle>
-              <CardDescription className="text-rose-600">{personalityType?.nickname || "Your Type"}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700 mb-6">{personalityType?.description || "No description available."}</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="bg-rose-50 p-4 rounded-md border border-rose-200">
-                  <h3 className="font-semibold text-rose-800 mb-2">Key Strengths</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
-                    {personalityType?.strengths?.map((strength: string, index: number) => (
-                      <li key={index}>{strength}</li>
-                    )) || <li>No strengths data available</li>}
-                  </ul>
-                </div>
-                <div className="bg-rose-50 p-4 rounded-md border border-rose-200">
-                  <h3 className="font-semibold text-rose-800 mb-2">Potential Challenges</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
-                    {personalityType?.challenges?.map((challenge: string, index: number) => (
-                      <li key={index}>{challenge}</li>
-                    )) || <li>No challenges data available</li>}
-                  </ul>
-                </div>
+      <main className="flex-1 bg-rose-50/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+              <div className="bg-gradient-to-r from-rose-500 to-rose-600 p-8 text-white text-center">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4">Your Personality Type</h1>
+                <div className="text-5xl md:text-6xl font-extrabold mb-4">{personalityType}</div>
+                <p className="text-lg opacity-90">
+                  {personalityType === "INFJ" && "The Counselor"}
+                  {personalityType === "INFP" && "The Mediator"}
+                  {personalityType === "INTJ" && "The Architect"}
+                  {personalityType === "INTP" && "The Logician"}
+                  {personalityType === "ENFJ" && "The Protagonist"}
+                  {personalityType === "ENFP" && "The Campaigner"}
+                  {personalityType === "ENTJ" && "The Commander"}
+                  {personalityType === "ENTP" && "The Debater"}
+                  {personalityType === "ISFJ" && "The Defender"}
+                  {personalityType === "ISFP" && "The Adventurer"}
+                  {personalityType === "ISTJ" && "The Logistician"}
+                  {personalityType === "ISTP" && "The Virtuoso"}
+                  {personalityType === "ESFJ" && "The Consul"}
+                  {personalityType === "ESFP" && "The Entertainer"}
+                  {personalityType === "ESTJ" && "The Executive"}
+                  {personalityType === "ESTP" && "The Entrepreneur"}
+                </p>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="font-semibold text-rose-800">Your Personality Dimensions</h3>
-
-                {personalityType?.dimensions &&
-                  Array.isArray(personalityType.dimensions) &&
-                  personalityType.dimensions.map((dim: any) => (
-                    <div key={dim.name} className="mb-2">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-700">{dim.left}</span>
-                        <span className="text-gray-700">{dim.right}</span>
-                      </div>
-                      <div className="relative h-6 bg-rose-100 rounded-full overflow-hidden">
-                        <div
-                          className="absolute top-0 bottom-0 left-0 bg-rose-500 rounded-full"
-                          style={{ width: `${dim.value}%` }}
-                        ></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Badge className="bg-white text-rose-700 border-rose-200 shadow-sm z-10">
-                            {dim.value < 50 ? dim.leftLetter : dim.rightLetter}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between flex-wrap gap-2">
-              <Button
-                variant="outline"
-                className="border-rose-300 text-rose-600 hover:bg-rose-50"
-                onClick={() => setShowShare(!showShare)}
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share Results
-              </Button>
-              <div className="flex gap-2">
-                <Link href={`/types/${typeCode.toLowerCase()}`}>
-                  <Button className="bg-rose-600 hover:bg-rose-700">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Learn More
-                  </Button>
-                </Link>
-              </div>
-            </CardFooter>
-          </Card>
-
-          {showShare && (
-            <Card className="mb-8 border-rose-200 animate-fade-in">
-              <CardHeader>
-                <CardTitle className="text-xl text-rose-800">Share Your Results</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <SocialShare
-                  title={`I'm a ${typeCode} (${personalityType?.name || "Personality Type"})!`}
-                  text="I just discovered my personality type. Take the test to find yours!"
-                  url={`${window.location.origin}/quiz`}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          <Tabs defaultValue="overview" className="animate-fade-in">
-            <TabsList className="grid grid-cols-4 mb-6 bg-rose-100">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white">
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white">
-                Career
-              </TabsTrigger>
-              <TabsTrigger
-                value="relationships"
-                className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
-              >
-                Relationships
-              </TabsTrigger>
-              <TabsTrigger value="growth" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white">
-                Growth
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="mt-0">
-              <Card className="border-rose-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-rose-800">
-                    <Brain className="h-5 w-5 mr-2" />
-                    Cognitive Functions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">
-                    {explanations?.cognitiveExplanation || "No explanation available."}
-                  </p>
-
-                  {personalityType?.cognitiveFunctions && Array.isArray(personalityType.cognitiveFunctions) ? (
-                    <div className="space-y-4">
-                      {personalityType.cognitiveFunctions.map((func: any, index: number) => (
-                        <div key={index} className="bg-rose-50 p-4 rounded-md border border-rose-200">
-                          <h4 className="font-semibold text-rose-800">
-                            {func.name} ({func.code})
-                          </h4>
-                          <p className="text-gray-700">{func.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-700">No cognitive functions data available</p>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="career" className="mt-0">
-              <Card className="border-rose-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-rose-800">
-                    <Briefcase className="h-5 w-5 mr-2" />
-                    Career Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">
-                    {personalityType?.careerInsights || "No career insights available."}
-                  </p>
-
-                  <h3 className="font-semibold text-rose-800 mb-2">Recommended Career Paths</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
-                    {personalityType?.recommendedCareers?.map((career: string, index: number) => (
-                      <div key={index} className="bg-rose-50 p-2 rounded border border-rose-200 text-gray-700">
-                        {career}
-                      </div>
-                    )) || (
-                      <div className="bg-rose-50 p-2 rounded border border-rose-200 text-gray-700">
-                        No career data available
-                      </div>
-                    )}
+              <div className="p-6">
+                <div className="flex flex-wrap justify-between items-center mb-6">
+                  <div className="flex items-center mb-4 md:mb-0">
+                    <Clock className="h-5 w-5 text-rose-500 mr-2" />
+                    <span className="text-gray-600">
+                      Completion time: <span className="font-medium">{formatTime(quizTime)}</span>
+                    </span>
                   </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      className="border-rose-200 text-rose-600 hover:bg-rose-50"
+                      onClick={() => setShowShare(!showShare)}
+                    >
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share
+                    </Button>
+                    <Button variant="outline" className="border-rose-200 text-rose-600 hover:bg-rose-50">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
 
-                  <Link href="/careers">
-                    <Button className="w-full bg-rose-600 hover:bg-rose-700">Explore Career Matches</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                {showShare && (
+                  <Card className="mb-6">
+                    <CardContent className="p-4">
+                      <SocialShare
+                        title={`I'm a ${personalityType} personality type!`}
+                        url={`${typeof window !== "undefined" ? window.location.origin : ""}/results?type=${personalityType}`}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
 
-            <TabsContent value="relationships" className="mt-0">
-              <Card className="border-rose-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-rose-800">
-                    <Heart className="h-5 w-5 mr-2" />
-                    Relationship Dynamics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">
-                    {personalityType?.relationshipApproach || "No relationship approach data available."}
-                  </p>
+                <Tabs defaultValue="overview" className="mt-6">
+                  <TabsList className="grid w-full grid-cols-4 bg-rose-100">
+                    <TabsTrigger
+                      value="overview"
+                      className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
+                    >
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="strengths"
+                      className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
+                    >
+                      Strengths
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="challenges"
+                      className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
+                    >
+                      Challenges
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="careers"
+                      className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
+                    >
+                      Careers
+                    </TabsTrigger>
+                  </TabsList>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="bg-rose-50 p-4 rounded-md border border-rose-200">
-                      <h3 className="font-semibold text-rose-800 mb-2">Compatible Types</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {personalityType?.compatibleTypes?.map((type: string, index: number) => (
-                          <Link key={index} href={`/types/${type.toLowerCase()}`}>
-                            <Badge className="bg-white hover:bg-rose-100 text-rose-700 border-rose-200 cursor-pointer">
-                              {type}
-                            </Badge>
-                          </Link>
-                        )) || <span className="text-gray-700">No compatibility data available</span>}
+                  <TabsContent value="overview" className="mt-6">
+                    <div className="space-y-6">
+                      <div>
+                        <h2 className="text-2xl font-bold text-rose-800 mb-3">About {personalityType}</h2>
+                        <p className="text-gray-600 leading-relaxed">
+                          {personalityType === "INFJ" &&
+                            "INFJs are creative nurturers with a strong sense of personal integrity and a drive to help others realize their potential. Creative and dedicated, they have a talent for helping others with original solutions to their personal challenges."}
+                          {personalityType === "INFP" &&
+                            "INFPs are imaginative idealists, guided by their own core values and beliefs. To a Mediator, possibilities are paramount; the reality of the moment is only of passing concern. They see potential for a better future, and pursue truth and meaning with their own individual flair."}
+                          {personalityType === "INTJ" &&
+                            "INTJs are analytical problem-solvers, eager to improve systems and processes with their innovative ideas. They have a talent for seeing possibilities for improvement, whether at work, at home, or in themselves."}
+                          {personalityType === "INTP" &&
+                            "INTPs are innovative inventors with an unquenchable thirst for knowledge. They are driven by a desire to understand the universe and everything in it. Logical and analytical, they excel at finding solutions to complex problems."}
+                          {personalityType === "ENFJ" &&
+                            "ENFJs are charismatic and inspiring leaders, able to mesmerize their listeners. They are usually idealistic, with high values and a great sense of integrity. They are natural leaders, sensitive to the needs of others and energetically dedicated to whatever cause they've decided to champion."}
+                          {personalityType === "ENFP" &&
+                            "ENFPs are people-centered creators with a focus on possibilities and a contagious enthusiasm for new ideas, people and activities. Energetic, warm, and passionate, ENFPs love to help other people explore their creative potential."}
+                          {personalityType === "ENTJ" &&
+                            "ENTJs are strategic leaders, motivated to organize change. They are quick to see inefficiency and conceptualize new solutions, and enjoy developing long-range plans to accomplish their vision. They excel at logical reasoning and are usually articulate and quick-witted."}
+                          {personalityType === "ENTP" &&
+                            "ENTPs are inspired innovators, motivated to find new solutions to intellectually challenging problems. They are curious and clever, and seek to understand the people, systems, and principles that surround them."}
+                          {personalityType === "ISFJ" &&
+                            "ISFJs are industrious caretakers, loyal to traditions and organizations. They are practical, compassionate, and caring, and are motivated to provide for others and protect them from the perils of life."}
+                          {personalityType === "ISFP" &&
+                            "ISFPs are gentle caretakers who live in the present moment and enjoy their surroundings with cheerful, low-key enthusiasm. They are flexible and spontaneous, and like to go with the flow to enjoy what life has to offer."}
+                          {personalityType === "ISTJ" &&
+                            "ISTJs are responsible organizers, driven to create and enforce order within systems and institutions. They are neat and orderly, inside and out, and tend to have a procedure for everything they do."}
+                          {personalityType === "ISTP" &&
+                            "ISTPs are observant artisans with an understanding of mechanics and an interest in troubleshooting. They approach their environments with a flexible logic, looking for practical solutions to the problems at hand."}
+                          {personalityType === "ESFJ" &&
+                            "ESFJs are conscientious helpers, sensitive to the needs of others and energetically dedicated to their responsibilities. They are highly attuned to their emotional environment and attentive to both the feelings of others and the perception others have of them."}
+                          {personalityType === "ESFP" &&
+                            "ESFPs are vivacious entertainers who charm and engage those around them. They are spontaneous, energetic, and fun-loving, and take pleasure in the things around them: food, clothes, nature, animals, and especially people."}
+                          {personalityType === "ESTJ" &&
+                            "ESTJs are hardworking traditionalists, eager to take charge in organizing projects and people. Orderly, rule-abiding, and conscientious, ESTJs like to get things done, and tend to go about projects in a systematic, methodical way."}
+                          {personalityType === "ESTP" &&
+                            "ESTPs are energetic thrillseekers who are at their best when putting out fires, whether literal or metaphorical. They bring a sense of dynamic energy to their interactions with others and the world around them."}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-xl font-semibold text-rose-800 mb-3">Your Personality Dimensions</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-rose-50 p-4 rounded-lg">
+                            <h4 className="font-medium text-rose-700 mb-2">
+                              {personalityType.charAt(0) === "E" ? "Extraversion (E)" : "Introversion (I)"}
+                            </h4>
+                            <p className="text-gray-600 text-sm">
+                              {personalityType.charAt(0) === "E"
+                                ? "You gain energy from social interactions and external activities. You enjoy being around people and tend to think out loud."
+                                : "You gain energy from solitary activities and internal reflection. You prefer deep one-on-one conversations and need time alone to recharge."}
+                            </p>
+                          </div>
+
+                          <div className="bg-rose-50 p-4 rounded-lg">
+                            <h4 className="font-medium text-rose-700 mb-2">
+                              {personalityType.charAt(1) === "S" ? "Sensing (S)" : "Intuition (N)"}
+                            </h4>
+                            <p className="text-gray-600 text-sm">
+                              {personalityType.charAt(1) === "S"
+                                ? "You focus on concrete facts and details. You trust information that is tangible and practical, and prefer to work with what is real and present."
+                                : "You focus on patterns and possibilities. You trust information that is more abstract or theoretical and enjoy thinking about the future."}
+                            </p>
+                          </div>
+
+                          <div className="bg-rose-50 p-4 rounded-lg">
+                            <h4 className="font-medium text-rose-700 mb-2">
+                              {personalityType.charAt(2) === "T" ? "Thinking (T)" : "Feeling (F)"}
+                            </h4>
+                            <p className="text-gray-600 text-sm">
+                              {personalityType.charAt(2) === "T"
+                                ? "You make decisions based on logic and objective analysis. You value consistency and fairness in your reasoning."
+                                : "You make decisions based on personal values and how actions affect others. You strive for harmony and positive interactions."}
+                            </p>
+                          </div>
+
+                          <div className="bg-rose-50 p-4 rounded-lg">
+                            <h4 className="font-medium text-rose-700 mb-2">
+                              {personalityType.charAt(3) === "J" ? "Judging (J)" : "Perceiving (P)"}
+                            </h4>
+                            <p className="text-gray-600 text-sm">
+                              {personalityType.charAt(3) === "J"
+                                ? "You prefer structure, plans, and organization. You like to make decisions and have things settled."
+                                : "You prefer flexibility, spontaneity, and keeping options open. You adapt easily to new information and changing circumstances."}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-rose-50 p-4 rounded-md border border-rose-200">
-                      <h3 className="font-semibold text-rose-800 mb-2">Communication Style</h3>
-                      <p className="text-gray-700">
-                        {personalityType?.communicationStyle || "No communication style data available"}
+                  </TabsContent>
+
+                  <TabsContent value="strengths" className="mt-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-rose-800 mb-4">Your Strengths</h2>
+                      <div className="space-y-4">
+                        {personalityType === "INFJ" && (
+                          <>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Insightful</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You have an intuitive understanding of people and situations, often knowing things
+                                without being able to explain how.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Principled</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You have strong values and integrity, and you're not easily swayed from your beliefs.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Inspiring</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You have a talent for bringing out the best in others and helping them reach their
+                                potential.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Creative</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You have a rich inner world and can envision unique solutions to complex problems.
+                              </p>
+                            </div>
+                          </>
+                        )}
+                        {/* Add strengths for other personality types here */}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="challenges" className="mt-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-rose-800 mb-4">Your Challenges</h2>
+                      <div className="space-y-4">
+                        {personalityType === "INFJ" && (
+                          <>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Perfectionism</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You may set unrealistically high standards for yourself and others, leading to
+                                disappointment.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Burnout</Badge>
+                              <p className="ml-3 text-gray-600">
+                                Your desire to help others can lead you to neglect your own needs and become exhausted.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Overthinking</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You may spend too much time in your head analyzing situations rather than taking action.
+                              </p>
+                            </div>
+                            <div className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">Sensitivity</Badge>
+                              <p className="ml-3 text-gray-600">
+                                You can be deeply affected by criticism and conflict, sometimes taking things too
+                                personally.
+                              </p>
+                            </div>
+                          </>
+                        )}
+                        {/* Add challenges for other personality types here */}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="careers" className="mt-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-rose-800 mb-4">Recommended Career Paths</h2>
+                      <p className="text-gray-600 mb-6">
+                        Based on your personality type, these career paths might be particularly fulfilling for you:
                       </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {personalityType === "INFJ" && (
+                          <>
+                            <div className="bg-rose-50 p-4 rounded-lg">
+                              <h3 className="font-semibold text-rose-700 mb-2">Counseling & Psychology</h3>
+                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Therapist</li>
+                                <li>Social Worker</li>
+                                <li>Psychologist</li>
+                                <li>Life Coach</li>
+                              </ul>
+                            </div>
+                            <div className="bg-rose-50 p-4 rounded-lg">
+                              <h3 className="font-semibold text-rose-700 mb-2">Education</h3>
+                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Professor</li>
+                                <li>School Counselor</li>
+                                <li>Special Education Teacher</li>
+                              </ul>
+                            </div>
+                            <div className="bg-rose-50 p-4 rounded-lg">
+                              <h3 className="font-semibold text-rose-700 mb-2">Creative Fields</h3>
+                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Writer</li>
+                                <li>Editor</li>
+                                <li>Filmmaker</li>
+                                <li>Musician</li>
+                              </ul>
+                            </div>
+                            <div className="bg-rose-50 p-4 rounded-lg">
+                              <h3 className="font-semibold text-rose-700 mb-2">Healthcare</h3>
+                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Physician</li>
+                                <li>Nurse</li>
+                                <li>Alternative Medicine Practitioner</li>
+                              </ul>
+                            </div>
+                          </>
+                        )}
+                        {/* Add career recommendations for other personality types here */}
+                      </div>
+
+                      <div className="mt-8 text-center">
+                        <Link href="/careers/personality-types">
+                          <Button className="bg-rose-600 hover:bg-rose-700">
+                            Explore More Career Insights
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="mt-8 border-t border-gray-200 pt-6">
+                  <h3 className="text-xl font-semibold text-rose-800 mb-4">What's Next?</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Link href={`/types/${personalityType.toLowerCase()}`} className="block">
+                      <div className="bg-rose-50 p-4 rounded-lg text-center hover:bg-rose-100 transition-colors">
+                        <Award className="h-8 w-8 text-rose-600 mx-auto mb-2" />
+                        <h4 className="font-medium text-rose-700">Detailed Profile</h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Dive deeper into your personality type characteristics
+                        </p>
+                      </div>
+                    </Link>
+                    <Link href="/relationships/compatibility" className="block">
+                      <div className="bg-rose-50 p-4 rounded-lg text-center hover:bg-rose-100 transition-colors">
+                        <Award className="h-8 w-8 text-rose-600 mx-auto mb-2" />
+                        <h4 className="font-medium text-rose-700">Compatibility</h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Discover how you interact with other personality types
+                        </p>
+                      </div>
+                    </Link>
+                    <Link href="/careers/personality-types" className="block">
+                      <div className="bg-rose-50 p-4 rounded-lg text-center hover:bg-rose-100 transition-colors">
+                        <Award className="h-8 w-8 text-rose-600 mx-auto mb-2" />
+                        <h4 className="font-medium text-rose-700">Career Matches</h4>
+                        <p className="text-sm text-gray-600 mt-1">Find the best career paths for your personality</p>
+                      </div>
+                    </Link>
                   </div>
-
-                  <Link href="/relationships">
-                    <Button className="w-full bg-rose-600 hover:bg-rose-700">Explore Relationship Compatibility</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="growth" className="mt-0">
-              <Card className="border-rose-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-rose-800">Personal Growth</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">
-                    {personalityType?.growthOpportunities || "No growth opportunities data available"}
-                  </p>
-
-                  <h3 className="font-semibold text-rose-800 mb-2">Development Suggestions</h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
-                    {personalityType?.developmentSuggestions?.map((suggestion: string, index: number) => (
-                      <li key={index}>{suggestion}</li>
-                    )) || <li>No development suggestions available</li>}
-                  </ul>
-
-                  <div className="bg-rose-50 p-4 rounded-md border border-rose-200 mb-6">
-                    <h3 className="font-semibold text-rose-800 mb-2">Under Stress</h3>
-                    <p className="text-gray-700">
-                      {personalityType?.underStress || "No stress response data available"}
-                    </p>
-                  </div>
-
-                  <Link href={`/types/${typeCode.toLowerCase()}`}>
-                    <Button className="w-full bg-rose-600 hover:bg-rose-700">Detailed Growth Path</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
       <Footer />
-    </>
+    </div>
   )
 }

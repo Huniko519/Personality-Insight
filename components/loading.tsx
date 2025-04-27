@@ -1,6 +1,6 @@
 "use client"
 
-export default function LoadingBar() {
+export function Loading() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
       <div className="text-center">
@@ -9,3 +9,6 @@ export default function LoadingBar() {
     </div>
   )
 }
+
+// Also export as default for backward compatibility
+export default Loading

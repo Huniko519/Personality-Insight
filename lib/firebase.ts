@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app"
-import { getDatabase, ref, get, set } from "firebase/database"
+import { getDatabase, ref, get, set, push } from "firebase/database"
 import { getAnalytics } from "firebase/analytics"
+import { getAuth, GoogleAuthProvider } from "firebase/auth"
 
 export interface PersonalityExplanations {
   cognitiveExplanation: string
@@ -14,6 +15,29 @@ export interface PersonalityExplanations {
   relationshipExplanation: string
 }
 
+export interface TestResult {
+  id?: string
+  userId: string
+  type: string
+  date: string
+  timeToComplete?: number
+  confidence?: number
+  dimensions?: {
+    EI: { preference: string; strength: number }
+    SN: { preference: string; strength: number }
+    TF: { preference: string; strength: number }
+    JP: { preference: string; strength: number }
+  }
+}
+
+export interface UserRole {
+  uid: string
+  email: string
+  displayName?: string
+  role: "admin" | "user"
+  createdAt: string
+}
+
 // Firebase Config
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -23,11 +47,14 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
 const database = getDatabase(app)
+const googleProvider = new GoogleAuthProvider()
 
 // Initialize Analytics only on client side
 let analytics: any = null
@@ -58,6 +85,112 @@ export async function writeToFirebase(path: string, data: any): Promise<void> {
   } catch (error) {
     console.error(`Error writing data to ${path}:`, error)
     throw error
+  }
+}
+
+// User role management functions
+export async function getUserRole(uid: string): Promise<"admin" | "user" | null> {
+  try {
+    const snapshot = await get(ref(database, `users/${uid}`))
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      return userData.role || "user" // Default to 'user' if role is not set
+    }
+    return null
+  } catch (error) {
+    console.error("Error getting user role:", error)
+    return null
+  }
+}
+
+export async function setUserRole(uid: string, role: "admin" | "user"): Promise<void> {
+  try {
+    const userRef = ref(database, `users/${uid}`)
+    const snapshot = await get(userRef)
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      await set(userRef, {
+        ...userData,
+        role,
+      })
+    } else {
+      throw new Error(`User with ID ${uid} does not exist`)
+    }
+  } catch (error) {
+    console.error("Error setting user role:", error)
+    throw error
+  }
+}
+
+export async function getAllUsers(): Promise<UserRole[]> {
+  try {
+    const snapshot = await get(ref(database, "users"))
+    if (snapshot.exists()) {
+      const usersData = snapshot.val()
+      return Object.entries(usersData).map(([uid, data]: [string, any]) => ({
+        uid,
+        email: data.email,
+        displayName: data.displayName || data.email,
+        role: data.role || "user",
+        createdAt: data.createdAt || new Date().toISOString(),
+      }))
+    }
+    return []
+  } catch (error) {
+    console.error("Error getting all users:", error)
+    return []
+  }
+}
+
+// Save test result to Firebase
+export async function saveTestResult(result: TestResult) {
+  try {
+    const newResultRef = push(ref(database, "user-results"))
+    await set(newResultRef, {
+      ...result,
+      id: newResultRef.key,
+    })
+    console.log("Test result saved successfully")
+    return newResultRef.key
+  } catch (error) {
+    console.error("Error saving test result:", error)
+    throw error
+  }
+}
+
+// Get test results for a specific user
+export async function getUserTestResults(userId: string): Promise<TestResult[]> {
+  try {
+    // Get all results and filter client-side to avoid indexing requirement
+    const resultsRef = ref(database, "user-results")
+    const snapshot = await get(resultsRef)
+
+    if (!snapshot.exists()) {
+      return []
+    }
+
+    const allResults = snapshot.val()
+    const userResults: TestResult[] = []
+
+    // Filter and transform results
+    Object.keys(allResults).forEach((key) => {
+      const result = allResults[key]
+      if (result.userId === userId) {
+        userResults.push({
+          ...result,
+          id: key,
+        })
+      }
+    })
+
+    // Sort by date (newest first)
+    return userResults.sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+  } catch (error) {
+    console.error("Error fetching user test results:", error)
+    return []
   }
 }
 
@@ -285,4 +418,4 @@ export async function getCommunicationTipsForType(typeCode: string) {
   }
 }
 
-export { app, database, analytics }
+export { auth, database, googleProvider, app, analytics }

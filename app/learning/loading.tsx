@@ -1,7 +1,5 @@
-import LoadingBar from "@/components/loading"
+import { Loading } from "@/components/loading"
 
-export default function Loading() {
-  return (
-    <LoadingBar />
-  )
+export default function LearningLoading() {
+  return <Loading />
 }

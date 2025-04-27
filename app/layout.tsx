@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import "./globals.css"
+import { AuthProvider } from "@/lib/auth"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,8 +24,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" />
       </head>
       <body className={inter.className}>
-        <ScrollToTop />
-        {children}
+        <AuthProvider>
+          <ScrollToTop />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

@@ -6,11 +6,15 @@ import Link from "next/link"
 import { Menu, X, ChevronDown, Search } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { AuthButtons } from "@/components/auth/auth-buttons"
+import { useAuth } from "@/lib/auth"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isTypesDropdownOpen, setIsTypesDropdownOpen] = useState(false)
+
+  const { user } = useAuth()
 
   // Handle scroll effect
   useEffect(() => {
@@ -147,6 +151,8 @@ export default function Header() {
               </div>
             </div>
 
+            <AuthButtons />
+
             <Link href="/quiz">
               <Button className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
                 Start Test
@@ -197,7 +203,34 @@ export default function Header() {
             </MobileNavLink>
           </nav>
 
-          <div className="mt-4 pt-4 border-t border-rose-100">
+          <div className="mt-4 pt-4 border-t border-rose-100 flex flex-col gap-3">
+            {user && (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium transition-all duration-300"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-user"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                My Profile
+              </Link>
+            )}
+
+            <AuthButtons />
+
             <div className="relative">
               <input
                 type="text"
