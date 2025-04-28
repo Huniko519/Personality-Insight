@@ -613,7 +613,7 @@ export default function VisualizationPage() {
     ctx.shadowOffsetY = 0
 
     // Draw function bars with enhanced styling
-    functions.forEach((func, index) => {
+    functions.forEach((func: any, index: any) => {
       const y = startY + index * (barHeight + barSpacing)
 
       // Function strength decreases with position

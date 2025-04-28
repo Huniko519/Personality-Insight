@@ -144,7 +144,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-rose-700/50 text-center">
-          <p className="text-rose-200">© {new Date().getFullYear()} Personality Insight. All rights reserved.</p>
+          <p className="text-rose-200">© {new Date().getFullYear()} PersonaIQ. All rights reserved.</p>
         </div>
       </div>
     </footer>

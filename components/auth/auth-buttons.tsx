@@ -40,11 +40,8 @@ export function AuthButtons() {
           {user.displayName || "Profile"}
         </Link>
         <Button
-          variant="outline"
-          size="sm"
           onClick={handleSignOut}
-          className="flex items-center gap-1 border-rose-200 text-rose-700 hover:bg-rose-50"
-        >
+          className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
           <LogOut className="w-4 h-4" />
           Sign Out
         </Button>
@@ -54,12 +51,8 @@ export function AuthButtons() {
 
   return (
     <Link href="/auth/signin">
-      <Button
-        variant="outline"
-        size="sm"
-        className="flex items-center gap-1 border-rose-200 text-rose-700 hover:bg-rose-50"
-      >
-        <LogIn className="w-4 h-4" />
+      <Button className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+        <LogIn className="w-4 h-4 mr-2" />
         Sign In
       </Button>
     </Link>

@@ -62,7 +62,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold text-rose-800 mb-2">Our Approach</h2>
               <div className="w-24 h-1 bg-rose-500 mx-auto mb-4"></div>
               <p className="text-rose-700 max-w-3xl mx-auto">
-                Personality Insight is based on the Myers-Briggs Type Indicator (MBTI), one of the most widely used
+                PersonaIQ is based on the Myers-Briggs Type Indicator (MBTI), one of the most widely used
                 personality assessments in the world, combined with modern psychological research and data science.
               </p>
             </div>

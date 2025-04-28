@@ -8,8 +8,27 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { getBlogPosts } from "@/lib/firebase"
 
+// Type definitions
+interface BlogPost {
+  id: string
+  title: string
+  excerpt: string
+  date: string
+  author: string
+  readTime: string
+  category: string
+  image: string
+  content: string | any[]
+  authorBio?: string
+  authorImage?: string
+  slug?: string
+  featured?: boolean
+  tags?: string[]
+  relatedPosts?: string[]
+}
+
 export default function BlogPage() {
-  const [blogPosts, setBlogPosts] = useState([])
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -56,7 +75,7 @@ export default function BlogPage() {
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-rose-800 mb-4">Personality Insights Blog</h1>
+            <h1 className="text-4xl font-bold text-rose-800 mb-4">PersonaIQ Blog</h1>
             <p className="text-xl text-rose-600 max-w-3xl mx-auto">
               Explore the fascinating world of personality psychology and discover insights to better understand
               yourself and others.
