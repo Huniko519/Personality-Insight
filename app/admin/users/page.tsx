@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, UserPlus, Trash2, Edit, Check, X } from "lucide-react"
+import { Shield, UserPlus, Trash2, Edit, Check, X, Link } from "lucide-react"
 import { ref, get, set, remove } from "firebase/database"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { ProtectedAdminRoute } from "@/components/auth/protected-admin-route"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -49,7 +50,12 @@ export default function UsersManagementPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
   const router = useRouter()
-  const { signOut } = useAuth()
+
+  const authContext = useAuth()
+  if (!authContext) {
+    throw new Error("Auth context is not available.")
+  }
+  const { signOut } = authContext
 
   useEffect(() => {
     fetchUsers()
@@ -230,9 +236,10 @@ export default function UsersManagementPage() {
     <ProtectedAdminRoute>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Shield className="h-6 w-6 mr-2 text-slate-700" />
-            <h1 className="text-2xl font-bold text-slate-800">User Management</h1>
+          <div className="flex items-center justify-center mb-4">
+            <Link href="/">
+              <Image src="/logo.png" alt="Personality Insight" width={150} height={40} className="h-10 w-auto" />
+            </Link>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" className="border-slate-200" onClick={() => router.push("/admin")}>
