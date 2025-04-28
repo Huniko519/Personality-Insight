@@ -133,7 +133,7 @@ export default function PersonalityExplanationsManager() {
   }
 
   const handleInputChange = (section: string, field: string, value: string) => {
-    setExplanations((prev) => ({
+    setExplanations((prev: any) => ({
       ...prev,
       [section]: {
         ...prev[section],
@@ -143,7 +143,7 @@ export default function PersonalityExplanationsManager() {
   }
 
   const handleDimensionDetailChange = (dimension: string, field: string, value: string | any) => {
-    setExplanations((prev) => ({
+    setExplanations((prev: any) => ({
       ...prev,
       dimensionExplanations: {
         ...prev.dimensionExplanations,
@@ -156,7 +156,7 @@ export default function PersonalityExplanationsManager() {
   }
 
   const handleCognitiveFunctionChange = (func: string, field: string, value: string) => {
-    setExplanations((prev) => ({
+    setExplanations((prev: any) => ({
       ...prev,
       cognitiveExplanations: {
         ...prev.cognitiveExplanations,

@@ -68,7 +68,7 @@ export default function LearningPage() {
         </section>
 
         {/* Introduction Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <section className="py-16 px-4 sm:px-0 max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8 -mt-20 relative z-20 border border-rose-100">
             <div className="prose prose-rose max-w-none">
               <div className="flex items-center mb-6">
@@ -131,7 +131,7 @@ export default function LearningPage() {
         </section>
 
         {/* Main Content */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <section className="pt-16 pb-4 px-4 sm:px-0 max-w-6xl mx-auto">
           <div className="prose prose-rose max-w-none">
             <div className="flex items-center gap-3 mb-8">
               <div className="bg-rose-100 p-3 rounded-full">
@@ -581,7 +581,7 @@ export default function LearningPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="relative py-16 px-4 sm:px-6 lg:px-8 mt-12 overflow-hidden">
+        <section className="relative pt-16 pb-16 px-4 sm:px-0 mt-12 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-rose-600 to-rose-800"></div>
           <div className="absolute inset-0 bg-pattern-dots-light opacity-10"></div>
 

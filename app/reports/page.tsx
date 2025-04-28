@@ -360,7 +360,7 @@ export default function ReportsPage() {
                       <div className="bg-rose-50 p-4 rounded-md">
                         <h4 className="font-semibold text-rose-800 mb-2">Core Traits</h4>
                         <ul className="list-disc list-inside text-rose-700 space-y-1">
-                          {personalityTypes[selectedType]?.traits.map((trait, index) => (
+                          {personalityTypes[selectedType]?.traits.map((trait: any, index: any) => (
                             <li key={index}>{trait}</li>
                           ))}
                         </ul>
@@ -368,7 +368,7 @@ export default function ReportsPage() {
                       <div className="bg-rose-50 p-4 rounded-md">
                         <h4 className="font-semibold text-rose-800 mb-2">Values</h4>
                         <ul className="list-disc list-inside text-rose-700 space-y-1">
-                          {personalityTypes[selectedType]?.values.map((value, index) => (
+                          {personalityTypes[selectedType]?.values.map((value: any, index: any) => (
                             <li key={index}>{value}</li>
                           ))}
                         </ul>
@@ -427,7 +427,7 @@ export default function ReportsPage() {
                       Strengths & Talents
                     </h3>
                     <ul className="space-y-3">
-                      {personalityTypes[selectedType]?.strengths.map((strength, index) => (
+                      {personalityTypes[selectedType]?.strengths.map((strength: any, index: any) => (
                         <li key={index} className="flex items-start">
                           <CheckCircle className="h-5 w-5 text-rose-500 mr-3 mt-1" />
                           <p className="text-rose-700">{strength}</p>
@@ -443,7 +443,7 @@ export default function ReportsPage() {
                       Potential Challenges
                     </h3>
                     <ul className="space-y-3">
-                      {personalityTypes[selectedType]?.weaknesses.map((weakness, index) => (
+                      {personalityTypes[selectedType]?.weaknesses.map((weakness: any, index: any) => (
                         <li key={index} className="flex items-start">
                           <div className="h-5 w-5 text-rose-500 mr-3 mt-1 flex-shrink-0">⚠️</div>
                           <p className="text-rose-700">{weakness}</p>
@@ -464,7 +464,7 @@ export default function ReportsPage() {
                       <div className="mb-6">
                         <h4 className="font-semibold text-rose-800 mb-3">Career-Related Traits</h4>
                         <ul className="space-y-2">
-                          {personalityTypes[selectedType]?.careerTraits.map((trait, index) => (
+                          {personalityTypes[selectedType]?.careerTraits.map((trait: any, index: any) => (
                             <li key={index} className="flex items-start">
                               <div className="mr-3 mt-1 text-rose-500">
                                 <svg
@@ -502,7 +502,7 @@ export default function ReportsPage() {
                       <div className="mb-6">
                         <h4 className="font-semibold text-rose-800 mb-3">Career Strengths</h4>
                         <ul className="space-y-2">
-                          {personalityTypes[selectedType]?.careerStrengths.map((strength, index) => (
+                          {personalityTypes[selectedType]?.careerStrengths.map((strength: any, index: any) => (
                             <li key={index} className="flex items-start">
                               <div className="mr-3 mt-1 text-rose-500">
                                 <svg
@@ -533,7 +533,7 @@ export default function ReportsPage() {
                       <div className="mb-6">
                         <h4 className="font-semibold text-rose-800 mb-3">Career Challenges</h4>
                         <ul className="space-y-2">
-                          {personalityTypes[selectedType]?.careerChallenges.map((challenge, index) => (
+                          {personalityTypes[selectedType]?.careerChallenges.map((challenge: any, index: any) => (
                             <li key={index} className="flex items-start">
                               <div className="mr-3 mt-1 text-rose-500">
                                 <svg
@@ -567,7 +567,7 @@ export default function ReportsPage() {
                       preferences:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {personalityTypes[selectedType]?.careers.map((career, index) => (
+                      {personalityTypes[selectedType]?.careers.map((career: any, index: any) => (
                         <div key={index} className="bg-rose-50 p-3 rounded-md">
                           <p className="text-rose-700">{career}</p>
                         </div>
@@ -628,7 +628,7 @@ export default function ReportsPage() {
                       <div className="mb-4">
                         <h4 className="font-semibold text-rose-800 mb-2">Relationship Strengths</h4>
                         <ul className="space-y-2">
-                          {personalityTypes[selectedType]?.relationshipStrengths.map((strength, index) => (
+                          {personalityTypes[selectedType]?.relationshipStrengths.map((strength: any, index: any) => (
                             <li key={index} className="flex items-start">
                               <div className="mr-3 mt-1 text-rose-500">
                                 <svg
@@ -657,7 +657,7 @@ export default function ReportsPage() {
                       <div className="mb-4">
                         <h4 className="font-semibold text-rose-800 mb-2">Relationship Challenges</h4>
                         <ul className="space-y-2">
-                          {personalityTypes[selectedType]?.relationshipWeaknesses.map((weakness, index) => (
+                          {personalityTypes[selectedType]?.relationshipWeaknesses.map((weakness: any, index: any) => (
                             <li key={index} className="flex items-start">
                               <div className="mr-3 mt-1 text-rose-500">
                                 <svg
@@ -688,7 +688,7 @@ export default function ReportsPage() {
                       <div className="bg-rose-50 p-4 rounded-md">
                         <h4 className="font-semibold text-rose-800 mb-2">Best Matches</h4>
                         <div className="flex flex-wrap gap-2">
-                          {personalityTypes[selectedType]?.compatibility.best.map((type, index) => (
+                          {personalityTypes[selectedType]?.compatibility.best.map((type: any, index: any) => (
                             <div key={index} className="bg-rose-100 px-3 py-1 rounded-full text-rose-700">
                               {type}
                             </div>
@@ -698,7 +698,7 @@ export default function ReportsPage() {
                       <div className="bg-rose-50 p-4 rounded-md">
                         <h4 className="font-semibold text-rose-800 mb-2">Good Matches</h4>
                         <div className="flex flex-wrap gap-2">
-                          {personalityTypes[selectedType]?.compatibility.good.map((type, index) => (
+                          {personalityTypes[selectedType]?.compatibility.good.map((type: any, index: any) => (
                             <div
                               key={index}
                               className="bg-white px-3 py-1 rounded-full text-rose-700 border border-rose-200"
@@ -735,7 +735,7 @@ export default function ReportsPage() {
                             <div className="mb-6">
                               <h4 className="font-semibold text-rose-800 mb-3">Growth Strengths</h4>
                               <ul className="space-y-2">
-                                {personalityTypes[selectedType]?.personalGrowth.strengths.map((strength, index) => (
+                                {personalityTypes[selectedType]?.personalGrowth.strengths.map((strength: any, index: any) => (
                                   <li key={index} className="flex items-start">
                                     <div className="mr-3 mt-1 text-rose-500">
                                       <svg
@@ -767,7 +767,7 @@ export default function ReportsPage() {
                             <div className="mb-6">
                               <h4 className="font-semibold text-rose-800 mb-3">Potential Problem Areas</h4>
                               <ul className="space-y-2">
-                                {personalityTypes[selectedType]?.personalGrowth.problemAreas.map((problem, index) => (
+                                {personalityTypes[selectedType]?.personalGrowth.problemAreas.map((problem: any, index: any) => (
                                   <li key={index} className="flex items-start">
                                     <div className="mr-3 mt-1 text-rose-500">
                                       <svg
@@ -801,7 +801,7 @@ export default function ReportsPage() {
                             <div className="mb-6">
                               <h4 className="font-semibold text-rose-800 mb-3">Growth Opportunities</h4>
                               <ul className="space-y-2">
-                                {personalityTypes[selectedType]?.personalGrowth.solutions.map((solution, index) => (
+                                {personalityTypes[selectedType]?.personalGrowth.solutions.map((solution: any, index: any) => (
                                   <li key={index} className="flex items-start">
                                     <div className="mr-3 mt-1 text-rose-500">
                                       <svg
@@ -835,7 +835,7 @@ export default function ReportsPage() {
                             <div className="mb-6">
                               <h4 className="font-semibold text-rose-800 mb-3">Rules for Success</h4>
                               <ul className="space-y-2">
-                                {personalityTypes[selectedType]?.personalGrowth.rulesForSuccess.map((rule, index) => (
+                                {personalityTypes[selectedType]?.personalGrowth.rulesForSuccess.map((rule: any, index: any) => (
                                   <li key={index} className="flex items-start">
                                     <div className="mr-3 mt-1 text-rose-500">
                                       <svg
@@ -1026,7 +1026,7 @@ export default function ReportsPage() {
                     </p>
 
                     <div className="space-y-4 mb-6">
-                      {personalityTypes[selectedType]?.cognitiveFunctions.map((func, index) => (
+                      {personalityTypes[selectedType]?.cognitiveFunctions.map((func: any, index: any) => (
                         <div key={index} className="bg-rose-50 p-4 rounded-md">
                           <div className="flex items-center mb-1">
                             <div

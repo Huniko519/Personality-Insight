@@ -14,7 +14,7 @@ export default function CaseStudiesPage() {
   useEffect(() => {
     const fetchCaseStudies = async () => {
       try {
-        const studies = await getCaseStudiesFromFirebase()
+        const studies = await getCaseStudiesFromFirebase() as any
         setCaseStudies(studies || [])
       } catch (error) {
         console.error("Error fetching case studies:", error)
@@ -65,7 +65,7 @@ export default function CaseStudiesPage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
-            {caseStudies.map((study, index) => (
+            {caseStudies.map((study: any, index: any) => (
               <div
                 key={index}
                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-rose-100 group"
@@ -91,7 +91,7 @@ export default function CaseStudiesPage() {
                 <div className="p-5">
                   <p className="text-gray-700 mb-4">{study.summary}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {study.tags.map((tag, i) => (
+                    {study.tags.map((tag: string, i: number) => (
                       <span key={i} className="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded-full">
                         {tag}
                       </span>

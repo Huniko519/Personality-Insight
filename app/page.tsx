@@ -1,8 +1,8 @@
 import Link from "next/link"
 import { ArrowRight, CheckCircle, Users, Brain, Briefcase } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (

@@ -40,16 +40,16 @@ export default function CareerDatabaseManager() {
     title: "",
     category: "",
     description: "",
-    suitableTypes: "",
-    goodFitTypes: "",
-    skills: "",
+    suitableTypes: [],
+    goodFitTypes: [],
+    skills: [],
     education: "",
     salary: "",
     growthPotential: "",
     workEnvironment: "",
-    personalityTraits: "",
-    challenges: "",
-    dayToDay: "",
+    personalityTraits: [],
+    challenges: [],
+    dayToDay: [],
   })
 
   const fetchCareers = async () => {
@@ -86,16 +86,16 @@ export default function CareerDatabaseManager() {
       title: "",
       category: "",
       description: "",
-      suitableTypes: "",
-      goodFitTypes: "",
-      skills: "",
+      suitableTypes: [],
+      goodFitTypes: [],
+      skills: [],
       education: "",
       salary: "",
       growthPotential: "",
       workEnvironment: "",
-      personalityTraits: "",
-      challenges: "",
-      dayToDay: "",
+      personalityTraits: [],
+      challenges: [],
+      dayToDay: [],
     })
   }
 
@@ -352,7 +352,7 @@ export default function CareerDatabaseManager() {
                         <div>
                           <EditableList
                             items={formData.suitableTypes || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, suitableTypes: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, suitableTypes: items }))}
                             label="Suitable Types"
                             placeholder="Add a type and press Enter..."
                           />
@@ -361,7 +361,7 @@ export default function CareerDatabaseManager() {
                         <div>
                           <EditableList
                             items={formData.goodFitTypes || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, goodFitTypes: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, goodFitTypes: items }))}
                             label="Good Fit Types"
                             placeholder="Add a type and press Enter..."
                           />
@@ -370,7 +370,7 @@ export default function CareerDatabaseManager() {
                         <div>
                           <EditableList
                             items={formData.skills || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, skills: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, skills: items }))}
                             label="Skills"
                             placeholder="Add a skill and press Enter..."
                           />
@@ -379,7 +379,7 @@ export default function CareerDatabaseManager() {
                         <div>
                           <EditableList
                             items={formData.personalityTraits || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, personalityTraits: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, personalityTraits: items }))}
                             label="Personality Traits"
                             placeholder="Add a trait and press Enter..."
                           />
@@ -439,7 +439,7 @@ export default function CareerDatabaseManager() {
                         <div className="md:col-span-2">
                           <EditableList
                             items={formData.challenges || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, challenges: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, challenges: items }))}
                             label="Challenges"
                             placeholder="Add a challenge and press Enter..."
                           />
@@ -448,7 +448,7 @@ export default function CareerDatabaseManager() {
                         <div className="md:col-span-2">
                           <EditableList
                             items={formData.dayToDay || []}
-                            onChange={(items) => setFormData((prev) => ({ ...prev, dayToDay: items }))}
+                            onChange={(items) => setFormData((prev: any) => ({ ...prev, dayToDay: items }))}
                             label="Day-to-Day Activities"
                             placeholder="Add an activity and press Enter..."
                           />

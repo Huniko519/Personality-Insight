@@ -52,7 +52,7 @@ export default function PersonalityTypesManager() {
   }
 
   const handleInputChange = (field: string, value: string) => {
-    setTypeData((prev) => ({
+    setTypeData((prev: any) => ({
       ...prev,
       [field]: value,
     }))
@@ -64,14 +64,14 @@ export default function PersonalityTypesManager() {
       .split(",")
       .map((item) => item.trim())
       .filter((item) => item)
-    setTypeData((prev) => ({
+    setTypeData((prev: any) => ({
       ...prev,
       [field]: arrayValue,
     }))
   }
 
   const handleNestedInputChange = (parent: string, field: string, value: string) => {
-    setTypeData((prev) => ({
+    setTypeData((prev: any) => ({
       ...prev,
       [parent]: {
         ...prev[parent],
@@ -86,7 +86,7 @@ export default function PersonalityTypesManager() {
       .split(",")
       .map((item) => item.trim())
       .filter((item) => item)
-    setTypeData((prev) => ({
+    setTypeData((prev: any) => ({
       ...prev,
       [parent]: {
         ...prev[parent],
@@ -105,7 +105,7 @@ export default function PersonalityTypesManager() {
       [field]: value,
     }
 
-    setTypeData((prev) => ({
+    setTypeData((prev: any) => ({
       ...prev,
       cognitiveFunctions: updatedFunctions,
     }))
@@ -123,7 +123,7 @@ export default function PersonalityTypesManager() {
       setSuccess(`Personality type ${editingType} updated successfully`)
 
       // Update local state
-      setTypes((prev) => ({
+      setTypes((prev: any) => ({
         ...prev,
         [editingType]: typeData,
       }))
@@ -282,7 +282,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.traits || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, traits: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, traits: items }))}
                             label="Traits"
                             placeholder="Add a trait and press Enter..."
                           />
@@ -291,7 +291,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.values || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, values: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, values: items }))}
                             label="Values"
                             placeholder="Add a value and press Enter..."
                           />
@@ -300,7 +300,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.strengths || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, strengths: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, strengths: items }))}
                             label="Strengths"
                             placeholder="Add a strength and press Enter..."
                           />
@@ -309,7 +309,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.weaknesses || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, weaknesses: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, weaknesses: items }))}
                             label="Weaknesses"
                             placeholder="Add a weakness and press Enter..."
                           />
@@ -325,7 +325,7 @@ export default function PersonalityTypesManager() {
                         <div className="md:col-span-2">
                           <EditableList
                             items={typeData.careers || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, careers: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, careers: items }))}
                             label="Careers"
                             placeholder="Add a career and press Enter..."
                           />
@@ -334,7 +334,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.careerStrengths || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, careerStrengths: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, careerStrengths: items }))}
                             label="Career Strengths"
                             placeholder="Add a career strength and press Enter..."
                           />
@@ -343,7 +343,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.careerChallenges || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, careerChallenges: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, careerChallenges: items }))}
                             label="Career Challenges"
                             placeholder="Add a career challenge and press Enter..."
                           />
@@ -352,7 +352,7 @@ export default function PersonalityTypesManager() {
                         <div>
                           <EditableList
                             items={typeData.careerTraits || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, careerTraits: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, careerTraits: items }))}
                             label="Career Traits"
                             placeholder="Add a career trait and press Enter..."
                           />
@@ -378,7 +378,7 @@ export default function PersonalityTypesManager() {
                         <div className="md:col-span-2">
                           <EditableList
                             items={typeData.famousPeople || []}
-                            onChange={(items) => setTypeData((prev) => ({ ...prev, famousPeople: items }))}
+                            onChange={(items) => setTypeData((prev: any) => ({ ...prev, famousPeople: items }))}
                             label="Famous People"
                             placeholder="Add a famous person and press Enter..."
                           />
@@ -388,7 +388,7 @@ export default function PersonalityTypesManager() {
                           <EditableList
                             items={typeData.compatibility?.best || []}
                             onChange={(items) =>
-                              setTypeData((prev) => ({
+                              setTypeData((prev: any) => ({
                                 ...prev,
                                 compatibility: {
                                   ...prev.compatibility,
@@ -405,7 +405,7 @@ export default function PersonalityTypesManager() {
                           <EditableList
                             items={typeData.compatibility?.good || []}
                             onChange={(items) =>
-                              setTypeData((prev) => ({
+                              setTypeData((prev: any) => ({
                                 ...prev,
                                 compatibility: {
                                   ...prev.compatibility,

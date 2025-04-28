@@ -144,7 +144,7 @@ export default function FAQCategoriesManager() {
   }
 
   const handleEdit = (category: FAQCategory, index: number) => {
-    setEditingCategory({ ...category, index: index as any })
+    setEditingCategory({ ...category, id: index as any })
     setFormData({
       id: category.id || "",
       name: category.name || "", // Changed from title to name

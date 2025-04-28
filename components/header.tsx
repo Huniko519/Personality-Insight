@@ -133,31 +133,7 @@ export default function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-3">
-            <div className="relative group">
-              <button className="w-8 h-8 flex items-center justify-center text-rose-600 hover:text-rose-800 transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
-              <div className="absolute right-0 top-full scale-0 opacity-0 origin-top-right group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 bg-white shadow-lg rounded-md p-2 w-64">
-                <div className="flex rounded-md overflow-hidden border border-rose-200 focus-within:ring-1 focus-within:ring-rose-500">
-                  <input
-                    type="text"
-                    placeholder="Search personality types..."
-                    className="w-full p-2 text-sm outline-none"
-                  />
-                  <button className="bg-rose-100 px-2 text-rose-700 hover:bg-rose-200 transition-colors">
-                    <Search className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <AuthButtons />
-
-            <Link href="/quiz">
-              <Button className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
-                Start Test
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -179,7 +155,7 @@ export default function Header() {
         {/* Mobile Menu */}
         <div
           className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-            isMobileMenuOpen ? "max-h-96 opacity-100 py-4" : "max-h-0 opacity-0"
+            isMobileMenuOpen ? "max-h-100 opacity-100 py-4" : "max-h-0 opacity-0"
           }`}
         >
           <nav className="flex flex-col space-y-1">
@@ -204,41 +180,7 @@ export default function Header() {
           </nav>
 
           <div className="mt-4 pt-4 border-t border-rose-100 flex flex-col gap-3">
-            {user && (
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium transition-all duration-300"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-user"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                My Profile
-              </Link>
-            )}
-
             <AuthButtons />
-
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search personality types..."
-                className="w-full p-2 text-sm rounded-md border border-rose-200 focus:outline-none focus:ring-1 focus:ring-rose-500"
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-rose-400" />
-            </div>
           </div>
         </div>
       </div>

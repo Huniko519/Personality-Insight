@@ -307,7 +307,7 @@ export default function CaseStudiesManager() {
                   <div className="space-y-2">
                     <EditableList
                       items={formData.tags ? formData.tags : []}
-                      onChange={(tags) => setFormData((prev) => ({ ...prev, tags }))}
+                      onChange={(tags) => setFormData((prev: any) => ({ ...prev, tags }))}
                       label="Tags"
                       placeholder="Add a tag and press Enter..."
                     />

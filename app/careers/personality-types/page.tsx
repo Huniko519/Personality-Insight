@@ -14,7 +14,7 @@ export default function CareerPersonalityTypesPage() {
   useEffect(() => {
     async function fetchPersonalityTypes() {
       try {
-        const types = await getAllPersonalityTypes()
+        const types = await getAllPersonalityTypes() as any
         setPersonalityTypes(types)
       } catch (error) {
         console.error("Error fetching personality types:", error)
@@ -53,7 +53,7 @@ export default function CareerPersonalityTypesPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {personalityTypes.map((type) => (
+            {personalityTypes.map((type: any) => (
               <Link
                 href={`/careers/personality-types/${type.code.toLowerCase()}`}
                 key={type.code}

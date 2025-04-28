@@ -33,18 +33,28 @@ const iconMap = {
   MessageSquare: Mail,
 }
 
+interface FaqCategory {
+  id: string
+  name: string
+  icon: keyof typeof iconMap
+  questions: {
+    question: string
+    answer: string
+  }[]
+}
+
 export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("general")
-  const [faqCategories, setFaqCategories] = useState([])
+  const [faqCategories, setFaqCategories] = useState<FaqCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadFAQCategories() {
       try {
         setIsLoading(true)
-        const categories = await getFAQCategories()
+        const categories = await getFAQCategories() as any
         setFaqCategories(categories)
         setIsLoading(false)
       } catch (err) {
@@ -60,10 +70,10 @@ export default function FAQPage() {
   // Filter questions based on search query
   const filteredCategories = searchQuery
     ? faqCategories
-        .map((category) => ({
+        .map((category: FaqCategory) => ({
           ...category,
           questions: category.questions.filter(
-            (q) =>
+            (q: { question: string; answer: string }) =>
               q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
               q.answer.toLowerCase().includes(searchQuery.toLowerCase()),
           ),
