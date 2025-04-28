@@ -1,12 +1,10 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 import { getBlogPosts } from "@/lib/firebase"
+import NewsletterForm from "@/components/newsletter-form"
 
 // Type definitions
 interface BlogPost {
@@ -27,26 +25,16 @@ interface BlogPost {
   relatedPosts?: string[]
 }
 
-export default function BlogPage() {
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchBlogPosts() {
-      try {
-        const posts = await getBlogPosts()
-        console.log(`Fetched ${posts.length} blog posts`)
-        setBlogPosts(Array.isArray(posts) ? posts : [])
-      } catch (error) {
-        console.error("Error fetching blog posts:", error)
-        setBlogPosts([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchBlogPosts()
-  }, [])
+export default async function BlogPage() {
+  // Fetch blog posts on the server
+  let blogPosts: BlogPost[] = []
+  try {
+    const posts = await getBlogPosts()
+    blogPosts = Array.isArray(posts) ? posts : []
+  } catch (error) {
+    console.error("Error fetching blog posts:", error)
+    blogPosts = []
+  }
 
   // Find featured post
   const featuredPost = blogPosts.find((post) => post.featured === true) || blogPosts[0]
@@ -54,24 +42,9 @@ export default function BlogPage() {
   // Get remaining posts
   const remainingPosts = featuredPost ? blogPosts.filter((post) => post.id !== featuredPost.id) : blogPosts
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-rose-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-            <p className="mt-4 text-rose-600">Loading blog posts...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -168,14 +141,7 @@ export default function BlogPage() {
             <p className="text-rose-600 mb-6 max-w-2xl mx-auto">
               Get the latest articles, personality insights, and exclusive content delivered straight to your inbox.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-grow px-4 py-2 border border-rose-200 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500"
-              />
-              <Button className="bg-rose-600 hover:bg-rose-700">Subscribe</Button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
       </div>

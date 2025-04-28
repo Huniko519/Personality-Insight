@@ -1,13 +1,13 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Heart, Users, Briefcase, Home, BookOpen, ArrowRight, MessageSquare } from "lucide-react"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 
-export default function RelationshipsPage() {
+export default async function RelationshipsPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main className="min-h-screen bg-gradient-to-b from-rose-50 to-white">
         <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 md:py-20">
           {/* Hero Section */}

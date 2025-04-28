@@ -4,11 +4,9 @@ import {
   Lightbulb,
   Brain,
   Users,
-  School,
   Sparkles,
   ArrowRight,
   GraduationCap,
-  Heart,
   ChevronRight,
   BookOpen,
   Compass,
@@ -16,18 +14,14 @@ import {
   Target,
   PenTool,
   Layers,
-  BarChart,
-  Award,
-  Coffee,
-  Feather,
 } from "lucide-react"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 
-export default function LearningPage() {
+export default async function LearningPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-rose-100 via-rose-50 to-white py-24 overflow-hidden">
@@ -312,270 +306,6 @@ export default function LearningPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-rose-50 rounded-2xl p-8 my-16 shadow-inner relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-rose-100 rounded-full -mr-32 -mt-32 opacity-50"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-100 rounded-full -ml-32 -mb-32 opacity-50"></div>
-
-              <div className="flex items-center gap-3 relative z-10 mb-6">
-                <div className="bg-rose-200 p-3 rounded-full">
-                  <School className="text-rose-600" size={28} />
-                </div>
-                <h2 className="text-2xl font-bold text-rose-800 m-0">Learning Styles vs Teaching Styles</h2>
-              </div>
-
-              <div className="relative z-10">
-                <p className="mb-4">
-                  For example, teachers who prefer Intuition may give open-ended directions that provide a basic
-                  framework for the assignment but young people who prefer Sensing do better with clear instructions
-                  presented in sequential order. Issues can arise, as well, with teachers who give too many details and
-                  step-by-step directions to a child who prefers Intuition who just wants to do it their own way and
-                  build upon their many innovative ideas.
-                </p>
-
-                <div className="my-6 p-4 bg-white rounded-lg shadow-sm border border-rose-200">
-                  <div className="flex items-center mb-2">
-                    <Coffee className="text-rose-500 mr-2" size={18} />
-                    <span className="font-medium text-rose-800">Teaching Style Insight</span>
-                  </div>
-                  <p className="text-gray-700 m-0">
-                    When the common language of personality type is understood, lesson plans can be tailored to meet the
-                    needs of all students. Teachers who know type can then approach the same lesson in multiple ways,
-                    appealing to the preferences of all their students.
-                  </p>
-                </div>
-
-                <p className="mb-4">
-                  Students whose preferences are different from those of a teacher may find it difficult to adjust to
-                  the classroom atmosphere and the teaching methods of that teacher. Teachers who vary their teaching
-                  styles after learning about personality type often find they can motivate and teach a wider range of
-                  students because they are developing diverse approaches that better meet the needs of all students.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mt-16 mb-8">
-              <div className="bg-rose-100 p-3 rounded-full">
-                <Brain className="text-rose-600" size={24} />
-              </div>
-              <h2 className="text-2xl font-bold text-rose-800 m-0">Type Awareness for Educators and Support Staff</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="bg-white rounded-xl shadow-md p-6 border border-rose-100 hover:shadow-lg transition-shadow">
-                <div className="bg-rose-100 rounded-full p-3 w-12 h-12 flex items-center justify-center mb-4">
-                  <Users size={24} className="text-rose-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-rose-800 mb-3">Parents & Teachers</h3>
-                <p className="text-gray-700">
-                  Parents and teachers both have type preferences. When these differ, misunderstandings about what is
-                  considered acceptable behavior can occur without type awareness.
-                </p>
-                <Link
-                  href="/blog/parenting-styles"
-                  className="text-rose-600 font-medium flex items-center mt-3 hover:text-rose-700"
-                >
-                  Learn more <ChevronRight size={16} className="ml-1" />
-                </Link>
-              </div>
-              <div className="bg-white rounded-xl shadow-md p-6 border border-rose-100 hover:shadow-lg transition-shadow">
-                <div className="bg-rose-100 rounded-full p-3 w-12 h-12 flex items-center justify-center mb-4">
-                  <Brain size={24} className="text-rose-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-rose-800 mb-3">School Counselors</h3>
-                <p className="text-gray-700">
-                  School counselors can use type awareness to help maximize student success by promoting understanding,
-                  academic achievement, and emotional management.
-                </p>
-                <Link
-                  href="/blog/counseling-approaches"
-                  className="text-rose-600 font-medium flex items-center mt-3 hover:text-rose-700"
-                >
-                  Learn more <ChevronRight size={16} className="ml-1" />
-                </Link>
-              </div>
-              <div className="bg-white rounded-xl shadow-md p-6 border border-rose-100 hover:shadow-lg transition-shadow">
-                <div className="bg-rose-100 rounded-full p-3 w-12 h-12 flex items-center justify-center mb-4">
-                  <School size={24} className="text-rose-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-rose-800 mb-3">Administrators</h3>
-                <p className="text-gray-700">
-                  School administrators can create environments that support diverse learning needs and professional
-                  development opportunities for educators.
-                </p>
-                <Link
-                  href="/blog/educational-leadership"
-                  className="text-rose-600 font-medium flex items-center mt-3 hover:text-rose-700"
-                >
-                  Learn more <ChevronRight size={16} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mt-16 mb-8">
-              <div className="bg-rose-100 p-3 rounded-full">
-                <Sparkles className="text-rose-600" size={24} />
-              </div>
-              <h2 className="text-2xl font-bold text-rose-800 m-0">Benefits of Type Awareness in Education</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <div className="bg-gradient-to-br from-rose-50 to-white p-6 rounded-xl border border-rose-100 shadow-md">
-                <h3 className="text-xl font-semibold text-rose-800 mb-4 flex items-center">
-                  <Award className="text-rose-500 mr-2" size={20} />
-                  Student Benefits
-                </h3>
-                <p className="text-gray-700 mb-4">
-                  Understanding personality type in education offers numerous benefits for students. When educators
-                  recognize and adapt to different learning preferences, students become more engaged and successful in
-                  their academic pursuits.
-                </p>
-                <p className="text-gray-700">
-                  Type awareness also helps students develop metacognitive skills - understanding how they learn best
-                  and how to adapt their approach when necessary.
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-rose-50 to-white p-6 rounded-xl border border-rose-100 shadow-md">
-                <h3 className="text-xl font-semibold text-rose-800 mb-4 flex items-center">
-                  <BarChart className="text-rose-500 mr-2" size={20} />
-                  Educational Outcomes
-                </h3>
-                <p className="text-gray-700">
-                  This self-knowledge becomes increasingly valuable as students progress through their educational
-                  journey and into their careers. Students who understand their learning preferences can advocate for
-                  themselves and develop strategies that work with their natural tendencies.
-                </p>
-                <div className="mt-4 flex justify-end">
-                  <div className="bg-rose-100 p-2 rounded-full">
-                    <Feather size={18} className="text-rose-600" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <Brain size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Self-understanding & awareness</span>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <Book size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Improved academic strategies</span>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <Sparkles size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Better emotional management</span>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <Users size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Enhanced interpersonal skills</span>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <GraduationCap size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Better career planning</span>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-lg flex items-center gap-3 hover:bg-rose-100 transition-colors">
-                <div className="bg-rose-200 rounded-full p-2">
-                  <Heart size={18} className="text-rose-700" />
-                </div>
-                <span className="text-rose-800 font-medium">Social-emotional learning</span>
-              </div>
-            </div>
-
-            <div className="mt-12 bg-white rounded-xl overflow-hidden shadow-xl border border-rose-100">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-rose-800 mb-4">Learning Style Spectrum</h3>
-                <div className="space-y-4">
-                  <div className="w-full bg-rose-50 p-3 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-rose-700">Visual</span>
-                      <span className="text-sm font-medium text-rose-700">Auditory</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-rose-500 h-2.5 rounded-full" style={{ width: "65%" }}></div>
-                    </div>
-                  </div>
-                  <div className="w-full bg-rose-50 p-3 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-rose-700">Theoretical</span>
-                      <span className="text-sm font-medium text-rose-700">Practical</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-rose-500 h-2.5 rounded-full" style={{ width: "40%" }}></div>
-                    </div>
-                  </div>
-                  <div className="w-full bg-rose-50 p-3 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-rose-700">Individual</span>
-                      <span className="text-sm font-medium text-rose-700">Collaborative</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-rose-500 h-2.5 rounded-full" style={{ width: "75%" }}></div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 italic text-center mt-4">
-                  Understanding different learning styles can help educators create more inclusive and effective
-                  teaching strategies.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <h3 className="text-xl font-semibold text-rose-800 mt-12 mb-6">Learning Environments</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Book size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Traditional Classroom</h4>
-              <p className="text-gray-600 text-center">Structured environment with clear expectations and routines</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Feather size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Outdoor Learning</h4>
-              <p className="text-gray-600 text-center">Nature-based education that engages all the senses</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Layers size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Digital Learning</h4>
-              <p className="text-gray-600 text-center">Technology-enhanced education with interactive content</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Users size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Collaborative Space</h4>
-              <p className="text-gray-600 text-center">Team-based learning environments that foster cooperation</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Zap size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Hands-on Learning</h4>
-              <p className="text-gray-600 text-center">Practical activities that reinforce theoretical concepts</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md border border-rose-100 p-5 hover:shadow-lg transition-all">
-              <div className="bg-rose-50 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                <Coffee size={28} className="text-rose-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-rose-800 text-center mb-2">Individual Study</h4>
-              <p className="text-gray-600 text-center">Focused environments for self-directed learning</p>
             </div>
           </div>
         </section>

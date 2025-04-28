@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 
-export default function CareersPage() {
+export default async function CareersPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">

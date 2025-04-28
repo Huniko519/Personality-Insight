@@ -309,8 +309,8 @@ export default function BlogsManager() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {blogs.map((blog) => (
-                      <TableRow key={blog.id} className="hover:bg-slate-50">
+                    {blogs.map((blog, index) => (
+                      <TableRow key={`${blog.id}-${index}`} className="hover:bg-slate-50">
                         <TableCell className="font-medium">{blog.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">

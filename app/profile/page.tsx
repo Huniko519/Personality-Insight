@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -17,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { useAuth } from "@/lib/auth"
 import { getUserTestResults, type TestResult } from "@/lib/firebase"
+import Loading from "@/components/loading"
 
 export default function ProfilePage() {
   return (
@@ -229,7 +231,7 @@ function ProfileContent() {
                 <CardContent>
                   {isLoadingResults ? (
                     <div className="text-center py-8">
-                      <div className="w-12 h-12 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin mx-auto"></div>
+                      <Loading />
                       <p className="mt-4 text-rose-600">Loading your test results...</p>
                     </div>
                   ) : testResults.length > 0 ? (

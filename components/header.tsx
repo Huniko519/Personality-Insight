@@ -3,18 +3,18 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, ChevronDown, Search } from "lucide-react"
+import { Menu, X, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { AuthButtons } from "@/components/auth/auth-buttons"
-import { useAuth } from "@/lib/auth"
 
-export default function Header() {
+export default function Header({ user, loading }: { user?: any; loading?: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isTypesDropdownOpen, setIsTypesDropdownOpen] = useState(false)
 
-  const { user } = useAuth()
+  // Remove this line if it exists:
+  // const { user, loading } = useAuth()
 
   // Handle scroll effect
   useEffect(() => {
