@@ -1,14 +1,9 @@
-"use client"
-
 export function Loading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin mx-auto"></div>
-      </div>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
     </div>
   )
 }
 
-// Also export as default for backward compatibility
 export default Loading

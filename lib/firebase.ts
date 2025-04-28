@@ -1,7 +1,8 @@
-import { initializeApp } from "firebase/app"
-import { getDatabase, ref, get, set, push } from "firebase/database"
-import { getAnalytics } from "firebase/analytics"
-import { getAuth, GoogleAuthProvider } from "firebase/auth"
+import { ref, get, push, set } from "firebase/database"
+import { cache } from "react"
+import { app, auth, database, googleProvider, analytics } from "./firebase-init"
+import { fetchFromFirebaseWithCache, writeToFirebaseAndInvalidateCache } from "./firebase-cache"
+import { CACHE_DURATIONS, getFromCache, setInCache } from "./cache"
 
 export interface PersonalityExplanations {
   cognitiveExplanation: string
@@ -38,65 +39,22 @@ export interface UserRole {
   createdAt: string
 }
 
-// Firebase Config
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-}
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
-const database = getDatabase(app)
-const googleProvider = new GoogleAuthProvider()
-
-// Initialize Analytics only on client side
-let analytics: any = null
-if (typeof window !== "undefined") {
-  analytics = getAnalytics(app)
-}
-
 // Generic function to fetch data from Firebase
 export async function fetchFromFirebase<T>(path: string): Promise<T> {
-  try {
-    const snapshot = await get(ref(database, path))
-    if (snapshot.exists()) {
-      return snapshot.val() as T
-    } else {
-      throw new Error(`No data available at path: ${path}`)
-    }
-  } catch (error) {
-    console.error(`Error fetching data from ${path}:`, error)
-    throw error
-  }
+  return fetchFromFirebaseWithCache<T>(path)
 }
 
 // Generic function to write data to Firebase
 export async function writeToFirebase(path: string, data: any): Promise<void> {
-  try {
-    await set(ref(database, path), data)
-    console.log(`Data successfully written to ${path}`)
-  } catch (error) {
-    console.error(`Error writing data to ${path}:`, error)
-    throw error
-  }
+  return writeToFirebaseAndInvalidateCache(path, data)
 }
 
 // User role management functions
 export async function getUserRole(uid: string): Promise<"admin" | "user" | null> {
   try {
-    const snapshot = await get(ref(database, `users/${uid}`))
-    if (snapshot.exists()) {
-      const userData = snapshot.val()
-      return userData.role || "user" // Default to 'user' if role is not set
-    }
-    return null
+    // User roles should have a short cache duration as they might change
+    const userData = await fetchFromFirebaseWithCache<any>(`users/${uid}`, CACHE_DURATIONS.SHORT)
+    return userData?.role || "user" // Default to 'user' if role is not set
   } catch (error) {
     console.error("Error getting user role:", error)
     return null
@@ -110,7 +68,7 @@ export async function setUserRole(uid: string, role: "admin" | "user"): Promise<
 
     if (snapshot.exists()) {
       const userData = snapshot.val()
-      await set(userRef, {
+      await writeToFirebaseAndInvalidateCache(`users/${uid}`, {
         ...userData,
         role,
       })
@@ -125,18 +83,15 @@ export async function setUserRole(uid: string, role: "admin" | "user"): Promise<
 
 export async function getAllUsers(): Promise<UserRole[]> {
   try {
-    const snapshot = await get(ref(database, "users"))
-    if (snapshot.exists()) {
-      const usersData = snapshot.val()
-      return Object.entries(usersData).map(([uid, data]: [string, any]) => ({
-        uid,
-        email: data.email,
-        displayName: data.displayName || data.email,
-        role: data.role || "user",
-        createdAt: data.createdAt || new Date().toISOString(),
-      }))
-    }
-    return []
+    // User list should have a short cache duration
+    const usersData = await fetchFromFirebaseWithCache<Record<string, any>>("users", CACHE_DURATIONS.SHORT)
+    return Object.entries(usersData).map(([uid, data]: [string, any]) => ({
+      uid,
+      email: data.email,
+      displayName: data.displayName || data.email,
+      role: data.role || "user",
+      createdAt: data.createdAt || new Date().toISOString(),
+    }))
   } catch (error) {
     console.error("Error getting all users:", error)
     return []
@@ -162,6 +117,14 @@ export async function saveTestResult(result: TestResult) {
 // Get test results for a specific user
 export async function getUserTestResults(userId: string): Promise<TestResult[]> {
   try {
+    // User-specific results should have a short cache duration
+    const cacheKey = `user-results-${userId}`
+    const cachedResults = getFromCache<TestResult[]>(cacheKey)
+
+    if (cachedResults) {
+      return cachedResults
+    }
+
     // Get all results and filter client-side to avoid indexing requirement
     const resultsRef = ref(database, "user-results")
     const snapshot = await get(resultsRef)
@@ -185,35 +148,40 @@ export async function getUserTestResults(userId: string): Promise<TestResult[]> 
     })
 
     // Sort by date (newest first)
-    return userResults.sort((a, b) => {
+    const sortedResults = userResults.sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime()
     })
+
+    // Cache the results
+    setInCache(cacheKey, sortedResults, CACHE_DURATIONS.SHORT)
+
+    return sortedResults
   } catch (error) {
     console.error("Error fetching user test results:", error)
     return []
   }
 }
 
-// Specific data fetching functions
-export async function getQuestions() {
-  return fetchFromFirebase<any[]>("/questions")
-}
+// Specific data fetching functions with React cache for server components
+export const getQuestions = cache(async () => {
+  return fetchFromFirebaseWithCache<any[]>("/questions", CACHE_DURATIONS.VERY_LONG)
+})
 
-export async function getPersonalityExplanations() {
-  return fetchFromFirebase<PersonalityExplanations>("/personality-explanations")
-}
+export const getPersonalityExplanations = cache(async () => {
+  return fetchFromFirebaseWithCache<PersonalityExplanations>("/personality-explanations", CACHE_DURATIONS.VERY_LONG)
+})
 
-export async function getPersonalityTypes() {
-  return fetchFromFirebase<any>("/personality-types")
-}
+export const getPersonalityTypes = cache(async () => {
+  return fetchFromFirebaseWithCache<any>("/personality-types", CACHE_DURATIONS.VERY_LONG)
+})
 
-export async function getPersonalityTypeByCode(code: string) {
-  return fetchFromFirebase<any>(`/personality-types/${code.toUpperCase()}`)
-}
+export const getPersonalityTypeByCode = cache(async (code: string) => {
+  return fetchFromFirebaseWithCache<any>(`/personality-types/${code.toUpperCase()}`, CACHE_DURATIONS.VERY_LONG)
+})
 
-export async function getAllPersonalityTypes() {
+export const getAllPersonalityTypes = cache(async () => {
   try {
-    const types = await fetchFromFirebase<Record<string, any>>("/personality-types")
+    const types = await fetchFromFirebaseWithCache<Record<string, any>>("/personality-types", CACHE_DURATIONS.VERY_LONG)
     return Object.entries(types).map(([code, type]) => ({
       code,
       ...type,
@@ -223,47 +191,40 @@ export async function getAllPersonalityTypes() {
     // Return empty array as fallback
     return []
   }
-}
+})
 
-export async function getCaseStudies() {
-  return fetchFromFirebase<any[]>("/case-studies")
-}
+export const getCaseStudies = cache(async () => {
+  return fetchFromFirebaseWithCache<any[]>("/case-studies", CACHE_DURATIONS.LONG)
+})
 
-export async function getCareerDatabase() {
-  return fetchFromFirebase<any[]>("/career-database")
-}
+export const getCareerDatabase = cache(async () => {
+  return fetchFromFirebaseWithCache<any[]>("/career-database", CACHE_DURATIONS.LONG)
+})
 
-// Updated getBlogPosts function to ensure it returns an array
-export async function getBlogPosts() {
+// Updated getBlogPosts function to ensure it returns an array with caching
+export const getBlogPosts = cache(async () => {
   try {
-    const snapshot = await get(ref(database, "/blogs"))
-    if (snapshot.exists()) {
-      const blogsData = snapshot.val()
-      // Convert the object of blog posts to an array
-      return Object.entries(blogsData).map(([slug, data]: [string, any]) => ({
-        id: slug, // Use slug as id for compatibility with existing code
-        slug,
-        ...data,
-      }))
-    } else {
-      console.warn("No blog posts found in Firebase, returning empty array")
-      return []
-    }
+    const blogsData = await fetchFromFirebaseWithCache<Record<string, any>>("/blogs", CACHE_DURATIONS.MEDIUM)
+    // Convert the object of blog posts to an array
+    return Object.entries(blogsData).map(([slug, data]: [string, any]) => ({
+      id: slug, // Use slug as id for compatibility with existing code
+      slug,
+      ...data,
+    }))
   } catch (error) {
     console.error("Error fetching blog posts:", error)
     // Return fallback data if Firebase fails
     return []
   }
-}
+})
 
 // Updated getBlogPost function with better error handling and debugging
-export async function getBlogPost(slug: string) {
+export const getBlogPost = cache(async (slug: string) => {
   try {
     console.log(`Fetching blog post with slug: ${slug}`)
-    const snapshot = await get(ref(database, `/blogs/${slug}`))
+    const post = await fetchFromFirebaseWithCache<any>(`/blogs/${slug}`, CACHE_DURATIONS.MEDIUM)
 
-    if (snapshot.exists()) {
-      const post = snapshot.val()
+    if (post) {
       console.log(`Successfully fetched blog post: ${post.title}`)
       return {
         id: slug,
@@ -276,89 +237,78 @@ export async function getBlogPost(slug: string) {
   } catch (error) {
     return null
   }
-}
+})
 
 // Update the getCompatibilityData function to handle missing data better
-export async function getCompatibilityData(type1: string, type2: string) {
+export const getCompatibilityData = cache(async (type1: string, type2: string) => {
   try {
-    const snapshot = await get(ref(database, `/compatibility-matrix/${type1}/${type2}`))
-    if (snapshot.exists()) {
-      return snapshot.val()
-    } else {
-      console.warn(`No compatibility data found for ${type1} and ${type2}, returning null`)
-      return null
-    }
+    return await fetchFromFirebaseWithCache<any>(`/compatibility-matrix/${type1}/${type2}`, CACHE_DURATIONS.VERY_LONG)
   } catch (error) {
     console.error(`Error fetching compatibility data for ${type1} and ${type2}:`, error)
     return null
   }
-}
+})
 
 // Update the getCompatibilityMatrix function to handle missing data better
-export async function getCompatibilityMatrix() {
+export const getCompatibilityMatrix = cache(async () => {
   try {
-    const snapshot = await get(ref(database, "/compatibility-matrix"))
-    if (snapshot.exists()) {
-      return snapshot.val()
-    } else {
-      console.warn("No compatibility matrix found in Firebase, returning null")
-      return null
-    }
+    return await fetchFromFirebaseWithCache<any>("/compatibility-matrix", CACHE_DURATIONS.VERY_LONG)
   } catch (error) {
     console.error("Error fetching compatibility matrix:", error)
     return null
   }
-}
+})
 
 // Function to fetch FAQ categories from Firebase
-export const getFAQCategories = async () => {
+export const getFAQCategories = cache(async () => {
   try {
-    const data = await fetchFromFirebase("/faq-categories")
+    const data = await fetchFromFirebaseWithCache<any[]>("/faq-categories", CACHE_DURATIONS.LONG)
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.error("Error fetching FAQ categories:", error)
     return []
   }
-}
+})
+
 // Function to get case studies from Firebase
-export async function getCaseStudiesFromFirebase() {
+export const getCaseStudiesFromFirebase = cache(async () => {
   try {
-    return await fetchFromFirebase<any[]>("/case-studies")
+    return await fetchFromFirebaseWithCache<any[]>("/case-studies", CACHE_DURATIONS.LONG)
   } catch (error) {
     console.error("Error fetching case studies from Firebase:", error)
     console.log("Falling back to static case studies data")
     return []
   }
-}
+})
 
 // Function to get case studies filtered by tag
-export async function getCaseStudiesByTag(tag: string) {
+export const getCaseStudiesByTag = cache(async (tag: string) => {
   const studies = await getCaseStudiesFromFirebase()
   return studies.filter((study) => study.tags.includes(tag))
-}
+})
 
 // Function to get case studies involving a specific personality type
-export async function getCaseStudiesByType(typeCode: string) {
+export const getCaseStudiesByType = cache(async (typeCode: string) => {
   const studies = await getCaseStudiesFromFirebase()
   return studies.filter((study) => study.type1 === typeCode || study.type2 === typeCode)
-}
+})
 
 // Function to get career database from Firebase
-export async function getCareerDatabaseFromFirebase() {
+export const getCareerDatabaseFromFirebase = cache(async () => {
   try {
-    return await fetchFromFirebase<any[]>("/career-database")
+    return await fetchFromFirebaseWithCache<any[]>("/career-database", CACHE_DURATIONS.LONG)
   } catch (error) {
     console.error("Error fetching career database from Firebase:", error)
     console.log("Falling back to static career database")
     return []
   }
-}
+})
 
 // Function to get careers suitable for a specific personality type
-export async function getCareersForType(typeCode: string) {
+export const getCareersForType = cache(async (typeCode: string) => {
   const careers = await getCareerDatabaseFromFirebase()
   return careers.filter((career) => career.suitableTypes?.includes(typeCode) || career.goodFitTypes?.includes(typeCode))
-}
+})
 
 // Function to initialize the database with static data
 export const initializeDatabase = async () => {
@@ -373,49 +323,33 @@ export const initializeDatabase = async () => {
 }
 
 // Function to get career-specific data for a personality type
-export async function getCareerDataForType(typeCode: string) {
+export const getCareerDataForType = cache(async (typeCode: string) => {
   try {
-    const snapshot = await get(ref(database, `/career-data/${typeCode}`))
-    if (snapshot.exists()) {
-      return snapshot.val()
-    } else {
-      console.warn(`No career data found for ${typeCode}, returning null`)
-      return null
-    }
+    return await fetchFromFirebaseWithCache<any>(`/career-data/${typeCode}`, CACHE_DURATIONS.LONG)
   } catch (error) {
     console.error(`Error fetching career data for ${typeCode}:`, error)
     return null
   }
-}
+})
 
 // Function to get development strategies for a personality type
-export async function getDevStrategiesForType(typeCode: string) {
+export const getDevStrategiesForType = cache(async (typeCode: string) => {
   try {
-    const snapshot = await get(ref(database, `/career-development-strategies/${typeCode}`))
-    if (snapshot.exists()) {
-      return snapshot.val()
-    } else {
-      return []
-    }
+    return await fetchFromFirebaseWithCache<any[]>(`/career-development-strategies/${typeCode}`, CACHE_DURATIONS.LONG)
   } catch (error) {
     console.error(`Error fetching development strategies for ${typeCode}:`, error)
     return []
   }
-}
+})
 
 // Function to get communication tips for a personality type
-export async function getCommunicationTipsForType(typeCode: string) {
+export const getCommunicationTipsForType = cache(async (typeCode: string) => {
   try {
-    const snapshot = await get(ref(database, `/career-communication-tips/${typeCode}`))
-    if (snapshot.exists()) {
-      return snapshot.val()
-    } else {
-      return []
-    }
+    return await fetchFromFirebaseWithCache<any[]>(`/career-communication-tips/${typeCode}`, CACHE_DURATIONS.LONG)
   } catch (error) {
     console.error(`Error fetching communication tips for ${typeCode}:`, error)
     return []
   }
-}
+})
 
 export { auth, database, googleProvider, app, analytics }

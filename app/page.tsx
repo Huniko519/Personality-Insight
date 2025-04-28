@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { ArrowRight, CheckCircle, Users, Brain, Briefcase } from "lucide-react"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
 
-export default function Home() {
+export default async function Home() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main>
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-rose-50 to-rose-100 py-20 px-4">

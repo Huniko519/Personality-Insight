@@ -1,49 +1,22 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import Header from "@/components/header"
+import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 import { getAllPersonalityTypes } from "@/lib/firebase"
 
-export default function TypesPage() {
-  const [personalityTypes, setPersonalityTypes] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchPersonalityTypes() {
-      try {
-        const types = await getAllPersonalityTypes() as any
-        setPersonalityTypes(types)
-      } catch (error) {
-        console.error("Error fetching personality types:", error)
-        setPersonalityTypes([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPersonalityTypes()
-  }, [])
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-rose-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-            <p className="mt-4 text-rose-600">Loading personality types...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
+export default async function TypesPage() {
+  // Fetch personality types on the server
+  let personalityTypes = []
+  try {
+    const types = await getAllPersonalityTypes()
+    personalityTypes = types
+  } catch (error) {
+    console.error("Error fetching personality types:", error)
+    personalityTypes = []
   }
 
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">

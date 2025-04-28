@@ -10,17 +10,13 @@ interface ProtectedAdminRouteProps {
   children: React.ReactNode
 }
 
-export default function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
-  const { user, userData, loading, isAdmin } = useAuth()
+export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
+  const { user, loading, isAdmin } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push("/admin/login")
-      } else if (!isAdmin) {
-        router.push("/")
-      }
+    if (!loading && (!user || !isAdmin)) {
+      router.push("/admin/login")
     }
   }, [user, isAdmin, loading, router])
 
@@ -34,5 +30,3 @@ export default function ProtectedAdminRoute({ children }: ProtectedAdminRoutePro
 
   return <>{children}</>
 }
-
-export { ProtectedAdminRoute }
