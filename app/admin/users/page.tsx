@@ -236,9 +236,9 @@ export default function UsersManagementPage() {
     <ProtectedAdminRoute>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Personality Insight" width={150} height={40} className="h-10 w-auto" />
+              <Image src="/logo.png" alt="Personality Insight Admin" width={120} height={32} className="h-8 w-auto" />
             </Link>
           </div>
           <div className="flex space-x-2">
