@@ -229,7 +229,7 @@ export default function ResultsPage() {
                         <div className="space-y-4">
                           {typeData.strengths.map((strength: string, index: number) => (
                             <div key={index} className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index}</Badge>
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index + 1}</Badge>
                               <p className="ml-3 text-gray-600">{strength}</p>
                             </div>
                           ))}
@@ -256,7 +256,7 @@ export default function ResultsPage() {
                         <div className="space-y-4">
                           {typeData.weaknesses.map((weakness: string, index: number) => (
                             <div key={index} className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index}</Badge>
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index + 1}</Badge>
                               <p className="ml-3 text-gray-600">{weakness}</p>
                             </div>
                           ))}
