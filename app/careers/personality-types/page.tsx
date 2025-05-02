@@ -42,13 +42,7 @@ export default async function CareerPersonalityTypesPage() {
                 >
                   <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1 border border-rose-100">
                     <div className="h-40 relative overflow-hidden bg-rose-50">
-                      {type.image ? (
-                        <Image src={type.image || "/placeholder.svg"} alt={type.name} fill className="object-cover" />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <span className="text-5xl font-bold text-rose-200">{type.code}</span>
-                        </div>
-                      )}
+                      <Image src={type.image || "/assets/placeholder.png"} alt={type.name} fill className="object-cover" />
                     </div>
                     <div className="p-4">
                       <h2 className="text-xl font-semibold mb-1 group-hover:text-rose-600">{type.code}</h2>

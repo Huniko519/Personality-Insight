@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import Image from "next/image"
 
 export default function AboutPage() {
   return (
@@ -14,8 +15,10 @@ export default function AboutPage() {
           {/* Hero Section */}
           <div className="relative rounded-2xl overflow-hidden mb-16">
             <div className="absolute inset-0 bg-rose-900 opacity-70"></div>
-            <img
-              src="/thinking-feeling-classrooms.png"
+            <Image
+              src="/assets/team-collaboration.jpg"
+              width={1200}
+              height={400}
               alt="Team collaboration"
               className="w-full h-64 md:h-96 object-cover"
             />
@@ -50,8 +53,8 @@ export default function AboutPage() {
                   about personality psychology.
                 </p>
               </div>
-              <div className="rounded-xl overflow-hidden shadow-lg">
-                <img src="/thinking-feeling-classrooms.png" alt="Our team" className="w-full h-auto" />
+              <div className="rounded-xl overflow-hidden">
+                <Image src="/logo.png" width={500} height={500} alt="Our team" className="w-full h-auto" />
               </div>
             </div>
           </div>
@@ -174,34 +177,36 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
-                  name: "Dr. Sarah Johnson",
+                  name: "Niko Hukka",
                   role: "Founder & Chief Psychologist",
-                  image: "/thinking-feeling-classrooms.png",
+                  image: "/assets/niko-hukka.png",
                   type: "INFJ",
                 },
                 {
-                  name: "Michael Chen",
+                  name: "Michael Henry",
                   role: "Lead Data Scientist",
-                  image: "/thinking-feeling-classrooms.png",
+                  image: "/assets/michel-henry.png",
                   type: "INTP",
                 },
                 {
                   name: "Emma Rodriguez",
                   role: "UX/UI Designer",
-                  image: "/thinking-feeling-classrooms.png",
+                  image: "/assets/emma-rodriguez.png",
                   type: "ENFP",
                 },
                 {
                   name: "James Wilson",
                   role: "Content Director",
-                  image: "/thinking-feeling-classrooms.png",
+                  image: "/assets/james-wilson.png",
                   type: "ENTJ",
                 },
               ].map((member) => (
-                <div key={member.name} className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <img
-                    src={member.image || "/thinking-feeling-classrooms.png"}
+                <div key={member.name} className="bg-white rounded-xl shadow-md overflow-hidden pt-2">
+                  <Image
+                    src={member.image || "/assets/placeholder.png"}
                     alt={member.name}
+                    width={300}
+                    height={300}
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-4 text-center">

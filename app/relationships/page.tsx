@@ -14,7 +14,7 @@ export default async function RelationshipsPage() {
           <div className="relative rounded-2xl overflow-hidden mb-16">
             <div className="absolute inset-0 bg-rose-600">
               <Image
-                src="/relationship-hero.jpg"
+                src="/assets/relationship.png"
                 alt="Relationships and personality types"
                 fill
                 className="object-cover mix-blend-overlay opacity-40"
@@ -208,7 +208,7 @@ export default async function RelationshipsPage() {
               <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-rose-100 group">
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src="/vibrant-brainstorm.png"
+                    src="/assets/placeholder.png"
                     alt="The Visionary and the Analyst"
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -244,7 +244,7 @@ export default async function RelationshipsPage() {
               <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-rose-100 group">
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src="/collaborative-innovation.png"
+                    src="/assets/placeholder.png"
                     alt="Creative Problem Solvers"
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

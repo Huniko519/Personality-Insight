@@ -5,6 +5,7 @@ import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 import { getBlogPosts } from "@/lib/firebase"
 import NewsletterForm from "@/components/newsletter-form"
+import Image from "next/image"
 
 // Type definitions
 interface BlogPost {
@@ -74,9 +75,11 @@ export default async function BlogPage() {
                   <Card className="overflow-hidden border-rose-200 shadow-lg hover:shadow-xl transition-shadow">
                     <div className="md:flex">
                       <div className="md:w-1/2 h-64 md:h-auto">
-                        <img
-                          src={featuredPost.image || "/thinking-feeling-classrooms.png"}
+                        <Image
+                          src={featuredPost.image || "/assets/placeholder.png"}
                           alt={featuredPost.title}
+                          width={300}
+                          height={300}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -107,9 +110,11 @@ export default async function BlogPage() {
                   {remainingPosts.map((post) => (
                     <Card key={post.id} className="border-rose-200 shadow-md hover:shadow-lg transition-shadow">
                       <div className="h-48 overflow-hidden">
-                        <img
-                          src={post.image || "/thinking-feeling-classrooms.png"}
+                        <Image
+                          src={post.image || "/assets/placeholder.png"}
                           alt={post.title}
+                          width={300}
+                          height={300}
                           className="w-full h-full object-cover"
                         />
                       </div>

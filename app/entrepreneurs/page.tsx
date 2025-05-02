@@ -193,7 +193,7 @@ export default function EntrepreneursPage() {
 
             <div className="relative rounded-lg overflow-hidden shadow-md">
               <Image
-                src="/focused-founder.png"
+                src="/assets/niko-hukka.png"
                 alt="Entrepreneur working on business strategy"
                 width={600}
                 height={400}

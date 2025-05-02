@@ -53,10 +53,10 @@ export function EditableList({ items = [], onChange, label, placeholder = "Add i
   }
 
   return (
-    <div className="space-y-3">
+    <div>
       {label && <Label>{label}</Label>}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 mb-2">
         <Input
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
@@ -64,14 +64,14 @@ export function EditableList({ items = [], onChange, label, placeholder = "Add i
           onKeyDown={handleKeyDown}
           className="flex-1"
         />
-        <Button type="button" onClick={handleAddItem} size="sm">
+        <Button type="button" onClick={handleAddItem}>
           <Plus className="h-4 w-4 mr-1" />
           Add
         </Button>
       </div>
 
       {items.length > 0 && (
-        <div className="border rounded-md p-3 bg-slate-50">
+        <div className="border rounded-md bg-slate-50">
           <ul className="space-y-2">
             {items.map((item, index) => (
               <li key={index} className="flex items-center justify-between group">

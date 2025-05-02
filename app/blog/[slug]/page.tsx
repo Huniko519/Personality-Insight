@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { getBlogPost, getBlogPosts } from "@/lib/firebase"
+import Image from "next/image"
 
 // Type definitions
 interface BlogPost {
@@ -112,7 +113,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
             {/* Featured Image */}
             <div className="mb-8 rounded-xl overflow-hidden shadow-md">
-              <img src={post.image || "/thinking-feeling-classrooms.png"} alt={post.title} className="w-full h-auto" />
+              <Image src={post.image || "/assets/placeholder.png"} width={300} height={300} alt={post.title} className="w-full h-auto" />
             </div>
 
             {/* Article Content */}
@@ -160,10 +161,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               <div className="bg-white rounded-xl shadow-md p-6 md:p-8 mb-8">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start">
                   <div className="w-20 h-20 rounded-full overflow-hidden mb-4 sm:mb-0 sm:mr-6 flex-shrink-0">
-                    <img
-                      src={post.authorImage || "/thinking-feeling-classrooms.png"}
+                    <Image
+                      src={post.authorImage || "/assets/placeholder.png"}
                       alt={post.author}
                       className="w-full h-full object-cover"
+                      width={80}
+                      height={80}
                     />
                   </div>
                   <div>
@@ -182,9 +185,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   {relatedPostsData.map((relatedPost) => (
                     <Card key={relatedPost.id} className="border-rose-200 shadow-md hover:shadow-lg transition-shadow">
                       <div className="h-40 overflow-hidden">
-                        <img
-                          src={relatedPost.image || "/thinking-feeling-classrooms.png"}
+                        <Image
+                          src={relatedPost.image || "/assets/placeholder.png"}
                           alt={relatedPost.title}
+                          width={300}
+                          height={300}
                           className="w-full h-full object-cover"
                         />
                       </div>

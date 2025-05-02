@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, UserPlus, Trash2, Edit, Check, X, Link } from "lucide-react"
+import { Shield, UserPlus, Trash2, Edit, Check, X, LogOut } from "lucide-react"
 import { ref, get, set, remove } from "firebase/database"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Image from "next/image"
 import { ProtectedAdminRoute } from "@/components/auth/protected-admin-route"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -238,7 +239,7 @@ export default function UsersManagementPage() {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Personality Insight Admin" width={120} height={32} className="h-8 w-auto" />
+              <Image src="/logo.png" alt="PersonaIQ Admin" width={120} height={32} className="h-8 w-auto" />
             </Link>
           </div>
           <div className="flex space-x-2">
@@ -246,6 +247,7 @@ export default function UsersManagementPage() {
               Back to Dashboard
             </Button>
             <Button variant="outline" size="sm" className="border-slate-200" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
               Log Out
             </Button>
           </div>
@@ -268,7 +270,7 @@ export default function UsersManagementPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Users</CardTitle>
+              <CardTitle>Users Management</CardTitle>
               <CardDescription>Manage user accounts and permissions</CardDescription>
             </div>
             <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
