@@ -1,8 +1,6 @@
 import { ref, get, push, set } from "firebase/database"
 import { cache } from "react"
 import { app, auth, database, googleProvider, analytics } from "./firebase-init"
-import { fetchFromFirebaseWithCache, writeToFirebaseAndInvalidateCache } from "./firebase-cache"
-import { CACHE_DURATIONS, getFromCache, setInCache } from "./cache"
 
 export interface PersonalityExplanations {
   cognitiveExplanation: string
@@ -41,20 +39,41 @@ export interface UserRole {
 
 // Generic function to fetch data from Firebase
 export async function fetchFromFirebase<T>(path: string): Promise<T> {
-  return fetchFromFirebaseWithCache<T>(path)
+  try {
+    const snapshot = await get(ref(database, path))
+    if (snapshot.exists()) {
+      return snapshot.val() as T
+    } else {
+      console.warn(`No data available at path: ${path}`)
+      throw new Error(`No data available at path: ${path}`)
+    }
+  } catch (error) {
+    console.error(`Error fetching data from ${path}:`, error)
+    throw error
+  }
 }
 
 // Generic function to write data to Firebase
 export async function writeToFirebase(path: string, data: any): Promise<void> {
-  return writeToFirebaseAndInvalidateCache(path, data)
+  try {
+    await set(ref(database, path), data)
+    console.log(`Data successfully written to ${path}`)
+  } catch (error) {
+    console.error(`Error writing data to ${path}:`, error)
+    throw error
+  }
 }
 
 // User role management functions
 export async function getUserRole(uid: string): Promise<"admin" | "user" | null> {
   try {
-    // User roles should have a short cache duration as they might change
-    const userData = await fetchFromFirebaseWithCache<any>(`users/${uid}`, CACHE_DURATIONS.SHORT)
-    return userData?.role || "user" // Default to 'user' if role is not set
+    const userRef = ref(database, `users/${uid}`)
+    const snapshot = await get(userRef)
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      return userData?.role || "user" // Default to 'user' if role is not set
+    }
+    return "user"
   } catch (error) {
     console.error("Error getting user role:", error)
     return null
@@ -68,7 +87,7 @@ export async function setUserRole(uid: string, role: "admin" | "user"): Promise<
 
     if (snapshot.exists()) {
       const userData = snapshot.val()
-      await writeToFirebaseAndInvalidateCache(`users/${uid}`, {
+      await writeToFirebase(`users/${uid}`, {
         ...userData,
         role,
       })
@@ -83,8 +102,14 @@ export async function setUserRole(uid: string, role: "admin" | "user"): Promise<
 
 export async function getAllUsers(): Promise<UserRole[]> {
   try {
-    // User list should have a short cache duration
-    const usersData = await fetchFromFirebaseWithCache<Record<string, any>>("users", CACHE_DURATIONS.SHORT)
+    const usersRef = ref(database, "users")
+    const snapshot = await get(usersRef)
+
+    if (!snapshot.exists()) {
+      return []
+    }
+
+    const usersData = snapshot.val()
     return Object.entries(usersData).map(([uid, data]: [string, any]) => ({
       uid,
       email: data.email,
@@ -117,14 +142,6 @@ export async function saveTestResult(result: TestResult) {
 // Get test results for a specific user
 export async function getUserTestResults(userId: string): Promise<TestResult[]> {
   try {
-    // User-specific results should have a short cache duration
-    const cacheKey = `user-results-${userId}`
-    const cachedResults = getFromCache<TestResult[]>(cacheKey)
-
-    if (cachedResults) {
-      return cachedResults
-    }
-
     // Get all results and filter client-side to avoid indexing requirement
     const resultsRef = ref(database, "user-results")
     const snapshot = await get(resultsRef)
@@ -152,9 +169,6 @@ export async function getUserTestResults(userId: string): Promise<TestResult[]> 
       return new Date(b.date).getTime() - new Date(a.date).getTime()
     })
 
-    // Cache the results
-    setInCache(cacheKey, sortedResults, CACHE_DURATIONS.SHORT)
-
     return sortedResults
   } catch (error) {
     console.error("Error fetching user test results:", error)
@@ -164,24 +178,24 @@ export async function getUserTestResults(userId: string): Promise<TestResult[]> 
 
 // Specific data fetching functions with React cache for server components
 export const getQuestions = cache(async () => {
-  return fetchFromFirebaseWithCache<any[]>("/questions", CACHE_DURATIONS.VERY_LONG)
+  return fetchFromFirebase<any[]>("/questions")
 })
 
 export const getPersonalityExplanations = cache(async () => {
-  return fetchFromFirebaseWithCache<PersonalityExplanations>("/personality-explanations", CACHE_DURATIONS.VERY_LONG)
+  return fetchFromFirebase<PersonalityExplanations>("/personality-explanations")
 })
 
 export const getPersonalityTypes = cache(async () => {
-  return fetchFromFirebaseWithCache<any>("/personality-types", CACHE_DURATIONS.VERY_LONG)
+  return fetchFromFirebase<any>("/personality-types")
 })
 
 export const getPersonalityTypeByCode = cache(async (code: string) => {
-  return fetchFromFirebaseWithCache<any>(`/personality-types/${code.toUpperCase()}`, CACHE_DURATIONS.VERY_LONG)
+  return fetchFromFirebase<any>(`/personality-types/${code.toUpperCase()}`)
 })
 
 export const getAllPersonalityTypes = cache(async () => {
   try {
-    const types = await fetchFromFirebaseWithCache<Record<string, any>>("/personality-types", CACHE_DURATIONS.VERY_LONG)
+    const types = await fetchFromFirebase<Record<string, any>>("/personality-types")
     return Object.entries(types).map(([code, type]) => ({
       code,
       ...type,
@@ -194,17 +208,17 @@ export const getAllPersonalityTypes = cache(async () => {
 })
 
 export const getCaseStudies = cache(async () => {
-  return fetchFromFirebaseWithCache<any[]>("/case-studies", CACHE_DURATIONS.LONG)
+  return fetchFromFirebase<any[]>("/case-studies")
 })
 
 export const getCareerDatabase = cache(async () => {
-  return fetchFromFirebaseWithCache<any[]>("/career-database", CACHE_DURATIONS.LONG)
+  return fetchFromFirebase<any[]>("/career-database")
 })
 
-// Updated getBlogPosts function to ensure it returns an array with caching
+// Updated getBlogPosts function to ensure it returns an array
 export const getBlogPosts = cache(async () => {
   try {
-    const blogsData = await fetchFromFirebaseWithCache<Record<string, any>>("/blogs", CACHE_DURATIONS.MEDIUM)
+    const blogsData = await fetchFromFirebase<Record<string, any>>("/blogs")
     // Convert the object of blog posts to an array
     return Object.entries(blogsData).map(([slug, data]: [string, any]) => ({
       id: slug, // Use slug as id for compatibility with existing code
@@ -222,7 +236,7 @@ export const getBlogPosts = cache(async () => {
 export const getBlogPost = cache(async (slug: string) => {
   try {
     console.log(`Fetching blog post with slug: ${slug}`)
-    const post = await fetchFromFirebaseWithCache<any>(`/blogs/${slug}`, CACHE_DURATIONS.MEDIUM)
+    const post = await fetchFromFirebase<any>(`/blogs/${slug}`)
 
     if (post) {
       console.log(`Successfully fetched blog post: ${post.title}`)
@@ -242,7 +256,7 @@ export const getBlogPost = cache(async (slug: string) => {
 // Update the getCompatibilityData function to handle missing data better
 export const getCompatibilityData = cache(async (type1: string, type2: string) => {
   try {
-    return await fetchFromFirebaseWithCache<any>(`/compatibility-matrix/${type1}/${type2}`, CACHE_DURATIONS.VERY_LONG)
+    return await fetchFromFirebase<any>(`/compatibility-matrix/${type1}/${type2}`)
   } catch (error) {
     console.error(`Error fetching compatibility data for ${type1} and ${type2}:`, error)
     return null
@@ -252,7 +266,7 @@ export const getCompatibilityData = cache(async (type1: string, type2: string) =
 // Update the getCompatibilityMatrix function to handle missing data better
 export const getCompatibilityMatrix = cache(async () => {
   try {
-    return await fetchFromFirebaseWithCache<any>("/compatibility-matrix", CACHE_DURATIONS.VERY_LONG)
+    return await fetchFromFirebase<any>("/compatibility-matrix")
   } catch (error) {
     console.error("Error fetching compatibility matrix:", error)
     return null
@@ -262,7 +276,7 @@ export const getCompatibilityMatrix = cache(async () => {
 // Function to fetch FAQ categories from Firebase
 export const getFAQCategories = cache(async () => {
   try {
-    const data = await fetchFromFirebaseWithCache<any[]>("/faq-categories", CACHE_DURATIONS.LONG)
+    const data = await fetchFromFirebase<any[]>("/faq-categories")
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.error("Error fetching FAQ categories:", error)
@@ -273,7 +287,7 @@ export const getFAQCategories = cache(async () => {
 // Function to get case studies from Firebase
 export const getCaseStudiesFromFirebase = cache(async () => {
   try {
-    return await fetchFromFirebaseWithCache<any[]>("/case-studies", CACHE_DURATIONS.LONG)
+    return await fetchFromFirebase<any[]>("/case-studies")
   } catch (error) {
     console.error("Error fetching case studies from Firebase:", error)
     console.log("Falling back to static case studies data")
@@ -296,7 +310,7 @@ export const getCaseStudiesByType = cache(async (typeCode: string) => {
 // Function to get career database from Firebase
 export const getCareerDatabaseFromFirebase = cache(async () => {
   try {
-    return await fetchFromFirebaseWithCache<any[]>("/career-database", CACHE_DURATIONS.LONG)
+    return await fetchFromFirebase<any[]>("/career-database")
   } catch (error) {
     console.error("Error fetching career database from Firebase:", error)
     console.log("Falling back to static career database")
@@ -325,7 +339,7 @@ export const initializeDatabase = async () => {
 // Function to get career-specific data for a personality type
 export const getCareerDataForType = cache(async (typeCode: string) => {
   try {
-    return await fetchFromFirebaseWithCache<any>(`/career-data/${typeCode}`, CACHE_DURATIONS.LONG)
+    return await fetchFromFirebase<any>(`/career-data/${typeCode}`)
   } catch (error) {
     console.error(`Error fetching career data for ${typeCode}:`, error)
     return null
@@ -335,7 +349,7 @@ export const getCareerDataForType = cache(async (typeCode: string) => {
 // Function to get development strategies for a personality type
 export const getDevStrategiesForType = cache(async (typeCode: string) => {
   try {
-    return await fetchFromFirebaseWithCache<any[]>(`/career-development-strategies/${typeCode}`, CACHE_DURATIONS.LONG)
+    return await fetchFromFirebase<any[]>(`/career-development-strategies/${typeCode}`)
   } catch (error) {
     console.error(`Error fetching development strategies for ${typeCode}:`, error)
     return []
@@ -345,7 +359,7 @@ export const getDevStrategiesForType = cache(async (typeCode: string) => {
 // Function to get communication tips for a personality type
 export const getCommunicationTipsForType = cache(async (typeCode: string) => {
   try {
-    return await fetchFromFirebaseWithCache<any[]>(`/career-communication-tips/${typeCode}`, CACHE_DURATIONS.LONG)
+    return await fetchFromFirebase<any[]>(`/career-communication-tips/${typeCode}`)
   } catch (error) {
     console.error(`Error fetching communication tips for ${typeCode}:`, error)
     return []
