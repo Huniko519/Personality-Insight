@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ScrollToTop } from "@/components/scroll-to-top"
-import { CacheProvider } from "@/contexts/cache-context"
 import { AuthProvider } from "@/lib/auth"
 import "./globals.css"
 
@@ -14,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "PersonaIQ - Personality Type Test",
   description: "Discover your personality type and gain valuable insights",
-  generator: 'Mr. Huniko'
+  generator: "Mr. Huniko",
 }
 
 export default function RootLayout({
@@ -28,12 +27,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" />
       </head>
       <body className={inter.className}>
-        <CacheProvider>
-          <AuthProvider>
-            <ScrollToTop />
-            {children}
-          </AuthProvider>
-        </CacheProvider>
+        <AuthProvider>
+          <ScrollToTop />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )
