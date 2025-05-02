@@ -12,14 +12,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import SocialShare from "@/components/social-share"
 import { useAuth } from "@/lib/auth"
-import { saveTestResult } from "@/lib/firebase"
+import { saveTestResult, getPersonalityTypeByCode } from "@/lib/firebase"
 
 export default function ResultsPage() {
   const searchParams = useSearchParams()
   const personalityType = searchParams.get("type") || "INFJ"
   const quizTime = searchParams.get("time") ? Number.parseInt(searchParams.get("time") as string) : undefined
   const [showShare, setShowShare] = useState(false)
+  const [typeData, setTypeData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
+
+  // Fetch personality type data
+  useEffect(() => {
+    const fetchTypeData = async () => {
+      try {
+        setLoading(true)
+        const data = await getPersonalityTypeByCode(personalityType)
+        setTypeData(data)
+      } catch (error) {
+        console.error("Error fetching personality type data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (personalityType) {
+      fetchTypeData()
+    }
+  }, [personalityType])
 
   // Save result to Firebase if user is logged in
   useEffect(() => {
@@ -32,7 +53,6 @@ export default function ResultsPage() {
             type: personalityType,
             date: new Date().toISOString(),
             timeToComplete: quizTime,
-            // You could add more data here like confidence scores, etc.
           }
 
           await saveTestResult(result)
@@ -65,22 +85,7 @@ export default function ResultsPage() {
                 <h1 className="text-3xl md:text-4xl font-bold mb-4">Your Personality Type</h1>
                 <div className="text-5xl md:text-6xl font-extrabold mb-4">{personalityType}</div>
                 <p className="text-lg opacity-90">
-                  {personalityType === "INFJ" && "The Counselor"}
-                  {personalityType === "INFP" && "The Mediator"}
-                  {personalityType === "INTJ" && "The Architect"}
-                  {personalityType === "INTP" && "The Logician"}
-                  {personalityType === "ENFJ" && "The Protagonist"}
-                  {personalityType === "ENFP" && "The Campaigner"}
-                  {personalityType === "ENTJ" && "The Commander"}
-                  {personalityType === "ENTP" && "The Debater"}
-                  {personalityType === "ISFJ" && "The Defender"}
-                  {personalityType === "ISFP" && "The Adventurer"}
-                  {personalityType === "ISTJ" && "The Logistician"}
-                  {personalityType === "ISTP" && "The Virtuoso"}
-                  {personalityType === "ESFJ" && "The Consul"}
-                  {personalityType === "ESFP" && "The Entertainer"}
-                  {personalityType === "ESTJ" && "The Executive"}
-                  {personalityType === "ESTP" && "The Entrepreneur"}
+                  {loading ? "Loading..." : typeData?.nickname || "Personality Type"}
                 </p>
               </div>
 
@@ -151,40 +156,15 @@ export default function ResultsPage() {
                     <div className="space-y-6">
                       <div>
                         <h2 className="text-2xl font-bold text-rose-800 mb-3">About {personalityType}</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                          {personalityType === "INFJ" &&
-                            "INFJs are creative nurturers with a strong sense of personal integrity and a drive to help others realize their potential. Creative and dedicated, they have a talent for helping others with original solutions to their personal challenges."}
-                          {personalityType === "INFP" &&
-                            "INFPs are imaginative idealists, guided by their own core values and beliefs. To a Mediator, possibilities are paramount; the reality of the moment is only of passing concern. They see potential for a better future, and pursue truth and meaning with their own individual flair."}
-                          {personalityType === "INTJ" &&
-                            "INTJs are analytical problem-solvers, eager to improve systems and processes with their innovative ideas. They have a talent for seeing possibilities for improvement, whether at work, at home, or in themselves."}
-                          {personalityType === "INTP" &&
-                            "INTPs are innovative inventors with an unquenchable thirst for knowledge. They are driven by a desire to understand the universe and everything in it. Logical and analytical, they excel at finding solutions to complex problems."}
-                          {personalityType === "ENFJ" &&
-                            "ENFJs are charismatic and inspiring leaders, able to mesmerize their listeners. They are usually idealistic, with high values and a great sense of integrity. They are natural leaders, sensitive to the needs of others and energetically dedicated to whatever cause they've decided to champion."}
-                          {personalityType === "ENFP" &&
-                            "ENFPs are people-centered creators with a focus on possibilities and a contagious enthusiasm for new ideas, people and activities. Energetic, warm, and passionate, ENFPs love to help other people explore their creative potential."}
-                          {personalityType === "ENTJ" &&
-                            "ENTJs are strategic leaders, motivated to organize change. They are quick to see inefficiency and conceptualize new solutions, and enjoy developing long-range plans to accomplish their vision. They excel at logical reasoning and are usually articulate and quick-witted."}
-                          {personalityType === "ENTP" &&
-                            "ENTPs are inspired innovators, motivated to find new solutions to intellectually challenging problems. They are curious and clever, and seek to understand the people, systems, and principles that surround them."}
-                          {personalityType === "ISFJ" &&
-                            "ISFJs are industrious caretakers, loyal to traditions and organizations. They are practical, compassionate, and caring, and are motivated to provide for others and protect them from the perils of life."}
-                          {personalityType === "ISFP" &&
-                            "ISFPs are gentle caretakers who live in the present moment and enjoy their surroundings with cheerful, low-key enthusiasm. They are flexible and spontaneous, and like to go with the flow to enjoy what life has to offer."}
-                          {personalityType === "ISTJ" &&
-                            "ISTJs are responsible organizers, driven to create and enforce order within systems and institutions. They are neat and orderly, inside and out, and tend to have a procedure for everything they do."}
-                          {personalityType === "ISTP" &&
-                            "ISTPs are observant artisans with an understanding of mechanics and an interest in troubleshooting. They approach their environments with a flexible logic, looking for practical solutions to the problems at hand."}
-                          {personalityType === "ESFJ" &&
-                            "ESFJs are conscientious helpers, sensitive to the needs of others and energetically dedicated to their responsibilities. They are highly attuned to their emotional environment and attentive to both the feelings of others and the perception others have of them."}
-                          {personalityType === "ESFP" &&
-                            "ESFPs are vivacious entertainers who charm and engage those around them. They are spontaneous, energetic, and fun-loving, and take pleasure in the things around them: food, clothes, nature, animals, and especially people."}
-                          {personalityType === "ESTJ" &&
-                            "ESTJs are hardworking traditionalists, eager to take charge in organizing projects and people. Orderly, rule-abiding, and conscientious, ESTJs like to get things done, and tend to go about projects in a systematic, methodical way."}
-                          {personalityType === "ESTP" &&
-                            "ESTPs are energetic thrillseekers who are at their best when putting out fires, whether literal or metaphorical. They bring a sense of dynamic energy to their interactions with others and the world around them."}
-                        </p>
+                        {loading ? (
+                          <div className="text-center py-4">
+                            <p className="text-gray-600">Loading description...</p>
+                          </div>
+                        ) : (
+                          <p className="text-gray-600 leading-relaxed">
+                            {typeData?.description || "No description available for this personality type."}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -241,78 +221,54 @@ export default function ResultsPage() {
                   <TabsContent value="strengths" className="mt-6">
                     <div>
                       <h2 className="text-2xl font-bold text-rose-800 mb-4">Your Strengths</h2>
-                      <div className="space-y-4">
-                        {personalityType === "INFJ" && (
-                          <>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Insightful</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You have an intuitive understanding of people and situations, often knowing things
-                                without being able to explain how.
-                              </p>
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Loading strengths data...</p>
+                        </div>
+                      ) : typeData?.strengths && typeData.strengths.length > 0 ? (
+                        <div className="space-y-4">
+                          {typeData.strengths.map((strength: string, index: number) => (
+                            <div key={index} className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index}</Badge>
+                              <p className="ml-3 text-gray-600">{strength}</p>
                             </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Principled</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You have strong values and integrity, and you're not easily swayed from your beliefs.
-                              </p>
-                            </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Inspiring</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You have a talent for bringing out the best in others and helping them reach their
-                                potential.
-                              </p>
-                            </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Creative</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You have a rich inner world and can envision unique solutions to complex problems.
-                              </p>
-                            </div>
-                          </>
-                        )}
-                        {/* Add strengths for other personality types here */}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="bg-rose-50 p-4 rounded-lg">
+                          <p className="text-gray-600">
+                            No specific strengths data available for {personalityType}. Try viewing the detailed profile
+                            for more information.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 
                   <TabsContent value="challenges" className="mt-6">
                     <div>
                       <h2 className="text-2xl font-bold text-rose-800 mb-4">Your Challenges</h2>
-                      <div className="space-y-4">
-                        {personalityType === "INFJ" && (
-                          <>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Perfectionism</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You may set unrealistically high standards for yourself and others, leading to
-                                disappointment.
-                              </p>
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Loading challenges data...</p>
+                        </div>
+                      ) : typeData?.weaknesses && typeData.weaknesses.length > 0 ? (
+                        <div className="space-y-4">
+                          {typeData.weaknesses.map((weakness: string, index: number) => (
+                            <div key={index} className="flex items-start">
+                              <Badge className="mt-1 bg-rose-100 text-rose-800">{index}</Badge>
+                              <p className="ml-3 text-gray-600">{weakness}</p>
                             </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Burnout</Badge>
-                              <p className="ml-3 text-gray-600">
-                                Your desire to help others can lead you to neglect your own needs and become exhausted.
-                              </p>
-                            </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Overthinking</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You may spend too much time in your head analyzing situations rather than taking action.
-                              </p>
-                            </div>
-                            <div className="flex items-start">
-                              <Badge className="mt-1 bg-rose-100 text-rose-800">Sensitivity</Badge>
-                              <p className="ml-3 text-gray-600">
-                                You can be deeply affected by criticism and conflict, sometimes taking things too
-                                personally.
-                              </p>
-                            </div>
-                          </>
-                        )}
-                        {/* Add challenges for other personality types here */}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="bg-rose-50 p-4 rounded-lg">
+                          <p className="text-gray-600">
+                            No specific challenges data available for {personalityType}. Try viewing the detailed
+                            profile for more information.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 
@@ -323,47 +279,43 @@ export default function ResultsPage() {
                         Based on your personality type, these career paths might be particularly fulfilling for you:
                       </p>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {personalityType === "INFJ" && (
-                          <>
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Loading career data...</p>
+                        </div>
+                      ) : typeData?.careers && typeData.careers.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-rose-50 p-4 rounded-lg">
+                            <h3 className="font-semibold text-rose-700 mb-2">Recommended Careers</h3>
+                            <ul className="text-gray-600 space-y-1 list-disc list-inside">
+                              {typeData.careers
+                                .slice(0, Math.ceil(typeData.careers.length / 2))
+                                .map((career: string, index: number) => (
+                                  <li key={index}>{career}</li>
+                                ))}
+                            </ul>
+                          </div>
+                          {typeData.careers.length > 1 && (
                             <div className="bg-rose-50 p-4 rounded-lg">
-                              <h3 className="font-semibold text-rose-700 mb-2">Counseling & Psychology</h3>
+                              <h3 className="font-semibold text-rose-700 mb-2">More Options</h3>
                               <ul className="text-gray-600 space-y-1 list-disc list-inside">
-                                <li>Therapist</li>
-                                <li>Social Worker</li>
-                                <li>Psychologist</li>
-                                <li>Life Coach</li>
+                                {typeData.careers
+                                  .slice(Math.ceil(typeData.careers.length / 2))
+                                  .map((career: string, index: number) => (
+                                    <li key={index}>{career}</li>
+                                  ))}
                               </ul>
                             </div>
-                            <div className="bg-rose-50 p-4 rounded-lg">
-                              <h3 className="font-semibold text-rose-700 mb-2">Education</h3>
-                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
-                                <li>Professor</li>
-                                <li>School Counselor</li>
-                                <li>Special Education Teacher</li>
-                              </ul>
-                            </div>
-                            <div className="bg-rose-50 p-4 rounded-lg">
-                              <h3 className="font-semibold text-rose-700 mb-2">Creative Fields</h3>
-                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
-                                <li>Writer</li>
-                                <li>Editor</li>
-                                <li>Filmmaker</li>
-                                <li>Musician</li>
-                              </ul>
-                            </div>
-                            <div className="bg-rose-50 p-4 rounded-lg">
-                              <h3 className="font-semibold text-rose-700 mb-2">Healthcare</h3>
-                              <ul className="text-gray-600 space-y-1 list-disc list-inside">
-                                <li>Physician</li>
-                                <li>Nurse</li>
-                                <li>Alternative Medicine Practitioner</li>
-                              </ul>
-                            </div>
-                          </>
-                        )}
-                        {/* Add career recommendations for other personality types here */}
-                      </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="bg-rose-50 p-4 rounded-lg">
+                          <p className="text-gray-600">
+                            No specific career data available for {personalityType}. Try viewing the detailed profile
+                            for more information.
+                          </p>
+                        </div>
+                      )}
 
                       <div className="mt-8 text-center">
                         <Link href="/careers/personality-types">
