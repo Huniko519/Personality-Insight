@@ -144,13 +144,13 @@ export default function FAQCategoriesManager() {
   }
 
   const handleEdit = (category: FAQCategory, index: number) => {
-    setEditingCategory({ ...category, id: index as any })
+    setEditingCategory({ ...category })
     setFormData({
       id: category.id || "",
-      name: category.name || "", // Changed from title to name
+      name: category.name || "",
       icon: category.icon || "HelpCircle",
       description: category.description || "",
-      questions: category.questions || [], // Changed from faqs to questions
+      questions: category.questions || [],
     })
     setIsEditing(true)
   }
@@ -195,35 +195,40 @@ export default function FAQCategoriesManager() {
     try {
       // Validate form data
       if (!formData.name.trim()) {
-        // Changed from title to name
         throw new Error("Category name is required")
       }
 
       // Generate ID from name if not provided
-      const categoryId = formData.id.trim() || formData.name.toLowerCase().replace(/\s+/g, "-") // Changed from title to name
+      const categoryId = formData.id.trim() || formData.name.toLowerCase().replace(/\s+/g, "-")
 
       const categoryData = {
         id: categoryId,
-        name: formData.name, // Changed from title to name
+        name: formData.name,
         icon: formData.icon,
         description: formData.description,
-        questions: formData.questions || [], // Changed from faqs to questions
+        questions: formData.questions || [],
       }
 
       if (isEditing && editingCategory) {
         // Update existing category
         const updatedCategories = [...categories]
-        const index = (editingCategory as any).index
+        // Fix: Use the numeric index stored in editingCategory, not the id property
+        const index = categories.findIndex((cat) => cat.id === editingCategory.id)
+
+        if (index === -1) {
+          throw new Error("Category not found")
+        }
+
         updatedCategories[index] = categoryData
         await writeToFirebase("/faq-categories", updatedCategories)
         setCategories(updatedCategories)
-        setSuccess(`FAQ category "${formData.name}" updated successfully`) // Changed from title to name
+        setSuccess(`FAQ category "${formData.name}" updated successfully`)
       } else {
         // Create new category
         const updatedCategories = [...categories, categoryData]
         await writeToFirebase("/faq-categories", updatedCategories)
         setCategories(updatedCategories)
-        setSuccess(`FAQ category "${formData.name}" created successfully`) // Changed from title to name
+        setSuccess(`FAQ category "${formData.name}" created successfully`)
       }
 
       // Reset form and state
