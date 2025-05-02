@@ -1,4 +1,4 @@
-import { ref, get } from "firebase/database"
+import { ref, get, set } from "firebase/database"
 import { database } from "./firebase-init"
 import { CACHE_DURATIONS, getFromCache, setInCache, invalidateCache } from "./cache"
 
@@ -47,8 +47,8 @@ export async function writeToFirebaseAndInvalidateCache(path: string, data: any)
   }
 
   try {
-    // Write to Firebase
-    await get(ref(database, path))
+    // Write to Firebase - FIXING THIS LINE
+    await set(ref(database, path), data)
 
     // Invalidate cache
     const cacheKey = `firebase:${path}`
