@@ -2,39 +2,45 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import Image from "next/image"
+import { Loading } from "@/components/loading"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const auth = useAuth()
   if (!auth) {
     throw new Error("Auth context is not available.")
   }
-  const { signIn, isAdmin } = auth
+  const { signIn, isAdmin, user, loading } = auth
   const router = useRouter()
 
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return <Loading />
+  }
+
   // If already logged in and is admin, redirect to admin page
-  useEffect(() => {
-    if (isAdmin) {
-      router.push("/admin")
-    }
-  }, [isAdmin])
+  // But only do this once authentication check is complete
+  if (!loading && user && isAdmin) {
+    router.push("/admin")
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setLoading(true)
+    setIsSubmitting(true)
 
     try {
       const userCredential = await signIn(email, password)
@@ -49,7 +55,7 @@ export default function AdminLoginPage() {
       console.error("Login error:", error)
       setError("Invalid email or password. Please try again.")
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -98,8 +104,8 @@ export default function AdminLoginPage() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
