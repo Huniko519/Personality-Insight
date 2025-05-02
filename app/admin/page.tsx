@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { LogOut, Shield, Users } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,7 +18,6 @@ import PersonalityExplanationsManager from "@/components/admin/personality-expla
 import FAQCategoriesManager from "@/components/admin/faq-categories-manager"
 import { ProtectedAdminRoute } from "@/components/auth/protected-admin-route"
 import { useAuth } from "@/lib/auth"
-import Image from "next/image"
 
 // Dummy function for database initialization
 const initializeDatabase = async () => {
@@ -35,15 +35,8 @@ export default function AdminPage() {
     throw new Error("Auth context is not available.")
   }
 
-  const { signOut, user } = auth
+  const { signOut } = auth
   const router = useRouter()
-
-  // Additional check to redirect if not logged in
-  useEffect(() => {
-    if (!user) {
-      router.push("/admin/login")
-    }
-  }, [user, router])
 
   const handleInitializeDatabase = async () => {
     try {
@@ -75,7 +68,7 @@ export default function AdminPage() {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Personality Insight Admin" width={120} height={32} className="h-8 w-auto" />
+              <Image src="/logo.png" alt="PersonaIQ Admin" width={120} height={32} className="h-8 w-auto" />
             </Link>
           </div>
           <div className="flex space-x-2">

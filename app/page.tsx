@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle, Users, Brain, Briefcase } from "lucide-react"
 import HeaderWrapper from "@/components/header-wrapper"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export default async function Home() {
   return (
@@ -37,10 +38,12 @@ export default async function Home() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <img
-                  src="/vibrant-personality-spectrum.png"
+                <Image
+                  src="/assets/mbti-circle.png"
                   alt="Personality Type Wheel"
-                  className="rounded-xl shadow-lg max-w-full h-auto"
+                  width={500}
+                  height={500}
+                  className="max-w-full h-auto"
                 />
               </div>
             </div>
@@ -136,11 +139,13 @@ export default async function Home() {
                   </Button>
                 </Link>
               </div>
-              <div className="flex justify-center">
-                <img
-                  src="/focused-founder.png"
+              <div className="flex justify-center h-full">
+                <Image
+                  src="/assets/business-people.png"
                   alt="Entrepreneur Types"
-                  className="rounded-xl shadow-lg max-w-full h-auto"
+                  width={500}
+                  height={500}
+                  className="rounded-full shadow-lg max-w-full h-auto"
                 />
               </div>
             </div>

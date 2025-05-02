@@ -31,7 +31,7 @@ export default function CaseStudiesPage() {
       <main className="min-h-screen bg-gradient-to-b from-rose-50 to-white">
         <div className="relative h-64 md:h-80 lg:h-96 w-full mb-12 overflow-hidden">
           <Image
-            src="/case-study-header.jpg"
+            src="/assets/case-study-header.jpg"
             alt="Personality relationships case studies"
             fill
             className="object-cover"
@@ -72,7 +72,7 @@ export default function CaseStudiesPage() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={study.image || "/vibrant-student-hub.png"}
+                    src={study.image || "/assets/placeholder.png"}
                     alt={study.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -155,7 +155,7 @@ export default function CaseStudiesPage() {
               </div>
 
               <div className="relative h-full min-h-[300px] rounded-xl overflow-hidden shadow-md">
-                <Image src="/thoughtful-couple-chat.png" alt="Relationship dynamics" fill className="object-cover" />
+                <Image src="/assets/relationship-dynamics.png" alt="Relationship dynamics" fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-900/70 to-transparent flex items-end">
                   <div className="p-6 text-white">
                     <h3 className="text-xl font-bold mb-2">Our Research Methodology</h3>
