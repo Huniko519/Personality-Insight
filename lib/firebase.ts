@@ -21,6 +21,7 @@ export interface TestResult {
   date: string
   timeToComplete?: number
   confidence?: number
+  testType?: "mbti" | "enneagram" // Add this line
   dimensions?: {
     EI: { preference: string; strength: number }
     SN: { preference: string; strength: number }
@@ -362,6 +363,43 @@ export const getCommunicationTipsForType = cache(async (typeCode: string) => {
     return await fetchFromFirebase<any[]>(`/career-communication-tips/${typeCode}`)
   } catch (error) {
     console.error(`Error fetching communication tips for ${typeCode}:`, error)
+    return []
+  }
+})
+
+// Function to get all Enneagram types
+export const getEnneagramTypes = cache(async () => {
+  try {
+    const types = await fetchFromFirebase<Record<string, any>>("/enneagram-types")
+    return types
+  } catch (error) {
+    console.error("Error fetching Enneagram types:", error)
+    // Return empty object as fallback
+    return {}
+  }
+})
+
+// Function to get a specific Enneagram type by number
+export const getEnneagramTypeByNumber = cache(async (number: string) => {
+  try {
+    return await fetchFromFirebase<any>(`/enneagram-types/${number}`)
+  } catch (error) {
+    console.error(`Error fetching Enneagram type ${number}:`, error)
+    return null
+  }
+})
+
+// Function to get all Enneagram types as an array
+export const getAllEnneagramTypes = cache(async () => {
+  try {
+    const types = await fetchFromFirebase<Record<string, any>>("/enneagram-types")
+    return Object.entries(types).map(([number, type]) => ({
+      number,
+      ...type,
+    }))
+  } catch (error) {
+    console.error("Error fetching Enneagram types:", error)
+    // Return empty array as fallback
     return []
   }
 })

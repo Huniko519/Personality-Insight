@@ -15,6 +15,7 @@ import PersonalityTypesManager from "@/components/admin/personality-types-manage
 import QuestionsManager from "@/components/admin/questions-manager"
 import PersonalityExplanationsManager from "@/components/admin/personality-explanations-manager"
 import FAQCategoriesManager from "@/components/admin/faq-categories-manager"
+import EnneagramTypesManager from "@/components/admin/enneagram-types-manager"
 import { useAuth } from "@/lib/auth"
 import Image from "next/image"
 import { Loading } from "@/components/loading"
@@ -138,6 +139,9 @@ export default function AdminPage() {
           <TabsTrigger value="personality-types" className="data-[state=active]:bg-white">
             Personality Types
           </TabsTrigger>
+          <TabsTrigger value="enneagram-types" className="data-[state=active]:bg-white">
+            Enneagram Types
+          </TabsTrigger>
           <TabsTrigger value="questions" className="data-[state=active]:bg-white">
             Questions
           </TabsTrigger>
@@ -159,6 +163,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="personality-types">
           <PersonalityTypesManager />
+        </TabsContent>
+        <TabsContent value="enneagram-types">
+          <EnneagramTypesManager />
         </TabsContent>
         <TabsContent value="questions">
           <QuestionsManager />

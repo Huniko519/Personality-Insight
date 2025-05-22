@@ -11,7 +11,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import SocialShare from "@/components/social-share"
-import { getPersonalityExplanations, getAllPersonalityTypes } from "@/lib/firebase"
+import { getPersonalityExplanations, getAllPersonalityTypes, getEnneagramTypes } from "@/lib/firebase"
 
 // Use dynamic import with no SSR for the comparison component
 const ComparisonView = dynamic(() => import("@/components/comparison-view"), {
@@ -43,6 +43,34 @@ export default function VisualizationPage() {
   const [dimensionValue, setDimensionValue] = useState<number>(50)
   const [error, setError] = useState<string | null>(null)
   const [dimensionExplanations, setDimensionExplanations] = useState<any>({})
+
+  // Add Enneagram types data and new visualization option
+  const [enneagramTypes, setEnneagramTypes] = useState<Record<string, any>>({})
+  const [isLoadingEnneagram, setIsLoadingEnneagram] = useState(true)
+  const [selectedEnneagramType, setSelectedEnneagramType] = useState<string>("none")
+  const [hoveredEnneagramType, setHoveredEnneagramType] = useState<string | null>(null)
+  const [enneagramTypePositions, setEnneagramTypePositions] = useState<
+    Record<string, { x: number; y: number; radius: number }>
+  >({})
+
+  // Read URL parameters to set initial visualization type
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const typeParam = searchParams.get("type")
+
+    if (typeParam) {
+      // Set visualization type based on URL parameter
+      if (
+        typeParam === "type-wheel" ||
+        typeParam === "cognitive-functions" ||
+        typeParam === "dimension-spectrum" ||
+        typeParam === "comparison" ||
+        typeParam === "enneagram-rings"
+      ) {
+        setSelectedVisualization(typeParam)
+      }
+    }
+  }, [])
 
   // Load personality types
   useEffect(() => {
@@ -81,6 +109,24 @@ export default function VisualizationPage() {
     loadExplanations()
   }, [])
 
+  // Load Enneagram types from Firebase
+  useEffect(() => {
+    const loadEnneagramTypes = async () => {
+      try {
+        setIsLoadingEnneagram(true)
+        const types = await getEnneagramTypes()
+        setEnneagramTypes(types)
+        setIsLoadingEnneagram(false)
+      } catch (error) {
+        console.error("Error loading Enneagram types:", error)
+        setError("Failed to load Enneagram types. Please try again later.")
+        setIsLoadingEnneagram(false)
+      }
+    }
+
+    loadEnneagramTypes()
+  }, [])
+
   // Animation loop
   useEffect(() => {
     const animate = () => {
@@ -100,9 +146,9 @@ export default function VisualizationPage() {
   useEffect(() => {
     if (
       canvasRef.current &&
-      ["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization) &&
+      ["type-wheel", "cognitive-functions", "dimension-spectrum", "enneagram-rings"].includes(selectedVisualization) &&
       !isLoading &&
-      Object.keys(personalityTypes).length > 0
+      (Object.keys(personalityTypes).length > 0 || selectedVisualization === "enneagram-rings")
     ) {
       const canvas = canvasRef.current
       const ctx = canvas.getContext("2d")
@@ -132,6 +178,16 @@ export default function VisualizationPage() {
           )
         } else if (selectedVisualization === "dimension-spectrum") {
           drawDimensionSpectrum(ctx, canvas.width, canvas.height, animationPhase, selectedDimension, dimensionValue)
+        } else if (selectedVisualization === "enneagram-rings") {
+          const positions = drawEnneagramRings(
+            ctx,
+            canvas.width,
+            canvas.height,
+            selectedEnneagramType === "none" ? "" : selectedEnneagramType,
+            hoveredEnneagramType,
+            animationPhase,
+          )
+          setEnneagramTypePositions(positions)
         }
       }
     }
@@ -145,46 +201,76 @@ export default function VisualizationPage() {
     dimensionValue,
     isLoading,
     personalityTypes,
+    selectedEnneagramType,
+    hoveredEnneagramType,
+    enneagramTypes,
   ])
 
   // Handle canvas mouse events
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (selectedVisualization !== "type-wheel" || !canvasRef.current) return
+    if (!canvasRef.current) return
+
+    if (selectedVisualization !== "type-wheel" && selectedVisualization !== "enneagram-rings") return
 
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    let hovered: string | null = null
+    if (selectedVisualization === "type-wheel") {
+      let hovered: string | null = null
 
-    // Check if mouse is over any type segment
-    Object.entries(typePositions).forEach(([type, position]) => {
-      const dx = x - position.x
-      const dy = y - position.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
+      // Check if mouse is over any type segment
+      Object.entries(typePositions).forEach(([type, position]) => {
+        const dx = x - position.x
+        const dy = y - position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
 
-      if (distance <= position.radius) {
-        hovered = type
+        if (distance <= position.radius) {
+          hovered = type
+        }
+      })
+
+      if (hovered !== hoveredType) {
+        setHoveredType(hovered)
+        canvas.style.cursor = hovered ? "pointer" : "default"
       }
-    })
+    } else if (selectedVisualization === "enneagram-rings") {
+      let hovered: string | null = null
 
-    if (hovered !== hoveredType) {
-      setHoveredType(hovered)
-      canvas.style.cursor = hovered ? "pointer" : "default"
+      // Check if mouse is over any enneagram type
+      Object.entries(enneagramTypePositions).forEach(([type, position]) => {
+        const dx = x - position.x
+        const dy = y - position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        if (distance <= position.radius) {
+          hovered = type
+        }
+      })
+
+      if (hovered !== hoveredEnneagramType) {
+        setHoveredEnneagramType(hovered)
+        canvas.style.cursor = hovered ? "pointer" : "default"
+      }
     }
   }
 
   const handleCanvasMouseLeave = () => {
     setHoveredType(null)
+    setHoveredEnneagramType(null)
     if (canvasRef.current) {
       canvasRef.current.style.cursor = "default"
     }
   }
 
   const handleCanvasClick = () => {
-    if (hoveredType) {
+    if (selectedVisualization === "type-wheel" && hoveredType) {
       router.push(`/types/${hoveredType}`)
+    } else if (selectedVisualization === "enneagram-rings" && hoveredEnneagramType) {
+      // You can add navigation to enneagram type details page if you have one
+      // For now, just select the type
+      setSelectedEnneagramType(hoveredEnneagramType)
     }
   }
 
@@ -972,6 +1058,541 @@ export default function VisualizationPage() {
     ctx.fillText(line, width / 2, y)
   }
 
+  // Function to draw Enneagram Rings
+  const drawEnneagramRings = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    highlightType: string,
+    hoverType: string | null,
+    phase: number,
+  ) => {
+    const centerX = width / 2
+    const centerY = height / 2
+    const outerRadius = Math.min(width, height) / 2.5
+    const innerRadius = outerRadius * 0.6
+    const positions: Record<string, { x: number; y: number; radius: number }> = {}
+
+    // Enhanced color palette
+    const bgColor = "#fff5f7" // rose-50
+    const gridColor = "rgba(244, 63, 94, 0.08)" // rose-500 with lower opacity
+    const textColor = "#881337" // rose-900
+    const centerTextColor = "#fff"
+    const lineColor = "rgba(244, 63, 94, 0.3)" // rose-500 with medium opacity
+
+    // Centers of Intelligence colors
+    const centersColors = {
+      Instinctive: "rgba(225, 29, 72, 0.2)", // rose-600 with opacity
+      Feeling: "rgba(251, 113, 133, 0.2)", // rose-400 with opacity
+      Thinking: "rgba(253, 164, 175, 0.2)", // rose-300 with opacity
+    }
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height)
+
+    // Draw background with gradient
+    const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, outerRadius * 1.5)
+    bgGradient.addColorStop(0, bgColor)
+    bgGradient.addColorStop(0.7, bgColor)
+    bgGradient.addColorStop(1, "#ffe4e6") // rose-100
+    ctx.fillStyle = bgGradient
+    ctx.fillRect(0, 0, width, height)
+
+    // Add subtle animated grid pattern
+    ctx.strokeStyle = gridColor
+    ctx.lineWidth = 1
+
+    // Draw radial grid lines with animation
+    for (let i = 0; i < 18; i++) {
+      const angle = (i * Math.PI * 2) / 18 + phase * 0.1
+      ctx.beginPath()
+      ctx.moveTo(centerX, centerY)
+      ctx.lineTo(centerX + Math.cos(angle) * outerRadius * 1.2, centerY + Math.sin(angle) * outerRadius * 1.2)
+      ctx.stroke()
+    }
+
+    // Draw concentric circles with animation
+    for (let r = outerRadius / 4; r <= outerRadius * 1.2; r += outerRadius / 4) {
+      const animatedRadius = r + Math.sin(phase * 1.5 + r / 50) * 3
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, animatedRadius, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+
+    // Draw outer glow effect
+    const outerGlow = ctx.createRadialGradient(centerX, centerY, outerRadius * 0.9, centerX, centerY, outerRadius * 1.3)
+    outerGlow.addColorStop(0, "rgba(244, 63, 94, 0.05)")
+    outerGlow.addColorStop(0.5, "rgba(244, 63, 94, 0.03)")
+    outerGlow.addColorStop(1, "rgba(244, 63, 94, 0)")
+    ctx.fillStyle = outerGlow
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, outerRadius * 1.3, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Draw main outer circle
+    ctx.fillStyle = "#fff"
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Add subtle shadow to main wheel
+    ctx.shadowColor = "rgba(0, 0, 0, 0.1)"
+    ctx.shadowBlur = 15
+    ctx.shadowOffsetY = 5
+    ctx.strokeStyle = "rgba(244, 63, 94, 0.2)"
+    ctx.lineWidth = 2
+    ctx.stroke()
+    ctx.shadowBlur = 0
+    ctx.shadowOffsetY = 0
+
+    // Draw inner circle
+    ctx.fillStyle = "#fff"
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = "rgba(244, 63, 94, 0.2)"
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Draw Centers of Intelligence regions
+    const instinctiveTypes = ["8", "9", "1"]
+    const feelingTypes = ["2", "3", "4"]
+    const thinkingTypes = ["5", "6", "7"]
+
+    // Draw Instinctive Center (types 8,9,1)
+    ctx.beginPath()
+    const instStartAngle = ((8 - 1) * Math.PI * 2) / 9 - Math.PI / 2
+    const instEndAngle = (1 * Math.PI * 2) / 9 - Math.PI / 2
+    ctx.moveTo(centerX, centerY)
+    ctx.arc(centerX, centerY, outerRadius, instStartAngle, instEndAngle)
+    ctx.closePath()
+    ctx.fillStyle = centersColors["Instinctive"]
+    ctx.fill()
+
+    // Draw Feeling Center (types 2,3,4)
+    ctx.beginPath()
+    const feelStartAngle = ((2 - 1) * Math.PI * 2) / 9 - Math.PI / 2
+    const feelEndAngle = (4 * Math.PI * 2) / 9 - Math.PI / 2
+    ctx.moveTo(centerX, centerY)
+    ctx.arc(centerX, centerY, outerRadius, feelStartAngle, feelEndAngle)
+    ctx.closePath()
+    ctx.fillStyle = centersColors["Feeling"]
+    ctx.fill()
+
+    // Draw Thinking Center (types 5,6,7)
+    ctx.beginPath()
+    const thinkStartAngle = ((5 - 1) * Math.PI * 2) / 9 - Math.PI / 2
+    const thinkEndAngle = (7 * Math.PI * 2) / 9 - Math.PI / 2
+    ctx.moveTo(centerX, centerY)
+    ctx.arc(centerX, centerY, outerRadius, thinkStartAngle, thinkEndAngle)
+    ctx.closePath()
+    ctx.fillStyle = centersColors["Thinking"]
+    ctx.fill()
+
+    // Draw Enneagram symbol (triangle and hexad)
+    ctx.strokeStyle = lineColor
+    ctx.lineWidth = 2
+
+    // Draw triangle
+    ctx.beginPath()
+    const trianglePoints = [3, 6, 9] // Points of the triangle
+    const triangleVertices = trianglePoints.map((point) => {
+      const angle = ((point - 1) * Math.PI * 2) / 9 - Math.PI / 2
+      return {
+        x: centerX + innerRadius * 0.8 * Math.cos(angle),
+        y: centerY + innerRadius * 0.8 * Math.sin(angle),
+      }
+    })
+
+    ctx.moveTo(triangleVertices[0].x, triangleVertices[0].y)
+    ctx.lineTo(triangleVertices[1].x, triangleVertices[1].y)
+    ctx.lineTo(triangleVertices[2].x, triangleVertices[2].y)
+    ctx.closePath()
+    ctx.stroke()
+
+    // Draw hexad (connecting points 1, 4, 2, 8, 5, 7)
+    const hexadPoints = [1, 4, 2, 8, 5, 7]
+    const hexadVertices = hexadPoints.map((point) => {
+      const angle = ((point - 1) * Math.PI * 2) / 9 - Math.PI / 2
+      return {
+        x: centerX + innerRadius * 0.8 * Math.cos(angle),
+        y: centerY + innerRadius * 0.8 * Math.sin(angle),
+      }
+    })
+
+    ctx.beginPath()
+    ctx.moveTo(hexadVertices[0].x, hexadVertices[0].y)
+    for (let i = 1; i < hexadVertices.length; i++) {
+      ctx.lineTo(hexadVertices[i].x, hexadVertices[i].y)
+    }
+    ctx.closePath()
+    ctx.stroke()
+
+    // Draw type segments
+    const types = Object.keys(enneagramTypes)
+    const segmentAngle = (Math.PI * 2) / types.length
+
+    types.forEach((type, index) => {
+      // Calculate position for this type (for hover detection)
+      const angle = index * segmentAngle - Math.PI / 2 // Start from top (12 o'clock position)
+      const midAngle = angle + segmentAngle / 2
+      const segmentRadius = (outerRadius + innerRadius) / 2
+      const x = centerX + segmentRadius * Math.cos(midAngle)
+      const y = centerY + segmentRadius * Math.sin(midAngle)
+      positions[type] = { x, y, radius: (outerRadius - innerRadius) / 2 }
+
+      // Draw segment highlight if selected or hovered
+      if (type === highlightType || type === hoverType) {
+        ctx.beginPath()
+        ctx.moveTo(centerX, centerY)
+        ctx.arc(centerX, centerY, outerRadius, angle, angle + segmentAngle)
+        ctx.lineTo(centerX, centerY)
+        ctx.closePath()
+
+        // Create gradient for segment
+        const gradientStartX = centerX + (innerRadius / 2) * Math.cos(midAngle)
+        const gradientStartY = centerY + (innerRadius / 2) * Math.sin(midAngle)
+        const gradientEndX = centerX + outerRadius * Math.cos(midAngle)
+        const gradientEndY = centerY + outerRadius * Math.sin(midAngle)
+
+        const segmentGradient = ctx.createLinearGradient(centerX, centerY, gradientEndX, gradientEndY)
+        segmentGradient.addColorStop(0, "rgba(244, 63, 94, 0.2)")
+        segmentGradient.addColorStop(1, "rgba(244, 63, 94, 0.4)")
+
+        ctx.fillStyle = segmentGradient
+        ctx.fill()
+
+        // Draw wing connections if a type is selected
+        if (type === highlightType) {
+          // Get the wing numbers (adjacent types)
+          const typeNum = Number.parseInt(type)
+          const leftWing = typeNum === 1 ? "9" : (typeNum - 1).toString()
+          const rightWing = typeNum === 9 ? "1" : (typeNum + 1).toString()
+
+          // Calculate positions for the wings
+          const leftWingAngle = ((Number.parseInt(leftWing) - 1) * Math.PI * 2) / 9 - Math.PI / 2
+          const rightWingAngle = ((Number.parseInt(rightWing) - 1) * Math.PI * 2) / 9 - Math.PI / 2
+
+          const leftWingMidAngle = leftWingAngle + segmentAngle / 2
+          const rightWingMidAngle = rightWingAngle + segmentAngle / 2
+
+          const leftWingX = centerX + segmentRadius * Math.cos(leftWingMidAngle)
+          const leftWingY = centerY + segmentRadius * Math.sin(leftWingMidAngle)
+
+          const rightWingX = centerX + segmentRadius * Math.cos(rightWingMidAngle)
+          const rightWingY = centerY + segmentRadius * Math.sin(rightWingMidAngle)
+
+          // Draw wing connections with animation
+          const pulseOpacity = 0.6 + Math.sin(phase * 3) * 0.3
+
+          // Left wing connection
+          ctx.beginPath()
+          ctx.moveTo(x, y)
+          ctx.lineTo(leftWingX, leftWingY)
+          ctx.strokeStyle = `rgba(244, 63, 94, ${pulseOpacity})`
+          ctx.lineWidth = 3
+          ctx.stroke()
+
+          // Right wing connection
+          ctx.beginPath()
+          ctx.moveTo(x, y)
+          ctx.lineTo(rightWingX, rightWingY)
+          ctx.strokeStyle = `rgba(244, 63, 94, ${pulseOpacity})`
+          ctx.lineWidth = 3
+          ctx.stroke()
+
+          // Draw wing labels
+          ctx.font = "bold 12px Arial"
+          ctx.fillStyle = "#881337"
+          ctx.textAlign = "center"
+          ctx.textBaseline = "middle"
+
+          // Calculate positions for wing labels
+          const leftLabelX = (x + leftWingX) / 2
+          const leftLabelY = (y + leftWingY) / 2
+
+          const rightLabelX = (x + rightWingX) / 2
+          const rightLabelY = (y + rightWingY) / 2
+
+          // Draw wing label backgrounds
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
+          ctx.beginPath()
+          ctx.arc(leftLabelX, leftLabelY, 15, 0, Math.PI * 2)
+          ctx.fill()
+
+          ctx.beginPath()
+          ctx.arc(rightLabelX, rightLabelY, 15, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Draw wing labels
+          ctx.fillStyle = "#881337"
+          ctx.fillText(`${type}w${leftWing}`, leftLabelX, leftLabelY)
+          ctx.fillText(`${type}w${rightWing}`, rightLabelX, rightLabelY)
+
+          // Draw growth and stress arrows if a type is selected
+          if (enneagramTypes[type].growth && enneagramTypes[type].stress) {
+            const growthType = enneagramTypes[type].growth
+            const stressType = enneagramTypes[type].stress
+
+            // Calculate positions
+            const growthAngle = ((Number.parseInt(growthType) - 1) * Math.PI * 2) / 9 - Math.PI / 2
+            const stressAngle = ((Number.parseInt(stressType) - 1) * Math.PI * 2) / 9 - Math.PI / 2
+
+            const growthMidAngle = growthAngle + segmentAngle / 2
+            const stressMidAngle = stressAngle + segmentAngle / 2
+
+            const growthX = centerX + segmentRadius * Math.cos(growthMidAngle)
+            const growthY = centerY + segmentRadius * Math.sin(growthMidAngle)
+
+            const stressX = centerX + segmentRadius * Math.cos(stressMidAngle)
+            const stressY = centerY + segmentRadius * Math.sin(stressMidAngle)
+
+            // Draw growth arrow (green)
+            ctx.beginPath()
+            ctx.moveTo(x, y)
+
+            // Create a curved line for the growth arrow
+            const growthControlX = (x + growthX) / 2 + (Math.random() - 0.5) * 30
+            const growthControlY = (y + growthY) / 2 + (Math.random() - 0.5) * 30
+
+            ctx.quadraticCurveTo(growthControlX, growthControlY, growthX, growthY)
+            ctx.strokeStyle = "rgba(34, 197, 94, 0.6)" // green-500 with opacity
+            ctx.lineWidth = 2
+            ctx.stroke()
+
+            // Draw arrowhead for growth
+            const growthArrowAngle = Math.atan2(growthY - growthControlY, growthX - growthControlX)
+            ctx.beginPath()
+            ctx.moveTo(growthX, growthY)
+            ctx.lineTo(
+              growthX - 10 * Math.cos(growthArrowAngle - Math.PI / 6),
+              growthY - 10 * Math.sin(growthArrowAngle - Math.PI / 6),
+            )
+            ctx.lineTo(
+              growthX - 10 * Math.cos(growthArrowAngle + Math.PI / 6),
+              growthY - 10 * Math.sin(growthArrowAngle + Math.PI / 6),
+            )
+            ctx.closePath()
+            ctx.fillStyle = "rgba(34, 197, 94, 0.6)"
+            ctx.fill()
+
+            // Draw stress arrow (red)
+            ctx.beginPath()
+            ctx.moveTo(x, y)
+
+            // Create a curved line for the stress arrow
+            const stressControlX = (x + stressX) / 2 + (Math.random() - 0.5) * 30
+            const stressControlY = (y + stressY) / 2 + (Math.random() - 0.5) * 30
+
+            ctx.quadraticCurveTo(stressControlX, stressControlY, stressX, stressY)
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.6)" // red-500 with opacity
+            ctx.lineWidth = 2
+            ctx.stroke()
+
+            // Draw arrowhead for stress
+            const stressArrowAngle = Math.atan2(stressY - stressControlY, stressX - stressControlX)
+            ctx.beginPath()
+            ctx.moveTo(stressX, stressY)
+            ctx.lineTo(
+              stressX - 10 * Math.cos(stressArrowAngle - Math.PI / 6),
+              stressY - 10 * Math.sin(stressArrowAngle - Math.PI / 6),
+            )
+            ctx.lineTo(
+              stressX - 10 * Math.cos(stressArrowAngle + Math.PI / 6),
+              stressY - 10 * Math.sin(stressArrowAngle + Math.PI / 6),
+            )
+            ctx.closePath()
+            ctx.fillStyle = "rgba(239, 68, 68, 0.6)"
+            ctx.fill()
+
+            // Draw growth/stress labels
+            ctx.font = "bold 12px Arial"
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+
+            // Growth label
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
+            ctx.beginPath()
+            ctx.arc((x + growthX) / 2, (y + growthY) / 2, 15, 0, Math.PI * 2)
+            ctx.fill()
+
+            ctx.fillStyle = "rgba(34, 197, 94, 0.8)"
+            ctx.fillText("Growth", (x + growthX) / 2, (y + growthY) / 2)
+
+            // Stress label
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
+            ctx.beginPath()
+            ctx.arc((x + stressX) / 2, (y + stressY) / 2, 15, 0, Math.PI * 2)
+            ctx.fill()
+
+            ctx.fillStyle = "rgba(239, 68, 68, 0.8)"
+            ctx.fillText("Stress", (x + stressX) / 2, (y + stressY) / 2)
+          }
+        }
+      }
+
+      // Draw type number with animation and enhanced styling
+      const pulseEffect = 1 + Math.sin(phase * 2 + index * 0.3) * 0.03
+      const labelRadius = ((outerRadius + innerRadius) / 2) * pulseEffect
+      const labelX = centerX + labelRadius * Math.cos(midAngle)
+      const labelY = centerY + labelRadius * Math.sin(midAngle)
+
+      // Draw label background for better readability
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
+      ctx.shadowColor = "rgba(0, 0, 0, 0.1)"
+      ctx.shadowBlur = 4
+      ctx.beginPath()
+      ctx.arc(labelX, labelY, 22, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.shadowBlur = 0
+
+      // Add subtle border to label background
+      ctx.strokeStyle = "rgba(244, 63, 94, 0.3)"
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      // Draw type number with enhanced styling
+      ctx.fillStyle = enneagramTypes[type].color
+      ctx.font = `bold ${type === hoverType || type === highlightType ? "18px" : "16px"} 'Arial', sans-serif`
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.fillText(type, labelX, labelY)
+
+      // Add subtle glow effect for highlighted or hovered types
+      if (type === highlightType || type === hoverType) {
+        ctx.shadowColor = "rgba(244, 63, 94, 0.4)"
+        ctx.shadowBlur = 10
+        ctx.fillText(type, labelX, labelY)
+        ctx.shadowBlur = 0
+      }
+    })
+
+    // Draw center circle with enhanced styling
+    const pulseSize = 1 + Math.sin(phase * 3) * 0.08
+    const centerRadius = innerRadius * 0.3 * pulseSize
+
+    // Draw center circle glow
+    ctx.shadowColor = "rgba(244, 63, 94, 0.4)"
+    ctx.shadowBlur = 15
+    ctx.fillStyle = "#fff"
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, centerRadius + 5, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.shadowBlur = 0
+
+    // Draw center circle with gradient
+    const centerGradient = ctx.createRadialGradient(
+      centerX - centerRadius * 0.3,
+      centerY - centerRadius * 0.3,
+      0,
+      centerX,
+      centerY,
+      centerRadius,
+    )
+    centerGradient.addColorStop(0, "#fda4af") // rose-300
+    centerGradient.addColorStop(0.7, "#f43f5e") // rose-500
+    centerGradient.addColorStop(1, "#e11d48") // rose-600
+
+    ctx.fillStyle = centerGradient
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Add highlight to center circle
+    ctx.beginPath()
+    ctx.arc(centerX - centerRadius * 0.3, centerY - centerRadius * 0.3, centerRadius * 0.6, 0, Math.PI * 2)
+    ctx.fillStyle = "rgba(255, 255, 255, 0.2)"
+    ctx.fill()
+
+    // Add title with enhanced styling
+    ctx.fillStyle = centerTextColor
+    ctx.font = "bold 16px 'Arial', sans-serif"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.shadowColor = "rgba(0, 0, 0, 0.3)"
+    ctx.shadowBlur = 3
+    ctx.fillText("Enneagram", centerX, centerY)
+    ctx.shadowBlur = 0
+
+    // Add Centers of Intelligence labels
+    ctx.font = "bold 14px 'Arial', sans-serif"
+
+    // Instinctive Center label
+    const instLabelAngle = Math.PI * 1.83 // Position for the Instinctive label
+    const instLabelX = centerX + (outerRadius + 40) * Math.cos(instLabelAngle)
+    const instLabelY = centerY + (outerRadius + 40) * Math.sin(instLabelAngle)
+    ctx.fillStyle = "#881337"
+    ctx.fillText("Instinctive Center", instLabelX, instLabelY)
+
+    // Feeling Center label
+    const feelLabelAngle = Math.PI * 0.5 // Position for the Feeling label
+    const feelLabelX = centerX + (outerRadius + 40) * Math.cos(feelLabelAngle)
+    const feelLabelY = centerY + (outerRadius + 40) * Math.sin(feelLabelAngle)
+    ctx.fillStyle = "#881337"
+    ctx.fillText("Feeling Center", feelLabelX, feelLabelY)
+
+    // Thinking Center label
+    const thinkLabelAngle = Math.PI * 1.17 // Position for the Thinking label
+    const thinkLabelX = centerX + (outerRadius + 40) * Math.cos(thinkLabelAngle)
+    const thinkLabelY = centerY + (outerRadius + 40) * Math.sin(thinkLabelAngle)
+    ctx.fillStyle = "#881337"
+    ctx.fillText("Thinking Center", thinkLabelX, thinkLabelY)
+
+    // Add legend for growth and stress arrows
+    if (highlightType) {
+      const legendY = height - 60
+      const legendX = width - 150
+
+      // Growth arrow legend
+      ctx.beginPath()
+      ctx.moveTo(legendX, legendY)
+      ctx.lineTo(legendX + 30, legendY)
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.6)" // green-500 with opacity
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // Growth arrowhead
+      ctx.beginPath()
+      ctx.moveTo(legendX + 30, legendY)
+      ctx.lineTo(legendX + 20, legendY - 5)
+      ctx.lineTo(legendX + 20, legendY + 5)
+      ctx.closePath()
+      ctx.fillStyle = "rgba(34, 197, 94, 0.6)"
+      ctx.fill()
+
+      // Growth text
+      ctx.fillStyle = "#881337"
+      ctx.font = "12px Arial"
+      ctx.textAlign = "left"
+      ctx.fillText("Growth Path", legendX + 40, legendY)
+
+      // Stress arrow legend
+      ctx.beginPath()
+      ctx.moveTo(legendX, legendY + 20)
+      ctx.lineTo(legendX + 30, legendY + 20)
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.6)" // red-500 with opacity
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // Stress arrowhead
+      ctx.beginPath()
+      ctx.moveTo(legendX + 30, legendY + 20)
+      ctx.lineTo(legendX + 20, legendY + 15)
+      ctx.lineTo(legendX + 20, legendY + 25)
+      ctx.closePath()
+      ctx.fillStyle = "rgba(239, 68, 68, 0.6)"
+      ctx.fill()
+
+      // Stress text
+      ctx.fillStyle = "#881337"
+      ctx.font = "12px Arial"
+      ctx.textAlign = "left"
+      ctx.fillText("Stress Path", legendX + 40, legendY + 20)
+    }
+
+    return positions
+  }
+
   // Handle dimension slider change
   const handleDimensionChange = (value: string) => {
     setSelectedDimension(value)
@@ -1030,11 +1651,54 @@ export default function VisualizationPage() {
                         <SelectItem value="cognitive-functions">Cognitive Functions</SelectItem>
                         <SelectItem value="dimension-spectrum">Dimension Spectrum</SelectItem>
                         <SelectItem value="comparison">Type Comparison</SelectItem>
+                        <SelectItem value="enneagram-rings">Enneagram Rings</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {selectedVisualization === "dimension-spectrum" ? (
+                  {selectedVisualization === "enneagram-rings" ? (
+                    <div>
+                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
+                        Enneagram Type
+                      </label>
+                      <Select value={selectedEnneagramType} onValueChange={setSelectedEnneagramType}>
+                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
+                          <SelectValue placeholder="Select type (optional)" />
+                        </SelectTrigger>
+                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
+                          <SelectItem value="none">None</SelectItem>
+                          {!isLoadingEnneagram &&
+                            Object.keys(enneagramTypes).map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type} - {enneagramTypes[type].name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : selectedVisualization !== "comparison" && selectedVisualization !== "dimension-spectrum" ? (
+                    <div>
+                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
+                        Personality Type
+                      </label>
+                      <Select value={selectedType} onValueChange={setSelectedType}>
+                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
+                          <SelectValue placeholder="Select type (optional)" />
+                        </SelectTrigger>
+                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
+                          {selectedVisualization === "cognitive-functions" ? null : (
+                            <SelectItem value="none">None</SelectItem>
+                          )}
+                          {!isLoading &&
+                            Object.keys(personalityTypes).map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type} - {personalityTypes[type].name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : selectedVisualization === "dimension-spectrum" ? (
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
@@ -1093,28 +1757,6 @@ export default function VisualizationPage() {
                         </div>
                       </div>
                     </div>
-                  ) : selectedVisualization !== "comparison" ? (
-                    <div>
-                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                        Personality Type
-                      </label>
-                      <Select value={selectedType} onValueChange={setSelectedType}>
-                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                          <SelectValue placeholder="Select type (optional)" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                          {selectedVisualization === "cognitive-functions" ? null : (
-                            <SelectItem value="none">None</SelectItem>
-                          )}
-                          {!isLoading &&
-                            Object.keys(personalityTypes).map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type} - {personalityTypes[type].name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                   ) : null}
 
                   <div className="pt-4 border-t border-rose-100 dark:border-rose-800">
@@ -1157,6 +1799,7 @@ export default function VisualizationPage() {
                     {selectedVisualization === "cognitive-functions" && "Cognitive Functions"}
                     {selectedVisualization === "dimension-spectrum" && "Personality Dimensions"}
                     {selectedVisualization === "comparison" && "Personality Type Comparison"}
+                    {selectedVisualization === "enneagram-rings" && "Enneagram Personality System"}
                   </CardTitle>
                   <CardDescription className="dark:text-rose-300">
                     {selectedVisualization === "type-wheel" && "Visual representation of all 16 personality types"}
@@ -1166,10 +1809,12 @@ export default function VisualizationPage() {
                       "The four dimensions that define personality type"}
                     {selectedVisualization === "comparison" &&
                       "Compare traits and compatibility between personality types"}
+                    {selectedVisualization === "enneagram-rings" &&
+                      "Visual representation of the nine Enneagram personality types"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {isLoading ? (
+                  {isLoading || isLoadingEnneagram ? (
                     <div className="flex items-center justify-center h-[500px] bg-white rounded-lg border border-slate-200">
                       <div className="text-center">
                         <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600"></div>
@@ -1177,7 +1822,9 @@ export default function VisualizationPage() {
                       </div>
                     </div>
                   ) : (
-                    ["type-wheel", "cognitive-functions", "dimension-spectrum"].includes(selectedVisualization) && (
+                    ["type-wheel", "cognitive-functions", "dimension-spectrum", "enneagram-rings"].includes(
+                      selectedVisualization,
+                    ) && (
                       <div
                         className={`bg-white dark:bg-rose-900/50 rounded-lg p-4 flex justify-center ${
                           selectedVisualization === "dimension-spectrum"
@@ -1273,6 +1920,78 @@ export default function VisualizationPage() {
                       </div>
                     </div>
                   )}
+
+                  {selectedVisualization === "enneagram-rings" &&
+                    selectedEnneagramType &&
+                    selectedEnneagramType !== "none" && (
+                      <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
+                        <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg flex items-center">
+                          <span className="inline-flex justify-center items-center w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-800 text-rose-600 dark:text-rose-300 mr-2">
+                            {selectedEnneagramType}
+                          </span>
+                          {enneagramTypes[selectedEnneagramType].name}
+                        </h3>
+
+                        <div className="mb-4">
+                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-800 dark:text-rose-100 mr-2">
+                            {enneagramTypes[selectedEnneagramType].center} Center
+                          </span>
+                          {enneagramTypes[selectedEnneagramType].keywords.map((keyword: string, index: number) => (
+                            <span
+                              key={index}
+                              className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 dark:bg-rose-900 dark:text-rose-200 mr-2 mb-1"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+
+                        <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
+                          {enneagramTypes[selectedEnneagramType].description}
+                        </p>
+
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                            <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">Wings:</span>
+                            {Object.entries(enneagramTypes[selectedEnneagramType].wings).map(
+                              ([wing, description]: [string, any]) => (
+                                <div key={wing} className="mb-2">
+                                  <span className="text-rose-600 dark:text-rose-400 font-medium">{description}</span>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                          <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
+                            <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
+                              Growth & Stress:
+                            </span>
+                            <div className="mb-2">
+                              <span className="text-green-600 dark:text-green-400 font-medium">Growth Path: </span>
+                              <span className="text-rose-600 dark:text-rose-400">
+                                Type {enneagramTypes[selectedEnneagramType].growth} -{" "}
+                                {enneagramTypes[enneagramTypes[selectedEnneagramType].growth].name}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-red-600 dark:text-red-400 font-medium">Stress Path: </span>
+                              <span className="text-rose-600 dark:text-rose-400">
+                                Type {enneagramTypes[selectedEnneagramType].stress} -{" "}
+                                {enneagramTypes[enneagramTypes[selectedEnneagramType].stress].name}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                          <a
+                            href="/enneagram"
+                            className="text-rose-600 dark:text-rose-300 hover:text-rose-800 dark:hover:text-rose-100 underline text-sm"
+                          >
+                            Learn more about Enneagram Type {selectedEnneagramType}
+                          </a>
+                        </div>
+                      </div>
+                    )}
                 </CardContent>
               </Card>
             </div>
@@ -1320,6 +2039,17 @@ export default function VisualizationPage() {
                   The comparison view allows you to select two personality types and see a detailed analysis of their
                   similarities, differences, and compatibility. This is useful for understanding relationship dynamics,
                   team interactions, and personal growth opportunities through complementary traits.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2">Enneagram Rings</h3>
+                <p className="text-rose-700 dark:text-rose-300">
+                  The Enneagram is a system of personality typing that describes patterns in how people interpret the
+                  world and manage their emotions. The nine Enneagram types are arranged in a circular diagram and
+                  grouped into three Centers of Intelligence: Instinctive (Types 8, 9, 1), Feeling (Types 2, 3, 4), and
+                  Thinking (Types 5, 6, 7). Each type has two adjacent "wings" that influence their personality, and
+                  paths of growth and stress that show how they behave under different conditions.
                 </p>
               </div>
             </CardContent>
