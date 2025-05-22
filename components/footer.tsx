@@ -38,6 +38,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/enneagram-test"
+                  className="text-rose-100 hover:text-white transition-colors flex items-center"
+                >
+                  <span className="hover:translate-x-1 transition-transform inline-block">Enneagram Test</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/types" className="text-rose-100 hover:text-white transition-colors flex items-center">
                   <span className="hover:translate-x-1 transition-transform inline-block">Personality Types</span>
                 </Link>
@@ -67,6 +75,11 @@ export default function Footer() {
               <li>
                 <Link href="/blog" className="text-rose-100 hover:text-white transition-colors flex items-center">
                   <span className="hover:translate-x-1 transition-transform inline-block">Blog</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/enneagram" className="text-rose-100 hover:text-white transition-colors flex items-center">
+                  <span className="hover:translate-x-1 transition-transform inline-block">Enneagram</span>
                 </Link>
               </li>
               <li>
