@@ -225,27 +225,43 @@ export function calculateDetailedPersonalityType(answers: Answers, questions?: Q
     }
   }
 
-  // Calculate results for each dimension
-  const eiResult = calculateDimensionResult(eScore, iScore, eiTotal, "E", "I")
-  const snResult = calculateDimensionResult(sScore, nScore, snTotal, "S", "N")
-  const tfResult = calculateDimensionResult(tScore, fScore, tfTotal, "T", "F")
-  const jpResult = calculateDimensionResult(jScore, pScore, jpTotal, "J", "P")
+  interface DimensionHandler {
+    scores: [number, number]
+    total: number
+    letters: [string, string]
+  }
 
-  // Calculate overall confidence as the average of dimension confidences
-  const overallConfidence = (eiResult.confidence + snResult.confidence + tfResult.confidence + jpResult.confidence) / 4
+  const dimensionHandlers: Record<string, DimensionHandler> = {
+    EI: { scores: [eScore, iScore], total: eiTotal, letters: ["E", "I"] },
+    SN: { scores: [sScore, nScore], total: snTotal, letters: ["S", "N"] },
+    TF: { scores: [tScore, fScore], total: tfTotal, letters: ["T", "F"] },
+    JP: { scores: [jScore, pScore], total: jpTotal, letters: ["J", "P"] },
+  }
 
-  // Determine the personality type based on the highest scores in each dimension
-  const type = `${eiResult.preference}${snResult.preference}${tfResult.preference}${jpResult.preference}`
+  const calculateAllDimensions = (handlers: Record<string, DimensionHandler>): { EI: DimensionScore; SN: DimensionScore; TF: DimensionScore; JP: DimensionScore } => {
+    return {
+      EI: calculateDimensionResult(...handlers.EI.scores, handlers.EI.total, ...handlers.EI.letters),
+      SN: calculateDimensionResult(...handlers.SN.scores, handlers.SN.total, ...handlers.SN.letters),
+      TF: calculateDimensionResult(...handlers.TF.scores, handlers.TF.total, ...handlers.TF.letters),
+      JP: calculateDimensionResult(...handlers.JP.scores, handlers.JP.total, ...handlers.JP.letters),
+    }
+  }
+
+  const dimensionsResult = calculateAllDimensions(dimensionHandlers)
+
+  const overallConfidence = Object.values(dimensionsResult).reduce((acc, curr) => acc + curr.confidence, 0) / 4
+
+  const type = Object.values(dimensionsResult).map(dim => dim.preference).join("")
 
   // Store the detailed results in localStorage for potential use in results page
   if (typeof window !== "undefined") {
     localStorage.setItem(
       "personality_strengths",
       JSON.stringify({
-        eiStrength: eiResult.strength,
-        snStrength: snResult.strength,
-        tfStrength: tfResult.strength,
-        jpStrength: jpResult.strength,
+        eiStrength: dimensionsResult.EI.strength,
+        snStrength: dimensionsResult.SN.strength,
+        tfStrength: dimensionsResult.TF.strength,
+        jpStrength: dimensionsResult.JP.strength,
         e: eScore,
         i: iScore,
         s: sScore,
@@ -261,12 +277,7 @@ export function calculateDetailedPersonalityType(answers: Answers, questions?: Q
 
   return {
     type,
-    dimensions: {
-      EI: eiResult,
-      SN: snResult,
-      TF: tfResult,
-      JP: jpResult,
-    },
+    dimensions: dimensionsResult,
     confidence: overallConfidence,
   }
 }

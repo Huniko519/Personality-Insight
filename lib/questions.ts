@@ -20,46 +20,27 @@ export async function getQuestionsFromFirebase(): Promise<Question[]> {
 
 // Function to get a subset of questions for each dimension
 export async function getRandomizedQuestions(questionsPerDimension = 5): Promise<Question[]> {
-  // Get questions from Firebase
   const questionsData = await getQuestionsFromFirebase()
+  const dimensions = ["EI", "SN", "TF", "JP"]
 
-  // Group questions by dimension
-  const eiQuestions = questionsData.filter((q) => q.dimension === "EI")
-  const snQuestions = questionsData.filter((q) => q.dimension === "SN")
-  const tfQuestions = questionsData.filter((q) => q.dimension === "TF")
-  const jpQuestions = questionsData.filter((q) => q.dimension === "JP")
-
-  // Ensure we include at least one high-weight question from each dimension
-  const getQuestionsWithWeightDistribution = (dimensionQuestions: Question[]) => {
-    // Sort by weight (highest first)
-    const sortedByWeight = [...dimensionQuestions].sort((a, b) => b.weight - a.weight)
-
-    // Take at least one high-weight (3) question if available
-    const highWeightQuestions = sortedByWeight.filter((q) => q.weight === 3).slice(0, 2)
-
-    // Take at least one medium-weight (2) question if available
-    const mediumWeightQuestions = sortedByWeight.filter((q) => q.weight === 2).slice(0, 2)
-
-    // Shuffle the remaining questions and take enough to reach questionsPerDimension
-    const remainingCount = questionsPerDimension - highWeightQuestions.length - mediumWeightQuestions.length
-    const remainingQuestions = shuffleArray(
-      sortedByWeight.filter((q) => !highWeightQuestions.includes(q) && !mediumWeightQuestions.includes(q)),
+  // Helper to select questions with weight distribution
+  const getQuestionsWithWeightDistribution = (dimensionQuestions: Question[]): Question[] => {
+    const sorted = [...dimensionQuestions].sort((a, b) => b.weight - a.weight)
+    const high = sorted.filter((q) => q.weight === 3).slice(0, 2)
+    const medium = sorted.filter((q) => q.weight === 2).slice(0, 2)
+    const remainingCount = questionsPerDimension - high.length - medium.length
+    const remaining = shuffleArray(
+      sorted.filter((q) => !high.includes(q) && !medium.includes(q)),
     ).slice(0, remainingCount)
-
-    // Combine and shuffle the final selection
-    return shuffleArray([...highWeightQuestions, ...mediumWeightQuestions, ...remainingQuestions])
+    return shuffleArray([...high, ...medium, ...remaining])
   }
 
-  // Select questions for each dimension with weight distribution
-  const selectedEI = getQuestionsWithWeightDistribution(eiQuestions)
-  const selectedSN = getQuestionsWithWeightDistribution(snQuestions)
-  const selectedTF = getQuestionsWithWeightDistribution(tfQuestions)
-  const selectedJP = getQuestionsWithWeightDistribution(jpQuestions)
+  // Select and combine questions for all dimensions
+  const selectedQuestions = dimensions.flatMap((dim) => {
+    const dimQuestions = questionsData.filter((q) => q.dimension === dim)
+    return getQuestionsWithWeightDistribution(dimQuestions)
+  })
 
-  // Combine all selected questions
-  const selectedQuestions = [...selectedEI, ...selectedSN, ...selectedTF, ...selectedJP]
-
-  // Shuffle the combined questions for the final quiz order
   return shuffleArray(selectedQuestions)
 }
 

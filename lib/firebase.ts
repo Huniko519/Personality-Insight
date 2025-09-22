@@ -208,12 +208,25 @@ export const getAllPersonalityTypes = cache(async () => {
   }
 })
 
+// Unified function to fetch array data with fallback
+async function fetchArrayWithFallback<T>(path: string, fallback: T[] = []): Promise<T[]> {
+  try {
+    const data = await fetchFromFirebase<T[]>(path)
+    return Array.isArray(data) ? data : fallback
+  } catch (error) {
+    console.error(`Error fetching array from ${path}:`, error)
+    return fallback
+  }
+}
+
+// Replace getCaseStudiesFromFirebase with getCaseStudies
 export const getCaseStudies = cache(async () => {
-  return fetchFromFirebase<any[]>("/case-studies")
+  return fetchArrayWithFallback<any>("/case-studies")
 })
 
+// Replace getCareerDatabaseFromFirebase with getCareerDatabase
 export const getCareerDatabase = cache(async () => {
-  return fetchFromFirebase<any[]>("/career-database")
+  return fetchArrayWithFallback<any>("/career-database")
 })
 
 // Updated getBlogPosts function to ensure it returns an array
@@ -233,14 +246,11 @@ export const getBlogPosts = cache(async () => {
   }
 })
 
-// Updated getBlogPost function with better error handling and debugging
+// Remove unnecessary console.log in production for getBlogPost
 export const getBlogPost = cache(async (slug: string) => {
   try {
-    console.log(`Fetching blog post with slug: ${slug}`)
     const post = await fetchFromFirebase<any>(`/blogs/${slug}`)
-
     if (post) {
-      console.log(`Successfully fetched blog post: ${post.title}`)
       return {
         id: slug,
         slug,
@@ -285,44 +295,16 @@ export const getFAQCategories = cache(async () => {
   }
 })
 
-// Function to get case studies from Firebase
-export const getCaseStudiesFromFirebase = cache(async () => {
-  try {
-    return await fetchFromFirebase<any[]>("/case-studies")
-  } catch (error) {
-    console.error("Error fetching case studies from Firebase:", error)
-    console.log("Falling back to static case studies data")
-    return []
-  }
-})
-
 // Function to get case studies filtered by tag
 export const getCaseStudiesByTag = cache(async (tag: string) => {
-  const studies = await getCaseStudiesFromFirebase()
+  const studies = await getCaseStudies()
   return studies.filter((study) => study.tags.includes(tag))
 })
 
 // Function to get case studies involving a specific personality type
 export const getCaseStudiesByType = cache(async (typeCode: string) => {
-  const studies = await getCaseStudiesFromFirebase()
+  const studies = await getCaseStudies()
   return studies.filter((study) => study.type1 === typeCode || study.type2 === typeCode)
-})
-
-// Function to get career database from Firebase
-export const getCareerDatabaseFromFirebase = cache(async () => {
-  try {
-    return await fetchFromFirebase<any[]>("/career-database")
-  } catch (error) {
-    console.error("Error fetching career database from Firebase:", error)
-    console.log("Falling back to static career database")
-    return []
-  }
-})
-
-// Function to get careers suitable for a specific personality type
-export const getCareersForType = cache(async (typeCode: string) => {
-  const careers = await getCareerDatabaseFromFirebase()
-  return careers.filter((career) => career.suitableTypes?.includes(typeCode) || career.goodFitTypes?.includes(typeCode))
 })
 
 // Function to initialize the database with static data

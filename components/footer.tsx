@@ -1,6 +1,78 @@
+import { memo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Mail, Twitter, Instagram, Linkedin } from "lucide-react"
+
+// Memoized footer link component
+const FooterLink = memo<{ href: string; children: React.ReactNode }>(({ href, children }) => (
+  <li>
+    <Link href={href} className="text-rose-100 hover:text-white transition-colors flex items-center">
+      <span className="hover:translate-x-1 transition-transform inline-block">{children}</span>
+    </Link>
+  </li>
+))
+
+FooterLink.displayName = 'FooterLink'
+
+// Memoized social media link component
+const SocialLink = memo<{ href: string; icon: React.ReactNode; label: string }>(({ href, icon, label }) => (
+  <a href={href} className="bg-rose-700/50 hover:bg-rose-600 p-2 rounded-full transition-colors">
+    {icon}
+    <span className="sr-only">{label}</span>
+  </a>
+))
+
+SocialLink.displayName = 'SocialLink'
+
+// Memoized footer section component
+const FooterSection = memo<{ title: string; children: React.ReactNode }>(({ title, children }) => (
+  <div className="space-y-4">
+    <h4 className="font-bold text-lg border-b border-rose-700 pb-2 mb-4">{title}</h4>
+    <ul className="space-y-3">
+      {children}
+    </ul>
+  </div>
+))
+
+FooterSection.displayName = 'FooterSection'
+
+// Memoized newsletter component
+const NewsletterSignup = memo(() => (
+  <div>
+    <h4 className="font-bold text-lg border-b border-rose-700 pb-2 mb-4">Stay Connected</h4>
+    <p className="text-rose-100 mb-4">
+      Join our community and get the latest updates on personality insights.
+    </p>
+
+    <div className="flex space-x-1 mb-6">
+      <input
+        type="email"
+        placeholder="Your email address"
+        className="bg-rose-700/30 border border-rose-700 rounded px-2 py-2 text-white placeholder-rose-300 flex-grow focus:outline-none focus:ring-2 focus:ring-rose-500"
+      />
+      <button className="bg-rose-600 hover:bg-rose-500 transition-colors text-white font-medium px-4 py-2 rounded-r-md">
+        Subscribe
+      </button>
+    </div>
+  </div>
+))
+
+NewsletterSignup.displayName = 'NewsletterSignup'
+
+// Memoized social media section
+const SocialMediaSection = memo(() => (
+  <div>
+    <h4 className="font-medium mb-3">Follow Us</h4>
+    <div className="flex space-x-4">
+      <SocialLink href="#" icon={<Twitter size={20} className="text-white" />} label="Twitter" />
+      <SocialLink href="#" icon={<Instagram size={20} className="text-white" />} label="Instagram" />
+      <SocialLink href="#" icon={<Linkedin size={20} className="text-white" />} label="LinkedIn" />
+      <SocialLink href="/contact" icon={<Mail size={20} className="text-white" />} label="Contact" />
+    </div>
+  </div>
+))
+
+SocialMediaSection.displayName = 'SocialMediaSection'
 
 export default function Footer() {
   return (
@@ -24,135 +96,32 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="md:col-span-2 space-y-4">
-            <h4 className="font-bold text-lg border-b border-rose-700 pb-2 mb-4">Explore</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Home</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/quiz" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Take the Test</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/enneagram-test"
-                  className="text-rose-100 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="hover:translate-x-1 transition-transform inline-block">Enneagram Test</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/types" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Personality Types</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/visualization"
-                  className="text-rose-100 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="hover:translate-x-1 transition-transform inline-block">Visualizations</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/entrepreneurs"
-                  className="text-rose-100 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="hover:translate-x-1 transition-transform inline-block">Entrepreneur Types</span>
-                </Link>
-              </li>
-            </ul>
+          <div className="md:col-span-2">
+            <FooterSection title="Explore">
+              <FooterLink href="/">Home</FooterLink>
+              <FooterLink href="/quiz">Take the Test</FooterLink>
+              <FooterLink href="/enneagram-test">Enneagram Test</FooterLink>
+              <FooterLink href="/types">Personality Types</FooterLink>
+              <FooterLink href="/visualization">Visualizations</FooterLink>
+              <FooterLink href="/entrepreneurs">Entrepreneur Types</FooterLink>
+            </FooterSection>
           </div>
 
-          <div className="md:col-span-2 space-y-4">
-            <h4 className="font-bold text-lg border-b border-rose-700 pb-2 mb-4">Resources</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/blog" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Blog</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/enneagram" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Enneagram</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/careers" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Career Matches</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/relationships"
-                  className="text-rose-100 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="hover:translate-x-1 transition-transform inline-block">Relationships</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/learning" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">Learning</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">FAQ</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-rose-100 hover:text-white transition-colors flex items-center">
-                  <span className="hover:translate-x-1 transition-transform inline-block">About</span>
-                </Link>
-              </li>
-            </ul>
+          <div className="md:col-span-2">
+            <FooterSection title="Resources">
+              <FooterLink href="/blog">Blog</FooterLink>
+              <FooterLink href="/enneagram">Enneagram</FooterLink>
+              <FooterLink href="/careers">Career Matches</FooterLink>
+              <FooterLink href="/relationships">Relationships</FooterLink>
+              <FooterLink href="/learning">Learning</FooterLink>
+              <FooterLink href="/faq">FAQ</FooterLink>
+              <FooterLink href="/about">About</FooterLink>
+            </FooterSection>
           </div>
 
           <div className="md:col-span-4 space-y-6">
-            <div>
-              <h4 className="font-bold text-lg border-b border-rose-700 pb-2 mb-4">Stay Connected</h4>
-              <p className="text-rose-100 mb-4">
-                Join our community and get the latest updates on personality insights.
-              </p>
-
-              <div className="flex space-x-1 mb-6">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="bg-rose-700/30 border border-rose-700 rounded px-2 py-2 text-white placeholder-rose-300 flex-grow focus:outline-none focus:ring-2 focus:ring-rose-500"
-                />
-                <button className="bg-rose-600 hover:bg-rose-500 transition-colors text-white font-medium px-4 py-2 rounded-r-md">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-3">Follow Us</h4>
-              <div className="flex space-x-4">
-                <a href="#" className="bg-rose-700/50 hover:bg-rose-600 p-2 rounded-full transition-colors">
-                  <Twitter size={20} className="text-white" />
-                  <span className="sr-only">Twitter</span>
-                </a>
-                <a href="#" className="bg-rose-700/50 hover:bg-rose-600 p-2 rounded-full transition-colors">
-                  <Instagram size={20} className="text-white" />
-                  <span className="sr-only">Instagram</span>
-                </a>
-                <a href="#" className="bg-rose-700/50 hover:bg-rose-600 p-2 rounded-full transition-colors">
-                  <Linkedin size={20} className="text-white" />
-                  <span className="sr-only">LinkedIn</span>
-                </a>
-                <a href="/contact" className="bg-rose-700/50 hover:bg-rose-600 p-2 rounded-full transition-colors">
-                  <Mail size={20} className="text-white" />
-                  <span className="sr-only">Contact</span>
-                </a>
-              </div>
-            </div>
+            <NewsletterSignup />
+            <SocialMediaSection />
           </div>
         </div>
 

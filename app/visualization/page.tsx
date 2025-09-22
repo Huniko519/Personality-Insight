@@ -1,17 +1,19 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback, memo } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
-import { Info, Download, Share2, ChevronRight, ChevronLeft, BarChart2 } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import SocialShare from "@/components/social-share"
 import { getPersonalityExplanations, getAllPersonalityTypes, getEnneagramTypes } from "@/lib/firebase"
+
+// Import optimized components
+import VisualizationHeader from "./components/visualization-header"
+import VisualizationControls from "./components/visualization-controls"
+import VisualizationMain from "./components/visualization-main"
+import VisualizationHelp from "./components/visualization-help"
 
 // Use dynamic import with no SSR for the comparison component
 const ComparisonView = dynamic(() => import("@/components/comparison-view"), {
@@ -206,90 +208,7 @@ export default function VisualizationPage() {
     enneagramTypes,
   ])
 
-  // Handle canvas mouse events
-  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return
 
-    if (selectedVisualization !== "type-wheel" && selectedVisualization !== "enneagram-rings") return
-
-    const canvas = canvasRef.current
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    if (selectedVisualization === "type-wheel") {
-      let hovered: string | null = null
-
-      // Check if mouse is over any type segment
-      Object.entries(typePositions).forEach(([type, position]) => {
-        const dx = x - position.x
-        const dy = y - position.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        if (distance <= position.radius) {
-          hovered = type
-        }
-      })
-
-      if (hovered !== hoveredType) {
-        setHoveredType(hovered)
-        canvas.style.cursor = hovered ? "pointer" : "default"
-      }
-    } else if (selectedVisualization === "enneagram-rings") {
-      let hovered: string | null = null
-
-      // Check if mouse is over any enneagram type
-      Object.entries(enneagramTypePositions).forEach(([type, position]) => {
-        const dx = x - position.x
-        const dy = y - position.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        if (distance <= position.radius) {
-          hovered = type
-        }
-      })
-
-      if (hovered !== hoveredEnneagramType) {
-        setHoveredEnneagramType(hovered)
-        canvas.style.cursor = hovered ? "pointer" : "default"
-      }
-    }
-  }
-
-  const handleCanvasMouseLeave = () => {
-    setHoveredType(null)
-    setHoveredEnneagramType(null)
-    if (canvasRef.current) {
-      canvasRef.current.style.cursor = "default"
-    }
-  }
-
-  const handleCanvasClick = () => {
-    if (selectedVisualization === "type-wheel" && hoveredType) {
-      router.push(`/types/${hoveredType}`)
-    } else if (selectedVisualization === "enneagram-rings" && hoveredEnneagramType) {
-      // You can add navigation to enneagram type details page if you have one
-      // For now, just select the type
-      setSelectedEnneagramType(hoveredEnneagramType)
-    }
-  }
-
-  // Function to download the visualization as an image
-  const downloadVisualization = () => {
-    if (!canvasRef.current && selectedVisualization !== "comparison") return
-
-    if (canvasRef.current) {
-      const canvas = canvasRef.current
-      const image = canvas.toDataURL("image/png")
-      const link = document.createElement("a")
-      link.href = image
-      link.download = `personality-${selectedVisualization}.png`
-      link.click()
-    } else {
-      // For comparison, take a screenshot of the page
-      alert("Download functionality for comparison is not available in this preview.")
-    }
-  }
 
   // Function to draw the type wheel with enhanced styling
   const drawTypeWheel = (
@@ -1594,31 +1513,111 @@ export default function VisualizationPage() {
   }
 
   // Handle dimension slider change
-  const handleDimensionChange = (value: string) => {
+  const handleDimensionChange = useCallback((value: string) => {
     setSelectedDimension(value)
     setDimensionValue(50) // Reset slider when changing dimension
-  }
+  }, [setSelectedDimension, setDimensionValue])
 
   // Handle slider value change
-  const handleSliderChange = (direction: "left" | "right") => {
+  const handleSliderChange = useCallback((direction: "left" | "right") => {
     if (direction === "left") {
       setDimensionValue(Math.max(0, dimensionValue - 10))
     } else {
       setDimensionValue(Math.min(100, dimensionValue + 10))
     }
-  }
+  }, [dimensionValue, setDimensionValue])
+
+  // Handle canvas mouse events
+  const handleCanvasMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!canvasRef.current) return
+
+    if (selectedVisualization !== "type-wheel" && selectedVisualization !== "enneagram-rings") return
+
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    if (selectedVisualization === "type-wheel") {
+      let hovered: string | null = null
+
+      // Check if mouse is over any type segment
+      Object.entries(typePositions).forEach(([type, position]) => {
+        const dx = x - position.x
+        const dy = y - position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        if (distance <= position.radius) {
+          hovered = type
+        }
+      })
+
+      if (hovered !== hoveredType) {
+        setHoveredType(hovered)
+        canvas.style.cursor = hovered ? "pointer" : "default"
+      }
+    } else if (selectedVisualization === "enneagram-rings") {
+      let hovered: string | null = null
+
+      // Check if mouse is over any enneagram type
+      Object.entries(enneagramTypePositions).forEach(([type, position]) => {
+        const dx = x - position.x
+        const dy = y - position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        if (distance <= position.radius) {
+          hovered = type
+        }
+      })
+
+      if (hovered !== hoveredEnneagramType) {
+        setHoveredEnneagramType(hovered)
+        canvas.style.cursor = hovered ? "pointer" : "default"
+      }
+    }
+  }, [selectedVisualization, typePositions, hoveredType, enneagramTypePositions, hoveredEnneagramType, setHoveredType, setHoveredEnneagramType])
+
+  const handleCanvasMouseLeave = useCallback(() => {
+    setHoveredType(null)
+    setHoveredEnneagramType(null)
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = "default"
+    }
+  }, [setHoveredType, setHoveredEnneagramType])
+
+  const handleCanvasClick = useCallback(() => {
+    if (selectedVisualization === "type-wheel" && hoveredType) {
+      router.push(`/types/${hoveredType}`)
+    } else if (selectedVisualization === "enneagram-rings" && hoveredEnneagramType) {
+      // You can add navigation to enneagram type details page if you have one
+      // For now, just select the type
+      setSelectedEnneagramType(hoveredEnneagramType)
+    }
+  }, [selectedVisualization, hoveredType, hoveredEnneagramType, router, setSelectedEnneagramType])
+
+  // Function to download the visualization as an image
+  const downloadVisualization = useCallback(() => {
+    if (!canvasRef.current && selectedVisualization !== "comparison") return
+
+    if (canvasRef.current) {
+      const canvas = canvasRef.current
+      const image = canvas.toDataURL("image/png")
+      const link = document.createElement("a")
+      link.href = image
+      link.download = `personality-${selectedVisualization}.png`
+      link.click()
+    } else {
+      // For comparison, take a screenshot of the page
+      alert("Download functionality for comparison is not available in this preview.")
+    }
+  }, [selectedVisualization])
 
   return (
     <>
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 dark:from-rose-950 dark:to-rose-900 py-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 animate-fade-in">
-            <h1 className="text-4xl font-bold text-rose-800 dark:text-rose-200 mb-4">Interactive Type Visualization</h1>
-            <p className="text-xl text-rose-700 dark:text-rose-300 max-w-3xl mx-auto">
-              Explore personality types through interactive visualizations
-            </p>
-          </div>
+          <VisualizationHeader />
 
           {error ? (
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8">
@@ -1632,428 +1631,45 @@ export default function VisualizationPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-              <Card className="lg:col-span-1 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-left">
-                <CardHeader>
-                  <CardTitle className="text-rose-800 dark:text-rose-200">Visualization Options</CardTitle>
-                  <CardDescription className="dark:text-rose-300">Select a visualization type</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                      Visualization Type
-                    </label>
-                    <Select value={selectedVisualization} onValueChange={setSelectedVisualization}>
-                      <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                        <SelectValue placeholder="Select visualization" />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                        <SelectItem value="type-wheel">Type Wheel</SelectItem>
-                        <SelectItem value="cognitive-functions">Cognitive Functions</SelectItem>
-                        <SelectItem value="dimension-spectrum">Dimension Spectrum</SelectItem>
-                        <SelectItem value="comparison">Type Comparison</SelectItem>
-                        <SelectItem value="enneagram-rings">Enneagram Rings</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <VisualizationControls
+                selectedVisualization={selectedVisualization}
+                setSelectedVisualization={setSelectedVisualization}
+                selectedType={selectedType}
+                setSelectedType={setSelectedType}
+                selectedEnneagramType={selectedEnneagramType}
+                setSelectedEnneagramType={setSelectedEnneagramType}
+                selectedDimension={selectedDimension}
+                setSelectedDimension={setSelectedDimension}
+                dimensionValue={dimensionValue}
+                setDimensionValue={setDimensionValue}
+                showShareOptions={showShareOptions}
+                setShowShareOptions={setShowShareOptions}
+                downloadVisualization={downloadVisualization}
+                isLoading={isLoading}
+                isLoadingEnneagram={isLoadingEnneagram}
+                personalityTypes={personalityTypes}
+                enneagramTypes={enneagramTypes}
+              />
 
-                  {selectedVisualization === "enneagram-rings" ? (
-                    <div>
-                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                        Enneagram Type
-                      </label>
-                      <Select value={selectedEnneagramType} onValueChange={setSelectedEnneagramType}>
-                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                          <SelectValue placeholder="Select type (optional)" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                          <SelectItem value="none">None</SelectItem>
-                          {!isLoadingEnneagram &&
-                            Object.keys(enneagramTypes).map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type} - {enneagramTypes[type].name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  ) : selectedVisualization !== "comparison" && selectedVisualization !== "dimension-spectrum" ? (
-                    <div>
-                      <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                        Personality Type
-                      </label>
-                      <Select value={selectedType} onValueChange={setSelectedType}>
-                        <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                          <SelectValue placeholder="Select type (optional)" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                          {selectedVisualization === "cognitive-functions" ? null : (
-                            <SelectItem value="none">None</SelectItem>
-                          )}
-                          {!isLoading &&
-                            Object.keys(personalityTypes).map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type} - {personalityTypes[type].name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  ) : selectedVisualization === "dimension-spectrum" ? (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                          Select Dimension
-                        </label>
-                        <Select value={selectedDimension} onValueChange={handleDimensionChange}>
-                          <SelectTrigger className="border-rose-200 dark:border-rose-800 dark:bg-rose-900 dark:text-rose-200">
-                            <SelectValue placeholder="Select dimension" />
-                          </SelectTrigger>
-                          <SelectContent className="dark:bg-rose-900 dark:border-rose-800">
-                            <SelectItem value="EI">Extraversion vs. Introversion</SelectItem>
-                            <SelectItem value="SN">Sensing vs. Intuition</SelectItem>
-                            <SelectItem value="TF">Thinking vs. Feeling</SelectItem>
-                            <SelectItem value="JP">Judging vs. Perceiving</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="pt-2">
-                        <label className="block text-sm font-medium text-rose-700 dark:text-rose-300 mb-2">
-                          Adjust Preference
-                        </label>
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
-                            {selectedDimension[0]}
-                          </div>
-                          <div className="flex-1 mx-4">
-                            <div className="relative h-4 bg-rose-100 dark:bg-rose-800/50 rounded-full overflow-hidden shadow-inner">
-                              <div
-                                className="absolute h-4 bg-gradient-to-r from-rose-300 via-rose-400 to-rose-500 dark:from-rose-400 dark:via-rose-500 dark:to-rose-600 rounded-full"
-                                style={{ width: `${dimensionValue}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div className="text-sm font-medium text-rose-700 dark:text-rose-300">
-                            {selectedDimension[1]}
-                          </div>
-                        </div>
-                        <div className="flex justify-between mt-3">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSliderChange("left")}
-                            className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSliderChange("right")}
-                            className="border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="pt-4 border-t border-rose-100 dark:border-rose-800">
-                    <Button
-                      onClick={downloadVisualization}
-                      variant="outline"
-                      className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Image
-                    </Button>
-                  </div>
-
-                  <div>
-                    <Button
-                      onClick={() => setShowShareOptions(!showShareOptions)}
-                      variant="outline"
-                      className="w-full border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-800"
-                    >
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Share Visualization
-                    </Button>
-
-                    {showShareOptions && (
-                      <div className="mt-4 p-3 bg-white dark:bg-rose-900 rounded-md border border-rose-200 dark:border-rose-800 animate-fade-in">
-                        <SocialShare
-                          title="Personality Type Visualization"
-                          text={`Check out this ${selectedVisualization} visualization for ${selectedType === "none" ? "personality types" : selectedType} on PersonaIQ!`}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="lg:col-span-3 border-rose-200 dark:border-rose-800 shadow-md animate-slide-in-right">
-                <CardHeader>
-                  <CardTitle className="text-rose-800 dark:text-rose-200">
-                    {selectedVisualization === "type-wheel" && "MBTI Type Wheel"}
-                    {selectedVisualization === "cognitive-functions" && "Cognitive Functions"}
-                    {selectedVisualization === "dimension-spectrum" && "Personality Dimensions"}
-                    {selectedVisualization === "comparison" && "Personality Type Comparison"}
-                    {selectedVisualization === "enneagram-rings" && "Enneagram Personality System"}
-                  </CardTitle>
-                  <CardDescription className="dark:text-rose-300">
-                    {selectedVisualization === "type-wheel" && "Visual representation of all 16 personality types"}
-                    {selectedVisualization === "cognitive-functions" &&
-                      "How different functions stack in a personality type"}
-                    {selectedVisualization === "dimension-spectrum" &&
-                      "The four dimensions that define personality type"}
-                    {selectedVisualization === "comparison" &&
-                      "Compare traits and compatibility between personality types"}
-                    {selectedVisualization === "enneagram-rings" &&
-                      "Visual representation of the nine Enneagram personality types"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {isLoading || isLoadingEnneagram ? (
-                    <div className="flex items-center justify-center h-[500px] bg-white rounded-lg border border-slate-200">
-                      <div className="text-center">
-                        <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600"></div>
-                        <p className="mt-4 text-lg text-slate-800 font-medium">Loading Visualization...</p>
-                      </div>
-                    </div>
-                  ) : (
-                    ["type-wheel", "cognitive-functions", "dimension-spectrum", "enneagram-rings"].includes(
-                      selectedVisualization,
-                    ) && (
-                      <div
-                        className={`bg-white dark:bg-rose-900/50 rounded-lg p-4 flex justify-center ${
-                          selectedVisualization === "dimension-spectrum"
-                            ? "dimension-spectrum-container"
-                            : selectedVisualization === "type-wheel"
-                              ? "type-wheel-container"
-                              : "canvas-container"
-                        }`}
-                      >
-                        <canvas
-                          ref={canvasRef}
-                          width={canvasSize.width}
-                          height={canvasSize.height}
-                          className="max-w-full h-auto border border-rose-200 dark:border-rose-800 rounded-lg shadow-md transition-all duration-300"
-                          onMouseMove={handleCanvasMouseMove}
-                          onMouseLeave={handleCanvasMouseLeave}
-                          onClick={handleCanvasClick}
-                        />
-                      </div>
-                    )
-                  )}
-
-                  {selectedVisualization === "comparison" && <ComparisonView />}
-
-                  {selectedVisualization === "type-wheel" && (
-                    <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 flex items-start animate-fade-in">
-                      <Info className="h-5 w-5 text-rose-600 dark:text-rose-400 mr-2 mt-0.5 flex-shrink-0" />
-                      <p className="text-rose-700 dark:text-rose-300 text-sm">
-                        <strong>Tip:</strong> Click on any personality type in the wheel to view detailed information
-                        about that type. Hover over a type to highlight it.
-                      </p>
-                    </div>
-                  )}
-
-                  {selectedVisualization === "cognitive-functions" && selectedType && selectedType !== "none" && (
-                    <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
-                      <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
-                        About {selectedType} Cognitive Functions
-                      </h3>
-                      <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
-                        Each personality type has a unique pattern of cognitive functions that influences how they
-                        perceive the world and make decisions. The dominant function is the most developed and
-                        consciously used, while the inferior function is often less developed.
-                      </p>
-                      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                            Dominant & Auxiliary:
-                          </span>
-                          <span className="text-rose-600 dark:text-rose-400">
-                            These are your primary ways of interacting with the world. They're well-developed and you
-                            use them consciously.
-                          </span>
-                        </div>
-                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                            Tertiary & Inferior:
-                          </span>
-                          <span className="text-rose-600 dark:text-rose-400">
-                            These functions are less developed and may emerge in times of stress or as areas for
-                            personal growth.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedVisualization === "dimension-spectrum" && (
-                    <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
-                      <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg">
-                        Understanding {selectedDimension[0]} vs {selectedDimension[1]}
-                      </h3>
-                      <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
-                        {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].description}
-                      </p>
-                      <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                            {selectedDimension[0]}:
-                          </span>
-                          <span className="text-rose-600 dark:text-rose-400">
-                            {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].left}
-                          </span>
-                        </div>
-                        <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                          <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                            {selectedDimension[1]}:
-                          </span>
-                          <span className="text-rose-600 dark:text-rose-400">
-                            {dimensionExplanations[selectedDimension as keyof typeof dimensionExplanations].right}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedVisualization === "enneagram-rings" &&
-                    selectedEnneagramType &&
-                    selectedEnneagramType !== "none" && (
-                      <div className="mt-4 p-5 bg-gradient-to-r from-rose-50 via-rose-50/80 to-rose-50 dark:from-rose-900/50 dark:via-rose-900/40 dark:to-rose-900/50 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm animate-fade-in">
-                        <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-3 text-lg flex items-center">
-                          <span className="inline-flex justify-center items-center w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-800 text-rose-600 dark:text-rose-300 mr-2">
-                            {selectedEnneagramType}
-                          </span>
-                          {enneagramTypes[selectedEnneagramType].name}
-                        </h3>
-
-                        <div className="mb-4">
-                          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-800 dark:text-rose-100 mr-2">
-                            {enneagramTypes[selectedEnneagramType].center} Center
-                          </span>
-                          {enneagramTypes[selectedEnneagramType].keywords.map((keyword: string, index: number) => (
-                            <span
-                              key={index}
-                              className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 dark:bg-rose-900 dark:text-rose-200 mr-2 mb-1"
-                            >
-                              {keyword}
-                            </span>
-                          ))}
-                        </div>
-
-                        <p className="text-rose-700 dark:text-rose-300 text-sm leading-relaxed">
-                          {enneagramTypes[selectedEnneagramType].description}
-                        </p>
-
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                          <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                            <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">Wings:</span>
-                            {Object.entries(enneagramTypes[selectedEnneagramType].wings).map(
-                              ([wing, description]: [string, any]) => (
-                                <div key={wing} className="mb-2">
-                                  <span className="text-rose-600 dark:text-rose-400 font-medium">{description}</span>
-                                </div>
-                              ),
-                            )}
-                          </div>
-                          <div className="p-3 bg-rose-100/50 dark:bg-rose-900/30 rounded-lg">
-                            <span className="font-bold text-rose-700 dark:text-rose-300 block mb-1">
-                              Growth & Stress:
-                            </span>
-                            <div className="mb-2">
-                              <span className="text-green-600 dark:text-green-400 font-medium">Growth Path: </span>
-                              <span className="text-rose-600 dark:text-rose-400">
-                                Type {enneagramTypes[selectedEnneagramType].growth} -{" "}
-                                {enneagramTypes[enneagramTypes[selectedEnneagramType].growth].name}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-red-600 dark:text-red-400 font-medium">Stress Path: </span>
-                              <span className="text-rose-600 dark:text-rose-400">
-                                Type {enneagramTypes[selectedEnneagramType].stress} -{" "}
-                                {enneagramTypes[enneagramTypes[selectedEnneagramType].stress].name}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 text-center">
-                          <a
-                            href="/enneagram"
-                            className="text-rose-600 dark:text-rose-300 hover:text-rose-800 dark:hover:text-rose-100 underline text-sm"
-                          >
-                            Learn more about Enneagram Type {selectedEnneagramType}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                </CardContent>
-              </Card>
+              <VisualizationMain
+                selectedVisualization={selectedVisualization}
+                canvasRef={canvasRef}
+                canvasSize={canvasSize}
+                handleCanvasMouseMove={handleCanvasMouseMove}
+                handleCanvasMouseLeave={handleCanvasMouseLeave}
+                handleCanvasClick={handleCanvasClick}
+                selectedType={selectedType}
+                selectedEnneagramType={selectedEnneagramType}
+                enneagramTypes={enneagramTypes}
+                dimensionExplanations={dimensionExplanations}
+                selectedDimension={selectedDimension}
+                isLoading={isLoading}
+                isLoadingEnneagram={isLoadingEnneagram}
+              />
             </div>
           )}
 
-          <Card className="border-rose-200 dark:border-rose-800 shadow-md mb-8 animate-slide-up">
-            <CardHeader>
-              <CardTitle className="text-rose-800 dark:text-rose-200">Understanding the Visualizations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2">Type Wheel</h3>
-                <p className="text-rose-700 dark:text-rose-300">
-                  The Type Wheel shows all 16 personality types arranged in a circle. Types are grouped by their
-                  dominant cognitive functions, with similar types positioned near each other. Select a type to
-                  highlight it on the wheel or click directly on a type to view its detailed profile.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2">Cognitive Functions</h3>
-                <p className="text-rose-700 dark:text-rose-300">
-                  This visualization shows the cognitive function stack for a selected personality type. The functions
-                  are displayed in order of preference, from dominant to inferior. Each personality type has a unique
-                  pattern of cognitive functions that influences how they perceive the world and make decisions.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2">Dimension Spectrum</h3>
-                <p className="text-rose-700 dark:text-rose-300">
-                  The Dimension Spectrum shows the four key dimensions that define personality type:
-                  Extraversion-Introversion, Sensing-Intuition, Thinking-Feeling, and Judging-Perceiving. Your
-                  preferences along these dimensions determine your four-letter type code. Use the interactive controls
-                  to explore each dimension in detail.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2 flex items-center">
-                  <BarChart2 className="h-4 w-4 mr-2" />
-                  Type Comparison
-                </h3>
-                <p className="text-rose-700 dark:text-rose-300">
-                  The comparison view allows you to select two personality types and see a detailed analysis of their
-                  similarities, differences, and compatibility. This is useful for understanding relationship dynamics,
-                  team interactions, and personal growth opportunities through complementary traits.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-rose-800 dark:text-rose-200 mb-2">Enneagram Rings</h3>
-                <p className="text-rose-700 dark:text-rose-300">
-                  The Enneagram is a system of personality typing that describes patterns in how people interpret the
-                  world and manage their emotions. The nine Enneagram types are arranged in a circular diagram and
-                  grouped into three Centers of Intelligence: Instinctive (Types 8, 9, 1), Feeling (Types 2, 3, 4), and
-                  Thinking (Types 5, 6, 7). Each type has two adjacent "wings" that influence their personality, and
-                  paths of growth and stress that show how they behave under different conditions.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <VisualizationHelp />
         </div>
       </div>
       <Footer />

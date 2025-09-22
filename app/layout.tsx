@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { memo } from "react"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { AuthProvider } from "@/lib/auth"
 import "./globals.css"
@@ -16,6 +17,27 @@ export const metadata: Metadata = {
   generator: "Mr. Huniko",
 }
 
+// Memoized head component
+const HeadContent = memo(() => (
+  <head>
+    <link rel="icon" href="/favicon.png" />
+  </head>
+))
+
+HeadContent.displayName = 'HeadContent'
+
+// Memoized body content component
+const BodyContent = memo<{ children: React.ReactNode }>(({ children }) => (
+  <body className={inter.className}>
+    <AuthProvider>
+      <ScrollToTop />
+      {children}
+    </AuthProvider>
+  </body>
+))
+
+BodyContent.displayName = 'BodyContent'
+
 export default function RootLayout({
   children,
 }: {
@@ -23,15 +45,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" webcrx="">
-      <head>
-        <link rel="icon" href="/favicon.png" />
-      </head>
-      <body className={inter.className}>
-        <AuthProvider>
-          <ScrollToTop />
-          {children}
-        </AuthProvider>
-      </body>
+      <HeadContent />
+      <BodyContent>{children}</BodyContent>
     </html>
   )
 }

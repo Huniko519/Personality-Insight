@@ -1,5 +1,8 @@
+import { memo } from "react"
 import { Loading } from "@/components/loading"
 
-export default function QuizLoading() {
-  return <Loading />
-}
+const QuizLoading = memo(() => <Loading />)
+
+QuizLoading.displayName = 'QuizLoading'
+
+export default QuizLoading

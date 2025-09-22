@@ -1,60 +1,72 @@
 "use client"
 import Link from "next/link"
-import { LogIn, LogOut } from "lucide-react"
+import { LogIn, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
+import { memo, useCallback } from "react"
+
+// Memoized profile link component
+const ProfileLink = memo<{ displayName?: string }>(({ displayName }) => (
+  <Link
+    href="/profile"
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 border border-rose-300/50"
+  >
+    <User className="w-4 h-4" />
+    {displayName || "Profile"}
+  </Link>
+))
+
+ProfileLink.displayName = 'ProfileLink'
+
+// Memoized sign out button component
+const SignOutButton = memo<{ onSignOut: () => void }>(({ onSignOut }) => (
+  <Button
+    onClick={onSignOut}
+    className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+  >
+    <LogOut className="w-4 h-4" />
+    Sign Out
+  </Button>
+))
+
+SignOutButton.displayName = 'SignOutButton'
+
+// Memoized sign in button component
+const SignInButton = memo(() => (
+  <Link href="/auth/signin">
+    <Button className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+      <LogIn className="w-4 h-4 mr-2" />
+      Sign In
+    </Button>
+  </Link>
+))
+
+SignInButton.displayName = 'SignInButton'
+
+// Memoized authenticated user section
+const AuthenticatedUser = memo<{ user: any; onSignOut: () => void }>(({ user, onSignOut }) => (
+  <div className="flex items-center gap-2">
+    <ProfileLink displayName={user.displayName} />
+    <SignOutButton onSignOut={onSignOut} />
+  </div>
+))
+
+AuthenticatedUser.displayName = 'AuthenticatedUser'
 
 export function AuthButtons() {
   const { user, signOut } = useAuth()
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     try {
       await signOut()
     } catch (error) {
       console.error("Sign out error:", error)
     }
-  }
+  }, [signOut])
 
   if (user) {
-    return (
-      <div className="flex items-center gap-2">
-        <Link
-          href="/profile"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-100 to-rose-200 hover:from-rose-200 hover:to-rose-300 text-rose-700 font-medium transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 border border-rose-300/50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-user"
-          >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          {user.displayName || "Profile"}
-        </Link>
-        <Button
-          onClick={handleSignOut}
-          className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
-          <LogOut className="w-4 h-4" />
-          Sign Out
-        </Button>
-      </div>
-    )
+    return <AuthenticatedUser user={user} onSignOut={handleSignOut} />
   }
 
-  return (
-    <Link href="/auth/signin">
-      <Button className="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
-        <LogIn className="w-4 h-4 mr-2" />
-        Sign In
-      </Button>
-    </Link>
-  )
+  return <SignInButton />
 }

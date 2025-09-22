@@ -1,5 +1,8 @@
+import { memo } from "react"
 import { Loading } from "@/components/loading"
 
-export default function ContactLoading() {
-  return <Loading />
-}
+const ContactLoading = memo(() => <Loading />)
+
+ContactLoading.displayName = 'ContactLoading'
+
+export default ContactLoading

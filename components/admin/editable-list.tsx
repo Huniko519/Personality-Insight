@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, memo, useCallback } from "react"
 import { Plus, X, ArrowUp, ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,24 +15,154 @@ interface EditableListProps {
   placeholder?: string
 }
 
+// Memoized add item form component
+const AddItemForm = memo<{
+  newItem: string
+  onNewItemChange: (value: string) => void
+  onAddItem: () => void
+  placeholder?: string
+}>(({ newItem, onNewItemChange, onAddItem, placeholder }) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      onAddItem()
+    }
+  }, [onAddItem])
+
+  return (
+    <div className="flex gap-2 mb-2">
+      <Input
+        value={newItem}
+        onChange={(e) => onNewItemChange(e.target.value)}
+        placeholder={placeholder}
+        onKeyDown={handleKeyDown}
+        className="flex-1"
+      />
+      <Button type="button" onClick={onAddItem}>
+        <Plus className="h-4 w-4 mr-1" />
+        Add
+      </Button>
+    </div>
+  )
+})
+
+AddItemForm.displayName = 'AddItemForm'
+
+// Memoized item actions component
+const ItemActions = memo<{
+  index: number
+  totalItems: number
+  onMoveUp: () => void
+  onMoveDown: () => void
+  onRemove: () => void
+}>(({ index, totalItems, onMoveUp, onMoveDown, onRemove }) => (
+  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onMoveUp}
+      disabled={index === 0}
+      className="h-7 w-7 p-0"
+    >
+      <ArrowUp className="h-4 w-4" />
+    </Button>
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onMoveDown}
+      disabled={index === totalItems - 1}
+      className="h-7 w-7 p-0"
+    >
+      <ArrowDown className="h-4 w-4" />
+    </Button>
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onRemove}
+      className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+    >
+      <X className="h-4 w-4" />
+    </Button>
+  </div>
+))
+
+ItemActions.displayName = 'ItemActions'
+
+// Memoized list item component
+const ListItem = memo<{
+  item: string
+  index: number
+  totalItems: number
+  onMoveUp: () => void
+  onMoveDown: () => void
+  onRemove: () => void
+}>(({ item, index, totalItems, onMoveUp, onMoveDown, onRemove }) => (
+  <li className="flex items-center justify-between group">
+    <Badge className="px-3 py-1.5 bg-white text-slate-800 border hover:bg-white">
+      {item}
+    </Badge>
+    <ItemActions
+      index={index}
+      totalItems={totalItems}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onRemove={onRemove}
+    />
+  </li>
+))
+
+ListItem.displayName = 'ListItem'
+
+// Memoized items list component
+const ItemsList = memo<{
+  items: string[]
+  onMoveItem: (index: number, direction: "up" | "down") => void
+  onRemoveItem: (index: number) => void
+}>(({ items, onMoveItem, onRemoveItem }) => {
+  if (items.length === 0) return null
+
+  return (
+    <div className="border rounded-md bg-slate-50">
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <ListItem
+            key={`${item}-${index}`}
+            item={item}
+            index={index}
+            totalItems={items.length}
+            onMoveUp={() => onMoveItem(index, "up")}
+            onMoveDown={() => onMoveItem(index, "down")}
+            onRemove={() => onRemoveItem(index)}
+          />
+        ))}
+      </ul>
+    </div>
+  )
+})
+
+ItemsList.displayName = 'ItemsList'
+
 export function EditableList({ items = [], onChange, label, placeholder = "Add item..." }: EditableListProps) {
   const [newItem, setNewItem] = useState("")
 
-  const handleAddItem = () => {
+  const handleAddItem = useCallback(() => {
     if (newItem.trim()) {
       const updatedItems = [...items, newItem.trim()]
       onChange(updatedItems)
       setNewItem("")
     }
-  }
+  }, [newItem, items, onChange])
 
-  const handleRemoveItem = (index: number) => {
+  const handleRemoveItem = useCallback((index: number) => {
     const updatedItems = [...items]
     updatedItems.splice(index, 1)
     onChange(updatedItems)
-  }
+  }, [items, onChange])
 
-  const handleMoveItem = (index: number, direction: "up" | "down") => {
+  const handleMoveItem = useCallback((index: number, direction: "up" | "down") => {
     if ((direction === "up" && index === 0) || (direction === "down" && index === items.length - 1)) {
       return
     }
@@ -43,75 +173,28 @@ export function EditableList({ items = [], onChange, label, placeholder = "Add i
     updatedItems[index] = updatedItems[newIndex]
     updatedItems[newIndex] = temp
     onChange(updatedItems)
-  }
+  }, [items, onChange])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      handleAddItem()
-    }
-  }
+  const handleNewItemChange = useCallback((value: string) => {
+    setNewItem(value)
+  }, [])
 
   return (
     <div>
       {label && <Label>{label}</Label>}
 
-      <div className="flex gap-2 mb-2">
-        <Input
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-          placeholder={placeholder}
-          onKeyDown={handleKeyDown}
-          className="flex-1"
-        />
-        <Button type="button" onClick={handleAddItem}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add
-        </Button>
-      </div>
+      <AddItemForm
+        newItem={newItem}
+        onNewItemChange={handleNewItemChange}
+        onAddItem={handleAddItem}
+        placeholder={placeholder}
+      />
 
-      {items.length > 0 && (
-        <div className="border rounded-md bg-slate-50">
-          <ul className="space-y-2">
-            {items.map((item, index) => (
-              <li key={index} className="flex items-center justify-between group">
-                <Badge className="px-3 py-1.5 bg-white text-slate-800 border hover:bg-white">{item}</Badge>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleMoveItem(index, "up")}
-                    disabled={index === 0}
-                    className="h-7 w-7 p-0"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleMoveItem(index, "down")}
-                    disabled={index === items.length - 1}
-                    className="h-7 w-7 p-0"
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemoveItem(index)}
-                    className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <ItemsList
+        items={items}
+        onMoveItem={handleMoveItem}
+        onRemoveItem={handleRemoveItem}
+      />
     </div>
   )
 }

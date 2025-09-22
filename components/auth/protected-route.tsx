@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect } from "react"
+import { useEffect, memo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { Loading } from "@/components/loading"
@@ -11,15 +11,26 @@ interface ProtectedRouteProps {
   redirectTo?: string
 }
 
+// Memoized protected route content
+const ProtectedContent = memo<{ children: React.ReactNode }>(({ children }) => (
+  <>{children}</>
+))
+
+ProtectedContent.displayName = 'ProtectedContent'
+
 export function ProtectedRoute({ children, redirectTo = "/" }: ProtectedRouteProps) {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  useEffect(() => {
+  const handleRedirect = useCallback(() => {
     if (!loading && !user) {
       router.push(redirectTo)
     }
   }, [user, loading, router, redirectTo])
+
+  useEffect(() => {
+    handleRedirect()
+  }, [handleRedirect])
 
   if (loading) {
     return <Loading />
@@ -29,5 +40,5 @@ export function ProtectedRoute({ children, redirectTo = "/" }: ProtectedRoutePro
     return null
   }
 
-  return <>{children}</>
+  return <ProtectedContent>{children}</ProtectedContent>
 }

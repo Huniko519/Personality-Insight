@@ -1,5 +1,8 @@
+import { memo } from "react"
 import { Loading } from "@/components/loading"
 
-export default function HomeLoading() {
-  return <Loading />
-}
+const HomeLoading = memo(() => <Loading />)
+
+HomeLoading.displayName = 'HomeLoading'
+
+export default HomeLoading
